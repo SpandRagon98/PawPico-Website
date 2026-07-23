@@ -2,6 +2,9 @@
 
 import { useState, type ReactNode } from "react";
 
+const publicBasePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
+const publicAsset = (path: string) => `${publicBasePath}${path}`;
+
 const films = [
   {
     id: "physics",
@@ -291,7 +294,7 @@ function PixelIcon({ children }: { children: ReactNode }) {
 function Brand() {
   return (
     <span className="brand-lockup">
-      <img className="brand-logo" src="/pawpico-face-logo.png" alt="" aria-hidden="true" />
+      <img className="brand-logo" src={publicAsset("/pawpico-face-logo.png")} alt="" aria-hidden="true" />
       <span><strong>PawPico</strong><small>DESKTOP CAT</small></span>
     </span>
   );
@@ -349,10 +352,10 @@ export default function Home() {
                 muted
                 playsInline
                 preload="auto"
-                poster="/pawpico-hero.png"
+                poster={publicAsset("/pawpico-hero.png")}
                 aria-label="PawPico stays seated while cheering, singing, listening to music, licking a paw, and getting tired"
               >
-                <source src="/pawpico-idle-reel.mp4" type="video/mp4" />
+                <source src={publicAsset("/pawpico-idle-reel.mp4")} type="video/mp4" />
               </video>
               <span className="scanlines" />
               <span className="screen-chip">IDLE PERSONALITY REEL</span>
@@ -387,7 +390,7 @@ export default function Home() {
           <div className="film-screen">
             <div className="film-titlebar"><span>REEL {film.number} · {film.label.toUpperCase()}</span><Dots /></div>
             <video key={film.video} autoPlay loop muted playsInline controls preload="metadata" aria-label={`${film.label} feature film`}>
-              <source src={film.video} type="video/mp4" />
+              <source src={publicAsset(film.video)} type="video/mp4" />
             </video>
             <span className="scanlines" aria-hidden="true" />
           </div>
@@ -431,7 +434,7 @@ export default function Home() {
           <div className="work-device">
             <div className="work-video-frame">
               <video autoPlay loop muted playsInline controls preload="metadata" aria-label="PawPico Work mode demonstration">
-                <source src="/videos/work-mode.mp4" type="video/mp4" />
+                <source src={publicAsset("/videos/work-mode.mp4")} type="video/mp4" />
               </video>
             </div>
             <div className="work-dials"><span>MODE <b>LOCAL</b></span><i /><span>CAT <b>FOCUSED</b></span></div>
@@ -464,7 +467,7 @@ export default function Home() {
                   <b>{group.count}</b>
                   <span className="drawer-cat-stage">
                     <video autoPlay loop muted playsInline preload="metadata" aria-label={group.previewLabel}>
-                      <source src={group.preview} type="video/mp4" />
+                      <source src={publicAsset(group.preview)} type="video/mp4" />
                     </video>
                   </span>
                 </div>
@@ -496,7 +499,7 @@ export default function Home() {
           </div>
           <div className="emotion-film">
             <video autoPlay loop muted playsInline controls preload="metadata" aria-label="PawPico emotion and sleep feature film">
-              <source src="/videos/rest-and-emotion.mp4" type="video/mp4" />
+              <source src={publicAsset("/videos/rest-and-emotion.mp4")} type="video/mp4" />
             </video>
           </div>
         </div>
@@ -518,7 +521,7 @@ export default function Home() {
           </div>
           <div className="atelier-film">
             <video autoPlay loop muted playsInline controls preload="metadata" aria-label="PawPico customization demonstration">
-              <source src="/videos/customization-studio.mp4" type="video/mp4" />
+              <source src={publicAsset("/videos/customization-studio.mp4")} type="video/mp4" />
             </video>
           </div>
           <div className="wardrobe">
@@ -565,7 +568,7 @@ export default function Home() {
 
       <section className="download section-shell section-pad" id="download">
         <div className="download-card">
-          <img src="/pawpico-face-logo.png" alt="PawPico's orange pixel cat face with enormous glossy green eyes" />
+          <img src={publicAsset("/pawpico-face-logo.png")} alt="PawPico's orange pixel cat face with enormous glossy green eyes" />
           <div><div className="kicker">WINDOWS 10 / 11 · 64-BIT</div><h2>Give your desktop<br /><em>a small, beating heart.</em></h2><p>One cat. Eighty-seven states. No account or subscription required.</p></div>
           <div className="purchase-block">
             <span className="price-label">ONE-TIME PRICE</span>

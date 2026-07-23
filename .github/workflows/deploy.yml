@@ -1,4 +1,4 @@
-name: Deploy PawPico Website
+name: Deploy PawPico to GitHub Pages
 
 on:
   push:
@@ -7,20 +7,26 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: pawpico-production
-  cancel-in-progress: true
+  group: pages
+  cancel-in-progress: false
 
 permissions:
   contents: read
+  pages: write
+  id-token: write
 
 jobs:
   deploy:
-    name: Build, verify, and deploy
+    name: Build and deploy GitHub Pages
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     env:
-      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      GITHUB_PAGES: "true"
+      NEXT_PUBLIC_BASE_PATH: /${{ github.event.repository.name }}
+      NEXT_PUBLIC_SITE_URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}
 
     steps:
       - name: Check out repository
@@ -35,13 +41,23 @@ jobs:
       - name: Install locked dependencies
         run: npm ci
 
-      - name: Build and verify website
+      - name: Verify website
         run: npm test
 
-      - name: Deploy to Cloudflare Workers
-        if: ${{ env.CLOUDFLARE_API_TOKEN != '' && env.CLOUDFLARE_ACCOUNT_ID != '' }}
-        run: npx wrangler deploy --config dist/server/wrangler.json --name pawpico-website
+      - name: Build static GitHub Pages site
+        run: npm run build:pages
 
-      - name: Explain skipped deployment
-        if: ${{ env.CLOUDFLARE_API_TOKEN == '' || env.CLOUDFLARE_ACCOUNT_ID == '' }}
-        run: echo "::warning::Build passed, but deployment was skipped. Add CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID as repository secrets, then run this workflow again."
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload GitHub Pages artifact
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: ./out
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+      - name: Add public URL to the Actions summary
+        run: echo "### PawPico is live at ${{ steps.deployment.outputs.page_url }}" >> "$GITHUB_STEP_SUMMARY"
