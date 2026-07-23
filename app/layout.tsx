@@ -17,7 +17,7 @@ export async function generateMetadata(): Promise<Metadata> {
     metadataBase: base,
     title,
     description,
-    icons: { icon: "/pawpico-face-logo.png", shortcut: "/pawpico-face-logo.png", apple: "/pawpico-face-logo.png" },
+    icons: { icon: "/pawpico-emblem.png", shortcut: "/pawpico-emblem.png", apple: "/pawpico-emblem.png" },
     openGraph: { title, description, type: "website", images: [{ url: new URL("/og.png", base).toString(), width: 1536, height: 1024, alt: "PawPico, an expressive pixel cat for the Windows desktop" }] },
     twitter: { card: "summary_large_image", title, description, images: [new URL("/og.png", base).toString()] },
   };

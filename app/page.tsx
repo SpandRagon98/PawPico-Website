@@ -1,6 +1,12 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
+
+const palettes = [
+  { id: "orange", label: "Warm orange" },
+  { id: "gray", label: "Soft gray" },
+  { id: "pink", label: "Blush pink" },
+] as const;
 
 const films = [
   {
@@ -273,7 +279,7 @@ function PixelIcon({ children }: { children: ReactNode }) {
 function Brand() {
   return (
     <span className="brand-lockup">
-      <img className="brand-logo" src="/pawpico-face-logo.png" alt="" aria-hidden="true" />
+      <img className="brand-logo" src="/pawpico-emblem.png" alt="" aria-hidden="true" />
       <span><strong>PawPico</strong><small>DESKTOP CAT</small></span>
     </span>
   );
@@ -282,11 +288,20 @@ function Brand() {
 export default function Home() {
   const [activeFilm, setActiveFilm] = useState(0);
   const [activeGroup, setActiveGroup] = useState("all");
+  const [paletteIndex, setPaletteIndex] = useState(0);
   const film = films[activeFilm];
+  const palette = palettes[paletteIndex];
   const visibleGroups = activeGroup === "all" ? featureGroups : featureGroups.filter((group) => group.id === activeGroup);
 
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      setPaletteIndex((current) => (current + 1) % palettes.length);
+    }, 5_000);
+    return () => window.clearInterval(timer);
+  }, []);
+
   return (
-    <main id="top">
+    <main id="top" data-theme={palette.id}>
       <header className="site-header">
         <a className="brand" href="#top" aria-label="PawPico home">
           <Brand />
@@ -303,6 +318,13 @@ export default function Home() {
       <section className="hero section-shell">
         <div className="hero-copy">
           <div className="kicker"><span className="live-dot" /> WINDOWS DESKTOP COMPANION · FULLY LOCAL</div>
+          <div className="theme-cycle" aria-label={`Automatic color theme: ${palette.label}; changes every five seconds`}>
+            <span className="palette-dots" aria-hidden="true">
+              {palettes.map((item, index) => <i className={index === paletteIndex ? "active" : ""} key={item.id} />)}
+            </span>
+            <b>{palette.label}</b>
+            <small>automatic palette · every 5 seconds</small>
+          </div>
           <h1>One tiny cat.<br /><em>An entire inner life.</em></h1>
           <p>
             PawPico walks your windows, watches your cursor, sings when the microphone is live,
@@ -326,6 +348,7 @@ export default function Home() {
             <div className="machine-top"><span>PAWPICO PERSONALITY UNIT · P-01</span><Dots /></div>
             <div className="machine-screen">
               <video
+                className="theme-cat-media"
                 autoPlay
                 loop
                 muted
@@ -368,7 +391,7 @@ export default function Home() {
         <div className="film-console">
           <div className="film-screen">
             <div className="film-titlebar"><span>REEL {film.number} · {film.label.toUpperCase()}</span><Dots /></div>
-            <video key={film.video} autoPlay loop muted playsInline controls preload="metadata" aria-label={`${film.label} feature film`}>
+            <video className="theme-cat-media" key={film.video} autoPlay loop muted playsInline controls preload="metadata" aria-label={`${film.label} feature film`}>
               <source src={film.video} type="video/mp4" />
             </video>
             <span className="scanlines" aria-hidden="true" />
@@ -412,7 +435,7 @@ export default function Home() {
           </div>
           <div className="work-device">
             <div className="work-video-frame">
-              <video autoPlay loop muted playsInline controls preload="metadata" aria-label="PawPico Work mode demonstration">
+              <video className="theme-cat-media" autoPlay loop muted playsInline controls preload="metadata" aria-label="PawPico Work mode demonstration">
                 <source src="/videos/work-mode.mp4" type="video/mp4" />
               </video>
             </div>
@@ -470,7 +493,7 @@ export default function Home() {
             </div>
           </div>
           <div className="emotion-film">
-            <video autoPlay loop muted playsInline controls preload="metadata" aria-label="PawPico emotion and sleep feature film">
+            <video className="theme-cat-media" autoPlay loop muted playsInline controls preload="metadata" aria-label="PawPico emotion and sleep feature film">
               <source src="/videos/rest-and-emotion.mp4" type="video/mp4" />
             </video>
           </div>
@@ -492,7 +515,7 @@ export default function Home() {
             </div>
           </div>
           <div className="atelier-film">
-            <video autoPlay loop muted playsInline controls preload="metadata" aria-label="PawPico customization demonstration">
+            <video className="theme-cat-media" autoPlay loop muted playsInline controls preload="metadata" aria-label="PawPico customization demonstration">
               <source src="/videos/customization-studio.mp4" type="video/mp4" />
             </video>
           </div>
@@ -540,7 +563,7 @@ export default function Home() {
 
       <section className="download section-shell section-pad" id="download">
         <div className="download-card">
-          <img src="/pawpico-face-logo.png" alt="Cute pixel face of PawPico with enormous glossy green eyes" />
+          <img src="/pawpico-emblem.png" alt="PawPico pixel cat emblem with a geometric lightning stripe" />
           <div><div className="kicker">WINDOWS 10 / 11 · 64-BIT</div><h2>Give your desktop<br /><em>a small, beating heart.</em></h2><p>One cat. Eighty-seven states. No account or subscription required.</p></div>
           <div className="purchase-block">
             <span className="price-label">ONE-TIME PRICE</span>
