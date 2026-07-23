@@ -71,6 +71,10 @@ test("ships the animated hero, new logo, pricing, and phone-first breakpoints", 
   assert.match(css, /@media \(max-width: 700px\)/);
   assert.match(css, /@media \(max-width: 430px\)/);
   assert.match(css, /safe-area-inset/);
+  assert.match(css, /\.section-shell\s*\{\s*width:\s*100%/);
+  assert.match(css, /100svh/);
+  assert.match(css, /scroll-snap-type:\s*x mandatory/);
+  assert.match(css, /\.drawer-cat-stage\s*\{[^}]*aspect-ratio:\s*16\s*\/\s*7/s);
 });
 
 test("keeps the orange theme and animates a relevant cat beside every feature description", async () => {
