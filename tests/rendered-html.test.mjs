@@ -60,12 +60,12 @@ test("ships the animated hero, new logo, pricing, and phone-first breakpoints", 
   const response = await render();
   const html = await response.text();
   assert.match(html, /\/pawpico-idle-reel\.mp4/);
-  assert.match(html, /\/pawpico-emblem\.png/);
+  assert.match(html, /\/pawpico-face-logo\.png/);
   assert.equal((html.match(/\$5\.99/g) ?? []).length, 1);
   assert.match(html, /ONE-TIME PRICE/);
   assert.match(html, /Cheer · sing · listen · groom · rest/);
   assert.ok((await stat(new URL("../public/pawpico-idle-reel.mp4", import.meta.url))).size > 100_000);
-  assert.ok((await stat(new URL("../public/pawpico-emblem.png", import.meta.url))).size > 10_000);
+  assert.ok((await stat(new URL("../public/pawpico-face-logo.png", import.meta.url))).size > 1_000_000);
   const css = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
   assert.match(css, /@media \(max-width: 1040px\)/);
   assert.match(css, /@media \(max-width: 700px\)/);
@@ -73,19 +73,25 @@ test("ships the animated hero, new logo, pricing, and phone-first breakpoints", 
   assert.match(css, /safe-area-inset/);
 });
 
-test("cycles orange, soft-gray, and blush-pink themes across UI and cat media", async () => {
+test("keeps the orange theme and animates a relevant cat beside every feature description", async () => {
   const response = await render();
   const html = await response.text();
-  assert.match(html, /data-theme="orange"/);
-  assert.match(html, /Warm orange/);
-  assert.match(html, /automatic palette · every 5 seconds/);
-  assert.match(html, /theme-cat-media/);
+  assert.equal((html.match(/class="drawer-cat-stage"/g) ?? []).length, 9);
+  for (const preview of [
+    "desktop-physics.mp4",
+    "touch-and-mochi.mp4",
+    "rest-and-emotion.mp4",
+    "context-companion.mp4",
+    "work-mode.mp4",
+    "focus-and-agent.mp4",
+    "customization-studio.mp4",
+    "pawpico-idle-reel.mp4",
+  ]) {
+    assert.match(html, new RegExp(preview.replace(".", "\\.")));
+  }
   const page = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
-  assert.match(page, /Soft gray/);
-  assert.match(page, /Blush pink/);
-  assert.match(page, /5_000/);
+  assert.doesNotMatch(page, /setInterval|data-theme|paletteIndex|Soft gray|Blush pink/);
   const css = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
-  assert.match(css, /main\[data-theme="gray"\]/);
-  assert.match(css, /main\[data-theme="pink"\]/);
-  assert.match(css, /\.theme-cat-media/);
+  assert.match(css, /\.drawer-cat-stage/);
+  assert.doesNotMatch(css, /data-theme|theme-cycle|palette-dots/);
 });
