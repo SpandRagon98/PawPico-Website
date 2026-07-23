@@ -1,13 +1,18 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Cormorant_Garamond, Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
+const cormorant = Cormorant_Garamond({
+  variable: "--font-cormorant",
+  subsets: ["latin"],
+  weight: ["500", "600", "700"],
+});
 const publicBasePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 const title = "PawPico — One tiny cat. An entire inner life.";
-const description = "Meet PawPico: a private Windows desktop cat with 87 animation states, tactile mochi motion, Work mode, music and microphone reactions, reminders, focus tools, and a complete wardrobe.";
+const description = "Meet PawPico: an expressive Windows desktop cat with Work mode, opt-in Gmail and Calendar connectors, smart reminders, 87 animation states, tactile mochi motion, focus tools, and a complete wardrobe.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -23,7 +28,7 @@ export const metadata: Metadata = {
     description,
     type: "website",
     images: [{
-      url: `${publicBasePath}/og.png`,
+      url: `${publicBasePath}/og-v2.png`,
       width: 1536,
       height: 1024,
       alt: "PawPico, an expressive pixel cat for the Windows desktop",
@@ -33,14 +38,14 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title,
     description,
-    images: [`${publicBasePath}/og.png`],
+    images: [`${publicBasePath}/og-v2.png`],
   },
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable}`}>{children}</body>
+      <body className={`${geistSans.variable} ${geistMono.variable} ${cormorant.variable}`}>{children}</body>
     </html>
   );
 }

@@ -1,408 +1,483 @@
 "use client";
 
+import Image from "next/image";
 import { useState, type ReactNode } from "react";
 
 const publicBasePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 const publicAsset = (path: string) => `${publicBasePath}${path}`;
 
-const films = [
-  {
-    id: "physics",
-    number: "01",
-    label: "Desktop physics",
-    title: "A desktop becomes cat territory.",
-    copy: "PawPico walks, sprints, leaps between ledges, clings to window edges, hangs by two paws, slips to one, and either pulls itself up or tumbles into a real landing.",
-    video: "/videos/desktop-physics.mp4",
-    chapters: ["walk + sprint", "long jump", "edge climb", "two-paw hang", "pull-up"],
-  },
-  {
-    id: "touch",
-    number: "02",
-    label: "Touch & mochi",
-    title: "Soft to pet. Properly squishy to hold.",
-    copy: "The glossy pupils follow first, the head leans a little later, and gentle strokes close the eyes into a purr. Pick PawPico up by the scruff and the whole body stretches, shears, recoils, and wobbles back.",
-    video: "/videos/touch-and-mochi.mp4",
-    chapters: ["eye tracking", "pet + purr", "mochi stretch", "rubber recoil"],
-  },
+type Film = {
+  id: string;
+  eyebrow: string;
+  title: string;
+  copy: string;
+  video: string;
+  accent: string;
+  signals: string[];
+  facts: string[];
+};
+
+const priorityFilms: Film[] = [
   {
     id: "work",
-    number: "03",
-    label: "Work mode",
-    title: "Lightning in. Sunglasses on. Work starts.",
-    copy: "A pixel bolt transforms PawPico into a parked laptop operator. The nearby Quick Tools console converts images to PDF and PDFs to PNG or JPG without covering the cat.",
+    eyebrow: "01 / Work mode",
+    title: "A tiny operator with real tools.",
+    copy: "A pixel lightning strike parks PawPico at a laptop in sunglasses. The console opens beside the cat and turns image and PDF conversion into a local desktop ritual.",
     video: "/videos/work-mode.mp4",
-    chapters: ["lightning swap", "sunglasses", "laptop loop", "local PDF tools"],
+    accent: "amber",
+    signals: ["parked pose", "local conversion", "smart placement"],
+    facts: [
+      "JPG or PNG to PDF, including multi-image PDFs in the order selected",
+      "PDF to PNG or JPG at 96, 150, or 300 DPI",
+      "Quick Tools avoids the cat and the Windows taskbar whenever space allows",
+    ],
   },
   {
-    id: "context",
-    number: "04",
-    label: "Context companion",
-    title: "It notices activity—not your content.",
-    copy: "Writing opens a notebook. Typing brings out the keyboard. Fast typing turns into steam, then full panic. Slow browser scrolling opens a book, while coding brings out tiny glasses.",
-    video: "/videos/context-companion.mp4",
-    chapters: ["note taking", "keyboard", "overheat", "panic", "reading", "coding"],
+    id: "gmail",
+    eyebrow: "02 / Gmail connector",
+    title: "New mail, delivered by cat.",
+    copy: "Connect with a Gmail address and Google app password. PawPico checks the inbox once per minute, then waves and surfaces only the newest sender and subject in its own notebook notice.",
+    video: "/videos/gmail-connector.mp4",
+    accent: "green",
+    signals: ["60 s poll", "IMAP over TLS", "body never read"],
+    facts: [
+      "The first successful check establishes a quiet baseline—no notification burst",
+      "Uses a revocable 16-character Google app password instead of an account login",
+      "Credentials stay in the app's local settings and are passed only to Gmail",
+    ],
   },
   {
-    id: "sound",
-    number: "05",
-    label: "Music & singing",
-    title: "Headphones for music. A microphone for you.",
-    copy: "When Windows reports media playback, PawPico puts on headphones and bops with floating notes. When another app uses the microphone, it sings along—and bows when the performance ends.",
-    video: "/videos/music-and-singing.mp4",
-    chapters: ["music state", "headphone bop", "mic activity", "sing", "bow"],
+    id: "calendar",
+    eyebrow: "03 / Google Calendar",
+    title: "Meetings arrive with a gentle warning.",
+    copy: "Paste a private Google Calendar iCal address and choose the warning window. PawPico turns upcoming timed events into early notices, then a more urgent starting-now reaction.",
+    video: "/videos/calendar-connector.mp4",
+    accent: "sage",
+    signals: ["5 min sync", "0–120 min warning", "snooze"],
+    facts: [
+      "Warn notices appear light green; starting-now notices switch to the due state",
+      "Due events outrank early warnings and remain actionable for a short grace period",
+      "The feed is parsed locally; all-day events are intentionally excluded from timed alarms",
+    ],
   },
   {
-    id: "emotion",
-    number: "06",
-    label: "Rest & emotion",
-    title: "The tiny rituals are the personality.",
-    copy: "Nods, paw-licks, face washes, ear scratches, happy hearts, annoyed tail flicks, hopeful sad eyes, a full open-mouth yawn, and a curled sleep story all belong to the same little cat.",
-    video: "/videos/rest-and-emotion.mp4",
-    chapters: ["cute nod", "grooming", "happy", "annoyed", "sad", "yawn", "sleep"],
+    id: "notices",
+    eyebrow: "04 / Smart notifications",
+    title: "Reminders that feel like company.",
+    copy: "PawPico uses one compact, typewriter-style notice system for one-off appointments, interval reminders, work-rest checks, Gmail, Calendar, motivation, and session milestones.",
+    video: "/videos/smart-notifications.mp4",
+    accent: "coral",
+    signals: ["warn + due", "5 min snooze", "mark done"],
+    facts: [
+      "Set a title, date, time, and optional 1, 5, 10, or 15 minute early warning",
+      "Stretch, water, custom, and active-use work-rest reminders have matching cat reactions",
+      "Notices stay above the cat, avoid full-screen work, and never become Windows pop-ups",
+    ],
   },
   {
-    id: "style",
-    number: "07",
-    label: "Customization",
-    title: "Five bodies. Seven coats. Twelve accessories.",
-    copy: "Breed changes real proportions—head, torso, legs, ears, eyes, and tail. Then choose size, fur, eyes, inner ears, markings, everyday accessories, or costumes that follow the calendar.",
+    id: "appearance",
+    eyebrow: "05 / Appearance studio",
+    title: "Anatomy, color, coat, character.",
+    copy: "The live studio changes real proportions before it applies color. Pick one of five bodies, then tune fur, eyes, inner ears, markings, size, accessories, and calendar-driven costumes.",
     video: "/videos/customization-studio.mp4",
-    chapters: ["5 breeds", "7 patterns", "3 sizes", "colors", "12 accessories"],
-  },
-  {
-    id: "focus",
-    number: "08",
-    label: "Focus & agent",
-    title: "A calm co-worker with very small paws.",
-    copy: "Pomodoro sessions, active-use rest checks, reminders, motivation placards, pinned notes, and an optional local agent-status file turn productivity into gentle companionship.",
-    video: "/videos/focus-and-agent.mp4",
-    chapters: ["Pomodoro", "reminders", "motivation", "agent thinking", "agent running", "success"],
+    accent: "rose",
+    signals: ["5 breeds", "7 patterns", "12 accessories"],
+    facts: [
+      "Classic, Chonk, Fluffy, Siamese, and Kitten have distinct silhouettes",
+      "Fur, iris, and inner-ear colors update independently in the live preview",
+      "Everyday accessories and seasonal costumes can be automatic or chosen manually",
+    ],
   },
 ];
 
 const featureGroups = [
   {
-    id: "movement",
-    preview: "/videos/desktop-physics.mp4",
-    previewLabel: "PawPico walking, jumping, and climbing",
-    icon: "↗",
-    title: "Movement & desktop physics",
-    count: "28 motion states",
-    lead: "PawPico treats the Windows desktop as a physical world instead of a flat animation layer.",
-    items: [
-      "Walk, stalk, run, and full sprint with distinct eight-frame leg cycles",
-      "Turn-around, left turn, right turn, look up, and look down",
-      "Standard jump, small hop, vertical jump, long jump, fall, soft landing, and hard landing",
-      "Walks along taskbar and window tops; balances or peeks at unsafe edges",
-      "Hops between reachable windows and explores vertically as well as horizontally",
-      "Clings to left or right window edges and climbs upward",
-      "Hangs by two paws, slips to one paw, pulls up, or loses grip",
-      "Rides a window when it moves; falls safely when the support closes or minimizes",
-      "Landing squash, shake-off, and occasional embarrassed recovery after a clumsy fall",
-      "Independent front, side, back, and three-quarter silhouettes; only side art is mirrored",
-    ],
-  },
-  {
-    id: "touch",
-    preview: "/videos/touch-and-mochi.mp4",
-    previewLabel: "PawPico reacting to touch and stretching like mochi",
-    icon: "✦",
-    title: "Cursor, touch & mochi",
-    count: "20 interaction states",
-    lead: "The pointer is a toy, a gaze target, a hand for petting, and the anchor for soft-body dragging.",
-    items: [
-      "Smooth pupil tracking with a restrained head lean so the neck stays connected",
-      "Watches, approaches, stalks, chases, pounces, swats, and performs a full paw swipe",
-      "Can visually catch the cursor, swing from it, lose grip, and land safely—without controlling the real pointer",
-      "Gentle back-and-forth strokes trigger petting; plain hover only gets a look",
-      "Petting cycles from half-closed eyes to closed-eye loafing, purrs, and hearts",
-      "Quick clicks are pokes; repeated disturbance raises annoyance before it settles again",
-      "Drag starts after a small movement or short hold, so clicks and lifts feel different",
-      "Scruff-pinned mochi body stretches vertically, narrows under tension, leans, and trails behind",
-      "Release transfers a gentle toss, overshoots its rest shape, and wobbles back",
-      "Drop on a title bar to stand, just below it to hang, beside it to cling, or mid-air to fall",
-    ],
-  },
-  {
-    id: "personality",
-    preview: "/videos/rest-and-emotion.mp4",
-    previewLabel: "PawPico grooming, yawning, and showing emotion",
-    icon: "☺",
-    title: "Personality, moods & rest",
-    count: "5 moods + 11 eye states",
-    lead: "Energy, curiosity, recent interaction, and a little weighted randomness keep the cat calm without making it robotic.",
-    items: [
-      "Core moods: calm, curious, playful, sleepy, and annoyed",
-      "Eye expressions: open, half, closed, wide, up, down, surprised, happy, focused, panicked, and sad",
-      "Ear positions: up, back, perked, and flat; tails curl, lift, flick, tuck, puff, wrap, or hang down",
-      "Mostly sits and watches by default, with wandering kept as occasional punctuation",
-      "Slow blink, tail flick, clean paw, wash face, groom, scratch, look around, and full-body stretch",
-      "Random front-facing cute nod with smile, blush, closed eyes, and tail flick",
-      "Self-play includes tail chasing and paw swipes",
-      "Energy drains while sprinting, jumping, climbing, catching, and dancing; it recovers while sitting or sleeping",
-      "A motionless cursor triggers a full yawn before sleep; nearby movement wakes the cat",
-      "After twenty minutes without a pet, the lowest-priority sad mood quietly appears",
-    ],
-  },
-  {
-    id: "context",
-    preview: "/videos/context-companion.mp4",
-    previewLabel: "PawPico reacting to writing, browsing, and coding",
-    icon: "⌘",
-    title: "Context-aware reactions",
-    count: "Local signals only",
-    lead: "PawPico reacts to simple Windows state. It never reads document text, page contents, track names, or recorded audio.",
-    items: [
-      "Writing apps: opens a notebook, writes, and occasionally glances back at the screen",
-      "Steady typing: attacks a tiny keyboard with alternating paws and the occasional wrong-key surprise",
-      "Sustained fast typing: blushes and emits steam; twenty-five uninterrupted seconds escalates into panic",
-      "Browser scrolling: looks up or down and unrolls a little paper strip",
-      "Sustained slow browser scrolling: settles with a book and scans the page",
-      "Coding apps and terminals: automatically puts on glasses",
-      "Media playing: swaps to headphones, dances, smiles, raises a paw, and floats music notes",
-      "Another app using the microphone: takes a mic, sings with a swaying body, then bows when capture ends",
-      "Explain-this-screen message describes only the foreground app name, broad category, and whether media is playing",
-      "Reaction priority prevents work mode, panic, singing, agents, music, writing, typing, reading, and scrolling from fighting",
-    ],
-  },
-  {
     id: "work",
-    preview: "/videos/work-mode.mp4",
-    previewLabel: "PawPico using its laptop in Work mode",
     icon: "⚡",
     title: "Work mode & Quick Tools",
-    count: "A real utility mode",
-    lead: "Work mode is not just a costume. It parks the cat, gives it a laptop, and opens a local conversion console beside it.",
+    label: "Flagship utility",
+    video: "/videos/work-mode.mp4",
+    lead: "The cat stops roaming, suits up at the flash peak, and operates a real local conversion panel.",
     items: [
-      "Entered from the cat’s compact right-click menu or the system tray",
-      "Crisp lightning strike hides the transformation at the flash peak",
-      "Sunglasses and a slow, focused laptop loop replace roaming and cursor chasing",
-      "Panel tries right, left, above, then below; it stays inside the monitor work area and avoids the cat",
-      "JPG or PNG to PDF, including several images combined in selected order",
+      "Open or exit from the cat menu, tray menu, or the panel close button",
+      "Lightning transition swaps the pose at the brightest moment",
+      "Front-facing sunglasses-and-laptop loop outranks roaming and full-screen peek",
+      "Cursor chasing is suppressed while eye tracking remains alive",
+      "Panel tries right, left, above, then below and stays in the monitor work area",
+      "JPG and PNG to PDF, including multiple images in selected order",
       "JPEG pages are embedded without re-encoding when possible",
       "PDF to PNG or JPG at 96, 150, or 300 DPI",
-      "All conversions run locally; PDF rendering degrades honestly if its local renderer is unavailable",
-      "DOC/DOCX conversion is clearly marked coming soon and is not falsely attempted",
-      "Exit from the same menu entry, panel close button, or tray",
+      "Every conversion runs locally; missing PDF rendering support degrades clearly",
+      "DOC/DOCX conversion is honestly marked coming soon",
     ],
   },
   {
-    id: "focus",
-    preview: "/videos/focus-and-agent.mp4",
-    previewLabel: "PawPico helping with focus sessions and reminders",
-    icon: "◷",
-    title: "Focus, reminders & notes",
-    count: "Gentle productivity",
-    lead: "The productivity layer is designed to feel like a companion checking in, never a system notification shouting.",
+    id: "gmail",
+    icon: "✉",
+    title: "Gmail connector",
+    label: "Opt-in connection",
+    video: "/videos/gmail-connector.mp4",
+    lead: "A small, revocable connection that turns fresh inbox arrivals into friendly cat notices.",
     items: [
-      "Configurable Pomodoro focus, short break, long break, and cycle count",
-      "Focus phase suppresses cursor chasing while eye tracking stays alive",
-      "Stretch reminders with a real cat stretch; water reminders with a happy reaction",
-      "Work-rest reminders count active computer use, pause while away, and stay quiet in full-screen",
-      "Unlimited custom reminder messages and intervals",
-      "Notebook-style reminder bubble with typewriter reveal, OK, and five-minute snooze",
-      "Pinned note stays tucked near the cat",
-      "Optional local display name personalizes reminders and encouragement",
-      "Motivation appears after sustained active work with glasses, an overhead placard, and rotating messages",
-      "Cat Off waves goodbye, fades and shrinks, while the tray remains available",
+      "Connect with a Gmail address and 16-character Google app password",
+      "Secure IMAP-over-TLS connection directly to Gmail",
+      "Inbox polling once per minute with explicit network timeouts",
+      "Reads unread count plus only the newest message envelope",
+      "Notification includes sender display name or address and subject",
+      "Never reads or stores the email body",
+      "First poll creates a baseline so existing mail never floods the screen",
+      "Notification can be switched off without disconnecting",
+      "PawPico waves and optionally meows when a genuinely new UID appears",
     ],
   },
   {
-    id: "agent",
-    preview: "/videos/focus-and-agent.mp4",
-    previewLabel: "PawPico reacting to local AI-agent status",
-    icon: "◆",
-    title: "Local AI-agent companion",
-    count: "8 status values",
-    lead: "Point PawPico at one small JSON file that a local tool owns. Nothing else on the machine is inspected.",
+    id: "calendar",
+    icon: "▦",
+    title: "Google Calendar connector",
+    label: "Opt-in connection",
+    video: "/videos/calendar-connector.mp4",
+    lead: "A private iCal feed becomes a quiet meeting concierge without OAuth or a separate sign-in window.",
     items: [
-      "Idle releases the cat back to its normal behavior",
-      "Thinking raises a paw and looks upward",
-      "Running kneads like a tiny operator",
-      "Waiting watches attentively",
-      "Success celebrates, meows when sound is enabled, and shows a finished message",
-      "Failed looks confused and explains that the agent hit an error",
-      "Attention triggers a startled jump",
-      "Integration is disabled until the user explicitly enters a local file path",
+      "Connect with the Secret address in iCal format from Google Calendar",
+      "HTTPS-only feed with a five-minute refresh interval",
+      "User-selectable early warning from 0 to 120 minutes",
+      "Upcoming timed events are resolved against the computer's local time zone",
+      "Early warning shows a green notice; event start switches to the due style",
+      "Due events outrank other calendar warnings",
+      "Five-minute snooze is available from the notice",
+      "All-day events are visible to the parser but intentionally skip timed alarms",
+      "Only events near the current time are retained, capped at forty",
+    ],
+  },
+  {
+    id: "notices",
+    icon: "◉",
+    title: "Notifications & reminders",
+    label: "Unified notice system",
+    video: "/videos/smart-notifications.mp4",
+    lead: "One restrained notebook language covers reminders, connected services, and encouragement.",
+    items: [
+      "One-off reminders with title, local date, time, and optional early warning",
+      "Warn and due phases use distinct color cues and matching cat urgency",
+      "Five-minute snooze and Mark Done for scheduled reminders",
+      "Configurable stretch and water intervals",
+      "Unlimited custom interval reminders with user-written messages",
+      "Work-rest checks count active computer use—not wall-clock time",
+      "Active-use tracking pauses while away, paused, hidden, or full-screen",
+      "Pinned note rides beside the cat without fighting active notices",
+      "Optional local display name personalizes messages",
+      "Typewriter reveal, single-line layout, and collision-aware placement above PawPico",
     ],
   },
   {
     id: "appearance",
-    preview: "/videos/customization-studio.mp4",
-    previewLabel: "PawPico showing body, color, and accessory choices",
     icon: "◈",
     title: "Appearance & wardrobe",
-    count: "5 × 7 × 12",
-    lead: "Customization changes anatomy, not only color. The live preview applies every edit immediately.",
+    label: "Live studio",
+    video: "/videos/customization-studio.mp4",
+    lead: "Five body plans create genuinely different cats before the coat and wardrobe are applied.",
     items: [
       "Classic: balanced house-cat proportions",
-      "Chonk: round body, stubby legs, heavy cheeks, and thicker tail",
-      "Fluffy: larger mass, ear tufts, neck ruff, and plume tail",
-      "Siamese: slender, leggy build, tall ears, thin tail, and dark points",
-      "Kitten: tiny body with an oversized head and the largest eyes",
+      "Chonk: round torso, short legs, broad cheeks, and a thicker tail",
+      "Fluffy: ear tufts, cheek floof, neck ruff, and plume tail",
+      "Siamese: slender body, taller ears, finer tail, and dark points",
+      "Kitten: smallest torso with the largest head and eyes",
       "Small, medium, and large display sizes",
-      "Independent fur, iris, and inner-ear color controls",
-      "Solid, tuxedo, tabby, socks, spotted, calico, and bicolour markings",
+      "Independent fur, iris, and inner-ear colors",
+      "Solid, tuxedo, tabby, socks, spotted, calico, and bicolour patterns",
       "Sunglasses, glasses, headphones, bandana, watch, hat, and cap",
       "Santa hat, witch hat, party hat, flower crown, and winter scarf",
-      "Automatic calendar outfits: Halloween, December, New Year, deep winter, and spring",
+      "Optional calendar wardrobe for Halloween, December, New Year, winter, and spring",
+    ],
+  },
+  {
+    id: "movement",
+    icon: "↗",
+    title: "Movement & desktop physics",
+    label: "28 motion states",
+    video: "/videos/desktop-physics.mp4",
+    lead: "Windows become ledges, monitor work areas become floors, and motion follows actual physical state.",
+    items: [
+      "Walk, stalk, run, and sprint with distinct multi-frame gaits",
+      "Turn around, turn left, turn right, look up, and look down",
+      "Jump, small hop, vertical jump, long jump, fall, and four landing outcomes",
+      "Walks and sits along taskbar and window tops",
+      "Balances or peeks at unsafe ledge ends",
+      "Hops between nearby windows and explores vertically",
+      "Clings to side edges and climbs up or down",
+      "Hangs by two paws, slips to one, pulls up, or loses grip",
+      "Rides moving windows and falls naturally when support disappears",
+      "Multi-monitor geometry, mixed-DPI scaling, taskbar awareness, and safe recovery",
+    ],
+  },
+  {
+    id: "touch",
+    icon: "✦",
+    title: "Cursor, petting & mochi",
+    label: "Tactile interaction",
+    video: "/videos/touch-and-mochi.mp4",
+    lead: "The pointer is a gaze target, toy, petting hand, and a welded scruff anchor for soft-body dragging.",
+    items: [
+      "Glossy pupils lead the cursor while the head follows with restrained lag",
+      "Watches, approaches, chases, pounces, swats, catches, and tail-chases",
+      "Gentle back-and-forth strokes trigger petting; plain hover only gets a look",
+      "Petting progresses through half-closed eyes, loafing, purrs, and hearts",
+      "Quick clicks are pokes; repeated grabbing gradually annoys the cat",
+      "Dragging begins only after movement or a short hold",
+      "The scruff stays welded to the cursor while the body stretches and narrows",
+      "Lower mesh points trail farther than the head without folding or gapping",
+      "Release carries a gentle toss, overshoots, wobbles, and settles",
+      "Drop on, below, or beside a title bar to stand, hang, or cling",
+    ],
+  },
+  {
+    id: "context",
+    icon: "⌘",
+    title: "Context-aware companion",
+    label: "Local Windows signals",
+    video: "/videos/context-companion.mp4",
+    lead: "Broad app category and activity—not text or screen content—select a useful companion pose.",
+    items: [
+      "Writing apps open a notebook and trigger animated note-taking",
+      "Steady typing attacks a tiny keyboard with alternating paws",
+      "Fast typing blushes and steams; a sustained streak escalates to panic",
+      "Scroll direction makes PawPico look up or down and unroll a paper strip",
+      "Sustained slow browser scrolling opens a book",
+      "Coding apps and terminals automatically bring out glasses",
+      "Foreground context uses only the executable basename",
+      "Keyboard reaction consumes aggregate key counts, never key identities",
+      "Explain-this-screen reports only app name, broad category, and media state",
+      "A strict priority system prevents competing context loops from fighting",
+    ],
+  },
+  {
+    id: "music",
+    icon: "♫",
+    title: "Music, microphone & sound",
+    label: "Performance mode",
+    video: "/videos/music-and-singing.mp4",
+    lead: "System playback becomes a headphone dance; microphone activity becomes a tiny stage performance.",
+    items: [
+      "Windows media playback state automatically swaps in headphones",
+      "Dance loop smiles, bops, raises a paw, and floats music notes",
+      "No artist, title, album art, or other track metadata is read",
+      "Detects only whether another application is actively capturing a microphone",
+      "No microphone stream is opened, recorded, or transcribed",
+      "Active capture starts a microphone singing animation",
+      "When capture ends, PawPico performs a small bow",
+      "Optional synthesized meow, purr, landing tap, and sleep tone",
+      "Sounds are off and muted by default, with rate limits for calm background use",
+    ],
+  },
+  {
+    id: "personality",
+    icon: "☺",
+    title: "Personality, moods & rest",
+    label: "A real inner life",
+    video: "/videos/rest-and-emotion.mp4",
+    lead: "Energy, curiosity, interaction history, and weighted randomness create calm rituals instead of a robotic loop.",
+    items: [
+      "Core moods: calm, curious, playful, sleepy, and annoyed",
+      "Eleven eye states plus coordinated pupils, ears, mouth, tail, blush, steam, hearts, notes, and Zs",
+      "Mostly settles front-facing and still, with roaming used as punctuation",
+      "Slow blink, tail flick, clean paw, wash face, groom, scratch, and look around",
+      "Random cute nod with smile, closed eyes, blush, and tail flick",
+      "Full-body stretch and self-play such as paw swipes and tail chasing",
+      "Energy drains during exertion and recovers while sitting or sleeping",
+      "A still cursor triggers a full open-mouth yawn before curled sleep",
+      "Nearby cursor movement—not a merely parked pointer—wakes the cat",
+      "Long periods without affection can surface a low-priority sad expression",
+    ],
+  },
+  {
+    id: "focus",
+    icon: "◎",
+    title: "Focus, breaks & Pomodoro",
+    label: "Gentle productivity",
+    video: "/videos/focus-and-agent.mp4",
+    lead: "Two timer systems cover quick focus sessions and configurable Pomodoro cycles without making the cat frantic.",
+    items: [
+      "Right-click Focus mode counts upward in a steady green timer chip",
+      "Focus parks PawPico front-facing and suppresses cursor chasing",
+      "A small happy nod or cheer appears every twenty to thirty-five seconds",
+      "Break picker offers 5, 10, 15, 20, or 30 minutes",
+      "Break timer counts down with a green-to-amber-to-red progress ramp",
+      "Overrun clearly changes the chip to BREAK'S OVER",
+      "Configurable Pomodoro focus, short break, long break, and cycle count",
+      "Pomodoro supports start, pause, resume, skip, reset, and phase completion",
+      "Focus completion raises a celebratory placard and a break invitation",
+      "Motivation can appear after sustained active work with glasses and rotating notes",
+    ],
+  },
+  {
+    id: "agent",
+    icon: "◆",
+    title: "Local AI-agent companion",
+    label: "Explicit file integration",
+    video: "/videos/focus-and-agent.mp4",
+    lead: "Point PawPico at one JSON status file written by a local tool; the cat never scans beyond that exact path.",
+    items: [
+      "Idle returns control to normal behavior",
+      "Thinking raises a paw and looks upward",
+      "Running kneads like a tiny keyboard operator",
+      "Waiting watches attentively",
+      "Success celebrates, optionally meows, and announces completion",
+      "Failed looks confused and surfaces an error note",
+      "Attention triggers a startled reaction",
+      "The integration is off until an absolute local path is explicitly supplied",
     ],
   },
   {
     id: "system",
-    preview: "/pawpico-idle-reel.mp4",
-    previewLabel: "PawPico calmly living on the Windows desktop",
     icon: "▣",
-    title: "Windows behavior, privacy & sound",
-    count: "Quiet infrastructure",
-    lead: "The companion is a transparent Windows overlay built to disappear as infrastructure and remain visible as personality.",
+    title: "Windows behavior & controls",
+    label: "Quiet infrastructure",
+    video: "/pawpico-idle-reel.mp4",
+    lead: "A lightweight Tauri overlay behaves like desktop infrastructure while the cat remains full of personality.",
     items: [
       "Transparent, borderless, always-on-top virtual-desktop overlay with no taskbar entry",
-      "Dynamic click-through everywhere except the cat, drag, menu, and panels",
-      "Multi-monitor geometry, mixed DPI scaling, taskbar-aware work areas, and off-screen recovery",
+      "Dynamic click-through everywhere except PawPico, its drag, menus, and panels",
       "Automatic or manual corner peek during full-screen apps and presentations",
-      "Adaptive detail and frame rate: lively while interacting, slower while calm or asleep, near-zero while hidden",
-      "Optional synthesized purr, landing tap, meow, and sleep tone with quiet rate limits",
-      "Tray controls for Cat On/Off, pause, pet, call, sleep, Work mode, chase, sound, activity, size, startup, reset, settings, and quit",
-      "Calm, balanced, and playful temperament profiles",
-      "Start with Windows, automatic update check, reset position, reset settings, and live appearance preview",
-      "No account, analytics, screen capture, key identities, document contents, cursor history, track metadata, or microphone audio",
+      "Cat Off waves goodbye, fades away, and remains available from the tray",
+      "Tray actions: on/off, pause, pet, call, sleep, work, chase, sound, temperament, size, startup, reset, and settings",
+      "Calm, balanced, and playful activity profiles",
+      "Start with Windows, reset position, reset settings, and live appearance preview",
+      "Adaptive frame rate and detail: lively during interaction, quiet during rest, near-zero when hidden",
+      "Dark or warm-light settings panels without changing the cat's chosen coat",
+      "Automatic or manual update checks with verified install flow",
+      "14-day full-feature trial, offline license verification, then a charming free core pet",
     ],
   },
 ];
 
 const animationLedger = [
-  ["Movement", ["idle", "side idle", "back idle", "walk", "stalk", "run", "sprint", "turn around", "turn left", "turn right", "look up", "look down", "jump", "small hop", "vertical jump", "long jump", "fall", "land", "soft land", "hard land", "climb", "climb up", "climb down", "step down", "balance", "hang—two paws", "hang—one paw", "pull up"]],
-  ["Rest & rituals", ["sit", "side sit", "cute nod", "lie down", "sleep", "wake up", "stretch", "yawn", "blink", "tail flick", "clean paw", "clean face", "scratch", "groom", "look around"]],
-  ["Cursor play", ["watch", "approach", "chase", "pounce", "swat", "paw swipe", "catch", "hold", "dragged by cursor", "cursor grab", "cursor swing", "lose grip", "land safe", "confused", "startled", "tired", "tail chase", "peek"]],
-  ["Touch & emotion", ["petted", "petted—eyes closed", "purr", "picked up", "dangle", "dragged—surprised", "placed down", "shake", "annoyed", "happy"]],
-  ["Work & context", ["knead", "overheat", "think", "celebrate", "wave", "write notes", "type keys", "sing", "bow", "Quick Tools", "panic", "sad", "placard", "read book", "dance bop", "embarrassed"]],
+  ["Movement · 28", ["idle", "side idle", "back idle", "walk", "stalk", "run", "sprint", "turn around", "turn left", "turn right", "look up", "look down", "jump", "small hop", "vertical jump", "long jump", "fall", "land", "soft land", "hard land", "climb", "climb up", "climb down", "step down", "balance", "hang—two paws", "hang—one paw", "pull up"]],
+  ["Rest & rituals · 15", ["sit", "side sit", "cute nod", "lie down", "sleep", "wake up", "stretch", "yawn", "blink", "tail flick", "clean paw", "clean face", "scratch", "groom", "look around"]],
+  ["Cursor play · 18", ["watch", "approach", "chase", "pounce", "swat", "paw swipe", "catch", "hold", "dragged by cursor", "cursor grab", "cursor swing", "lose grip", "land safe", "confused", "startled", "tired", "tail chase", "peek"]],
+  ["Touch & emotion · 10", ["petted", "petted—eyes closed", "purr", "picked up", "dangle", "dragged—surprised", "placed down", "shake", "annoyed", "happy"]],
+  ["Work & context · 16", ["knead", "overheat", "think", "celebrate", "wave", "write notes", "type keys", "sing", "bow", "Quick Tools", "panic", "sad", "placard", "read book", "dance bop", "embarrassed"]],
 ];
 
-const everydayAccessories = ["Sunglasses", "Glasses", "Headphones", "Bandana", "Watch", "Hat", "Cap"];
-const seasonalAccessories = ["Santa hat", "Witch hat", "Party hat", "Flower crown", "Winter scarf"];
-const patterns = ["Solid", "Tuxedo", "Tabby", "Socks", "Spotted", "Calico", "Bicolour"];
+const filters = [
+  ["all", "All systems"],
+  ["connected", "Connected"],
+  ["desktop", "Desktop"],
+  ["companion", "Companion"],
+  ["productivity", "Productivity"],
+  ["personalize", "Personalize"],
+] as const;
+
+const filterMap: Record<string, string[]> = {
+  connected: ["gmail", "calendar", "notices"],
+  desktop: ["work", "movement", "touch", "system"],
+  companion: ["context", "music", "personality", "agent"],
+  productivity: ["work", "notices", "focus", "agent"],
+  personalize: ["appearance", "personality", "system"],
+};
 
 function Dots() {
   return <span className="window-dots" aria-hidden="true"><i /><i /><i /></span>;
+}
+
+function Brand() {
+  return (
+    <span className="brand-lockup">
+      <span className="brand-medallion">
+        <Image src={publicAsset("/pawpico-face-logo.png")} alt="" aria-hidden="true" width={50} height={50} unoptimized />
+      </span>
+      <span><strong>PawPico</strong><small>PERSONAL DESKTOP CAT</small></span>
+    </span>
+  );
 }
 
 function PixelIcon({ children }: { children: ReactNode }) {
   return <span className="pixel-icon" aria-hidden="true">{children}</span>;
 }
 
-function Brand() {
-  return (
-    <span className="brand-lockup">
-      <img className="brand-logo" src={publicAsset("/pawpico-face-logo.png")} alt="" aria-hidden="true" />
-      <span><strong>PawPico</strong><small>DESKTOP CAT</small></span>
-    </span>
-  );
-}
-
 export default function Home() {
   const [activeFilm, setActiveFilm] = useState(0);
-  const [activeGroup, setActiveGroup] = useState("all");
-  const film = films[activeFilm];
-  const visibleGroups = activeGroup === "all" ? featureGroups : featureGroups.filter((group) => group.id === activeGroup);
+  const [activeFilter, setActiveFilter] = useState("all");
+  const film = priorityFilms[activeFilm];
+  const allowed = filterMap[activeFilter];
+  const visibleGroups = activeFilter === "all" ? featureGroups : featureGroups.filter((group) => allowed.includes(group.id));
 
   return (
     <main id="top">
       <header className="site-header">
-        <a className="brand" href="#top" aria-label="PawPico home">
-          <Brand />
-        </a>
+        <a className="brand" href="#top" aria-label="PawPico home"><Brand /></a>
         <nav aria-label="Primary navigation">
-          <a href="#films">Feature films</a>
+          <a href="#command-deck">Highlights</a>
           <a href="#complete">Every feature</a>
-          <a href="#atelier">Atelier</a>
+          <a href="#motion">Animations</a>
           <a href="#privacy">Privacy</a>
         </nav>
-        <a className="pixel-button mini" href="#download">Get PawPico <span>↓</span></a>
+        <a className="metal-button compact" href="#download">Get PawPico <span>↓</span></a>
       </header>
 
       <section className="hero section-shell">
         <div className="hero-copy">
-          <div className="kicker"><span className="live-dot" /> WINDOWS DESKTOP COMPANION · FULLY LOCAL</div>
-          <h1>One tiny cat.<br /><em>An entire inner life.</em></h1>
+          <div className="eyebrow"><span className="live-dot" /> WINDOWS COMPANION / CONNECTED WHEN YOU CHOOSE</div>
+          <h1>Your desktop,<br /><em>now with a pulse.</em></h1>
           <p>
-            PawPico walks your windows, watches your cursor, sings when the microphone is live,
-            dances in headphones, works at a laptop, reads beside you, and quietly develops moods
-            of its own.
+            PawPico is an expressive pixel cat, a tiny productivity console, and a private
+            Windows companion in one. It lives on your windows, learns the rhythm of your work,
+            and connects to Gmail or Calendar only when invited.
           </p>
           <div className="hero-actions">
-            <a className="pixel-button primary" href="#films">Meet every side of PawPico <span>↘</span></a>
-            <a className="underlink" href="#complete">Read the complete feature index</a>
+            <a className="metal-button primary" href="#command-deck">Open the command deck <span>↘</span></a>
+            <a className="text-link" href="#complete">Inspect every verified feature</a>
           </div>
-          <div className="hero-stats" aria-label="Verified product statistics">
-            <span><strong>87</strong><small>animation states</small></span>
-            <span><strong>5</strong><small>real body types</small></span>
-            <span><strong>12</strong><small>accessories</small></span>
-            <span><strong>100%</strong><small>local reactions</small></span>
+          <div className="hero-readout">
+            <span><b>87</b><small>motion states</small></span>
+            <span><b>05</b><small>body types</small></span>
+            <span><b>07</b><small>coat patterns</small></span>
+            <span><b>02</b><small>opt-in connectors</small></span>
           </div>
         </div>
 
-        <div className="hero-machine" aria-label="PawPico live product portrait">
-          <div className="machine-bezel">
-            <div className="machine-top"><span>PAWPICO PERSONALITY UNIT · P-01</span><Dots /></div>
-            <div className="machine-screen">
-              <video
-                autoPlay
-                loop
-                muted
-                playsInline
-                preload="auto"
-                poster={publicAsset("/pawpico-hero.png")}
-                aria-label="PawPico stays seated while cheering, singing, listening to music, licking a paw, and getting tired"
-              >
+        <div className="hero-terminal" aria-label="Animated PawPico personality reel">
+          <div className="terminal-rim">
+            <div className="terminal-head">
+              <span>PAWPICO PERSONALITY CORE / P-01</span>
+              <span className="terminal-state"><i /> LIVE</span>
+              <Dots />
+            </div>
+            <div className="terminal-screen">
+              <video autoPlay loop muted playsInline preload="auto" poster={publicAsset("/pawpico-hero.png")}>
                 <source src={publicAsset("/pawpico-idle-reel.mp4")} type="video/mp4" />
               </video>
               <span className="scanlines" />
-              <span className="screen-chip">IDLE PERSONALITY REEL</span>
+              <span className="screen-label top">ACTUAL APP RENDERER</span>
+              <span className="screen-label bottom">CHEER / SING / LISTEN / GROOM / REST</span>
             </div>
-            <div className="machine-deck">
-              <span className="speaker-grid" aria-hidden="true">{Array.from({ length: 18 }, (_, i) => <i key={i} />)}</span>
-              <span><b>MOTION</b><small>IN PLACE</small></span>
-              <span><b>REEL</b><small>ON LOOP</small></span>
-              <span className="machine-knob"><i /></span>
+            <div className="terminal-deck">
+              <span className="speaker" aria-hidden="true">{Array.from({ length: 24 }, (_, i) => <i key={i} />)}</span>
+              <span className="meter"><small>PERSONALITY</small><b><i style={{ width: "92%" }} /></b></span>
+              <span className="meter"><small>DISTRACTION</small><b><i style={{ width: "18%" }} /></b></span>
+              <span className="dial"><i /></span>
             </div>
           </div>
-          <div className="stitched-tag left">Actual in-app animations</div>
-          <div className="stitched-tag right">Cheer · sing · listen · groom · rest</div>
+          <span className="floating-note note-one">ACTUAL IN-APP ANIMATION</span>
+          <span className="floating-note note-two">ORANGE CAT / GREEN EYES</span>
         </div>
       </section>
 
-      <div className="ticker" aria-label="PawPico behavior highlights">
-        <div>
-          {["WALKS", "CLIMBS", "HANGS", "PURRS", "SINGS", "DANCES", "READS", "TYPES", "YAWNS", "DREAMS", "WORKS", "CELEBRATES"].map((word) => (
-            <span key={word}>{word}<i>✦</i></span>
-          ))}
-        </div>
+      <div className="signal-strip" aria-label="PawPico highlights">
+        <div>{["WORKS", "NOTIFIES", "CLIMBS", "PURRS", "FOCUSES", "SINGS", "READS", "STRETCHES", "DREAMS", "CELEBRATES"].map((word) => <span key={word}>{word}<i>◆</i></span>)}</div>
       </div>
 
-      <section className="films section-shell section-pad" id="films">
+      <section className="command-section section-shell section-pad" id="command-deck">
         <div className="section-heading">
-          <div><div className="kicker">08 VERIFIED FEATURE FILMS</div><h2>Not mockups.<br /><em>The real cat in motion.</em></h2></div>
-          <p>Every film below is rendered from PawPico’s actual pose system, current orange coat, green eyes, red inner ears, and product props. Choose a reel to inspect it.</p>
+          <div>
+            <div className="eyebrow">THE ESSENTIAL FIVE</div>
+            <h2>Start with what makes<br /><em>PawPico indispensable.</em></h2>
+          </div>
+          <p>These are the highest-impact systems in the current Windows build. Choose a module to see its real cat animation and exact product behavior.</p>
         </div>
 
-        <div className="film-console">
-          <div className="film-screen">
-            <div className="film-titlebar"><span>REEL {film.number} · {film.label.toUpperCase()}</span><Dots /></div>
-            <video key={film.video} autoPlay loop muted playsInline controls preload="metadata" aria-label={`${film.label} feature film`}>
-              <source src={publicAsset(film.video)} type="video/mp4" />
-            </video>
-            <span className="scanlines" aria-hidden="true" />
-          </div>
-          <div className="film-copy">
-            <span className="reel-number">{film.number}</span>
-            <div className="kicker">{film.label}</div>
-            <h3>{film.title}</h3>
-            <p>{film.copy}</p>
-            <div className="chapter-list">{film.chapters.map((chapter) => <span key={chapter}>{chapter}</span>)}</div>
-          </div>
-          <div className="reel-selector" role="tablist" aria-label="Choose a PawPico feature film">
-            {films.map((item, index) => (
+        <div className="command-console">
+          <div className="console-nav" role="tablist" aria-label="Choose a primary PawPico feature">
+            {priorityFilms.map((item, index) => (
               <button
                 type="button"
                 role="tab"
@@ -411,138 +486,92 @@ export default function Home() {
                 onClick={() => setActiveFilm(index)}
                 key={item.id}
               >
-                <span>{item.number}</span><b>{item.label}</b><i aria-hidden="true">▶</i>
+                <span>{String(index + 1).padStart(2, "0")}</span>
+                <b>{item.eyebrow.split(" / ")[1]}</b>
+                <i aria-hidden="true">↗</i>
               </button>
+            ))}
+          </div>
+
+          <div className={`console-display accent-${film.accent}`}>
+            <div className="console-film">
+              <div className="console-titlebar"><span>{film.eyebrow.toUpperCase()} / VERIFIED FILM</span><Dots /></div>
+              <video key={film.video} autoPlay loop muted playsInline controls preload="metadata" aria-label={`${film.title} feature film`}>
+                <source src={publicAsset(film.video)} type="video/mp4" />
+              </video>
+              <span className="scanlines" />
+            </div>
+            <div className="console-copy">
+              <div className="eyebrow">{film.eyebrow}</div>
+              <h3>{film.title}</h3>
+              <p>{film.copy}</p>
+              <div className="signal-pills">{film.signals.map((signal) => <span key={signal}><i />{signal}</span>)}</div>
+              <ol>{film.facts.map((fact, index) => <li key={fact}><span>0{index + 1}</span>{fact}</li>)}</ol>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="complete-section section-pad" id="complete">
+        <div className="section-shell">
+          <div className="section-heading">
+            <div>
+              <div className="eyebrow">SOURCE-VERIFIED SYSTEM DIRECTORY</div>
+              <h2>Every feature.<br /><em>Down to the small ones.</em></h2>
+            </div>
+            <p>Nothing here is inferred from marketing copy. Each detail is matched to the current application source, native Windows modules, tests, and installer build.</p>
+          </div>
+
+          <div className="feature-filter" role="tablist" aria-label="Filter PawPico features">
+            {filters.map(([id, label]) => (
+              <button type="button" key={id} className={activeFilter === id ? "active" : ""} onClick={() => setActiveFilter(id)}>{label}</button>
+            ))}
+          </div>
+
+          <div className="feature-directory">
+            {visibleGroups.map((group) => (
+              <article className="feature-drawer" key={group.id}>
+                <div className="drawer-head">
+                  <PixelIcon>{group.icon}</PixelIcon>
+                  <div className="drawer-title">
+                    <small>{String(featureGroups.indexOf(group) + 1).padStart(2, "0")} / {group.label}</small>
+                    <h3>{group.title}</h3>
+                    <p>{group.lead}</p>
+                  </div>
+                  <div className="drawer-film">
+                    <video autoPlay loop muted playsInline preload="metadata" aria-label={`${group.title} animation`}>
+                      <source src={publicAsset(group.video)} type="video/mp4" />
+                    </video>
+                    <span className="scanlines" />
+                    <b>IN APP</b>
+                  </div>
+                </div>
+                <ol>
+                  {group.items.map((item, index) => <li key={item}><span>{String(index + 1).padStart(2, "0")}</span>{item}</li>)}
+                </ol>
+              </article>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="work-mode section-pad">
-        <div className="section-shell work-shell">
-          <div className="work-copy">
-            <div className="kicker light">PAWPICO AT WORK</div>
-            <h2>A work mode<br /><em>with actual work inside.</em></h2>
-            <p>Right-click PawPico, choose Work mode, and a lightning bolt swaps the cat into sunglasses and a laptop at the flash peak. Roaming pauses; eye tracking does not.</p>
-            <div className="work-list">
-              <span><PixelIcon>J</PixelIcon><b>JPG / PNG → PDF</b><small>One image or many, in chosen order</small></span>
-              <span><PixelIcon>P</PixelIcon><b>PDF → PNG / JPG</b><small>96, 150, or 300 DPI export</small></span>
-              <span><PixelIcon>⌖</PixelIcon><b>Smart panel placement</b><small>Right, left, above, or below—never casually over the cat</small></span>
-              <span><PixelIcon>⌂</PixelIcon><b>Entirely local</b><small>No upload step and no conversion server</small></span>
-            </div>
-          </div>
-          <div className="work-device">
-            <div className="work-video-frame">
-              <video autoPlay loop muted playsInline controls preload="metadata" aria-label="PawPico Work mode demonstration">
-                <source src={publicAsset("/videos/work-mode.mp4")} type="video/mp4" />
-              </video>
-            </div>
-            <div className="work-dials"><span>MODE <b>LOCAL</b></span><i /><span>CAT <b>FOCUSED</b></span></div>
-          </div>
-        </div>
-      </section>
-
-      <section className="complete section-shell section-pad" id="complete">
-        <div className="section-heading">
-          <div><div className="kicker">SOURCE-VERIFIED INVENTORY</div><h2>Every feature.<br /><em>Nothing hand-waved.</em></h2></div>
-          <p>This directory is based on the installed Windows build and its active behavior, animation, physics, settings, productivity, and native-integration systems.</p>
-        </div>
-
-        <div className="feature-filter" role="tablist" aria-label="Filter PawPico features">
-          <button type="button" className={activeGroup === "all" ? "active" : ""} onClick={() => setActiveGroup("all")}>All systems</button>
-          {featureGroups.map((group) => (
-            <button type="button" key={group.id} className={activeGroup === group.id ? "active" : ""} onClick={() => setActiveGroup(group.id)}>
-              {group.title.split(" & ")[0]}
-            </button>
-          ))}
-        </div>
-
-        <div className="feature-directory">
-          {visibleGroups.map((group, index) => (
-            <article className="feature-drawer" key={group.id}>
-              <div className="drawer-head">
-                <PixelIcon>{group.icon}</PixelIcon>
-                <span><small>0{featureGroups.indexOf(group) + 1}</small><h3>{group.title}</h3><p>{group.lead}</p></span>
-                <div className="drawer-preview">
-                  <b>{group.count}</b>
-                  <span className="drawer-cat-stage">
-                    <video autoPlay loop muted playsInline preload="metadata" aria-label={group.previewLabel}>
-                      <source src={publicAsset(group.preview)} type="video/mp4" />
-                    </video>
-                  </span>
-                </div>
-              </div>
-              <ol>
-                {group.items.map((item, itemIndex) => (
-                  <li key={item}><span>{String(itemIndex + 1).padStart(2, "0")}</span>{item}</li>
-                ))}
-              </ol>
-              <i className="drawer-handle" aria-hidden="true">{index % 2 ? "•••" : "— —"}</i>
-            </article>
-          ))}
-        </div>
-      </section>
-
-      <section className="emotion-section section-pad">
-        <div className="section-shell emotion-shell">
-          <div className="emotion-copy">
-            <div className="kicker light">THE EXPRESSION ENGINE</div>
-            <h2>Eyes lead.<br /><em>The whole body answers.</em></h2>
-            <p>
-              Eleven eye states combine with ears, pupils, mouth, tail, blush, steam, hearts, music notes,
-              Zs, and two emotional color washes. That is why “sad” reads differently from “sleepy,” and
-              “panic” is more than a faster idle.
-            </p>
-            <div className="expression-tokens">
-              {["open", "half", "closed", "wide", "up", "down", "surprised", "happy", "focus", "panic", "sad"].map((eye) => <span key={eye}>{eye}</span>)}
-            </div>
-          </div>
-          <div className="emotion-film">
-            <video autoPlay loop muted playsInline controls preload="metadata" aria-label="PawPico emotion and sleep feature film">
-              <source src={publicAsset("/videos/rest-and-emotion.mp4")} type="video/mp4" />
-            </video>
-          </div>
-        </div>
-      </section>
-
-      <section className="atelier section-shell section-pad" id="atelier">
-        <div className="atelier-frame">
-          <div className="atelier-copy">
-            <div className="kicker">THE PAWPICO ATELIER</div>
-            <h2>Built differently.<br /><em>Dressed personally.</em></h2>
-            <p>These are not palette swaps. Each breed changes head, torso, leg, ear, eye, and tail proportions before color, pattern, or wardrobe is applied.</p>
-            <div className="breed-list">
-              <span><b>Classic</b><small>balanced house cat</small></span>
-              <span><b>Chonk</b><small>round + stubby</small></span>
-              <span><b>Fluffy</b><small>tufts + ruff + plume</small></span>
-              <span><b>Siamese</b><small>slender + dark points</small></span>
-              <span><b>Kitten</b><small>tiny body + biggest eyes</small></span>
-            </div>
-          </div>
-          <div className="atelier-film">
-            <video autoPlay loop muted playsInline controls preload="metadata" aria-label="PawPico customization demonstration">
-              <source src={publicAsset("/videos/customization-studio.mp4")} type="video/mp4" />
-            </video>
-          </div>
-          <div className="wardrobe">
-            <div><small>EVERYDAY</small>{everydayAccessories.map((item) => <span key={item}>{item}</span>)}</div>
-            <div><small>SEASONAL</small>{seasonalAccessories.map((item) => <span key={item}>{item}</span>)}</div>
-            <div><small>PATTERNS</small>{patterns.map((item) => <span key={item}>{item}</span>)}</div>
-          </div>
-        </div>
-      </section>
-
-      <section className="ledger section-pad">
+      <section className="motion-section section-pad" id="motion">
         <div className="section-shell">
-          <div className="section-heading compact">
-            <div><div className="kicker">THE COMPLETE ANIMATION LEDGER</div><h2>All 87 states,<br /><em>accounted for.</em></h2></div>
-            <p>These are the discrete animation states currently defined by the app—not a loose marketing estimate.</p>
+          <div className="motion-intro">
+            <div>
+              <div className="eyebrow light">THE COMPLETE MOTION LEDGER</div>
+              <h2>Eighty-seven states.<br /><em>One coherent little animal.</em></h2>
+            </div>
+            <div className="motion-orb">
+              <span><b>87</b><small>DEFINED<br />STATES</small></span>
+              <i />
+            </div>
           </div>
           <div className="ledger-grid">
-            {animationLedger.map(([group, names]) => (
-              <article key={group as string}>
-                <header><span>{group}</span><b>{(names as string[]).length}</b></header>
-                <div>{(names as string[]).map((name) => <span key={name}>{name}</span>)}</div>
+            {animationLedger.map(([title, states]) => (
+              <article key={title as string}>
+                <header><span>{title}</span><i /></header>
+                <div>{(states as string[]).map((state) => <span key={state}>{state}</span>)}</div>
               </article>
             ))}
           </div>
@@ -551,38 +580,53 @@ export default function Home() {
 
       <section className="privacy-section section-pad" id="privacy">
         <div className="section-shell privacy-shell">
-          <div className="privacy-seal" aria-hidden="true"><span>LOCAL</span><b>BY DESIGN</b><i>✦</i></div>
-          <div className="privacy-title"><div className="kicker light">A TRUSTWORTHY BACKGROUND APP</div><h2>Smart enough to react.<br /><em>Disciplined enough not to pry.</em></h2></div>
+          <div className="privacy-copy">
+            <div className="eyebrow">PRIVACY, WITH THE CONNECTORS EXPLAINED</div>
+            <h2>Local-first.<br /><em>Network only by invitation.</em></h2>
+            <p>
+              PawPico&apos;s desktop behavior stays on the computer. Gmail and Calendar are the only
+              network features, both off until you connect them, and each talks directly to the
+              service you chose—never to PawPico analytics or an intermediary account.
+            </p>
+          </div>
+          <div className="privacy-seal" aria-hidden="true"><span>NO</span><b>TRACKING</b><i>◆</i></div>
           <div className="privacy-grid">
             <span><b>No screen capture</b><small>Only window rectangles become ledges.</small></span>
-            <span><b>No key identities</b><small>Typing uses only an aggregate keys-down count.</small></span>
-            <span><b>No document reading</b><small>Writing and browser categories come from app names.</small></span>
-            <span><b>No track metadata</b><small>Music reactions use one playback-state boolean.</small></span>
-            <span><b>No microphone audio</b><small>Singing reacts only to whether capture is active.</small></span>
-            <span><b>No cursor history</b><small>Position is sampled for animation and discarded.</small></span>
-            <span><b>No analytics or account</b><small>Preferences remain on the machine.</small></span>
-            <span><b>Optional local agent file</b><small>Off until the user provides one exact path.</small></span>
+            <span><b>No key identities</b><small>Typing consumes an aggregate activity count.</small></span>
+            <span><b>No document reading</b><small>Context comes from executable names only.</small></span>
+            <span><b>No track metadata</b><small>Music uses a single playback-state boolean.</small></span>
+            <span><b>No microphone audio</b><small>Singing uses capture-active state only.</small></span>
+            <span><b>No cursor history</b><small>Samples drive motion and are discarded.</small></span>
+            <span><b>Gmail: envelope only</b><small>Newest sender, subject, UID, and unread count.</small></span>
+            <span><b>Calendar: private feed</b><small>Upcoming event times and summaries, parsed locally.</small></span>
+            <span><b>Offline license check</b><small>No account or activation server.</small></span>
           </div>
         </div>
       </section>
 
       <section className="download section-shell section-pad" id="download">
         <div className="download-card">
-          <img src={publicAsset("/pawpico-face-logo.png")} alt="PawPico's orange pixel cat face with enormous glossy green eyes" />
-          <div><div className="kicker">WINDOWS 10 / 11 · 64-BIT</div><h2>Give your desktop<br /><em>a small, beating heart.</em></h2><p>One cat. Eighty-seven states. No account or subscription required.</p></div>
+          <div className="download-logo">
+            <Image src={publicAsset("/pawpico-face-logo.png")} alt="PawPico orange pixel cat face logo with glossy green eyes" width={500} height={500} unoptimized />
+          </div>
+          <div className="download-copy">
+            <div className="eyebrow">WINDOWS 10 / 11 · 64-BIT</div>
+            <h2>Put a small, bright<br /><em>presence on your desktop.</em></h2>
+            <p>Full-feature trial included. One offline license keeps the complete PawPico experience.</p>
+          </div>
           <div className="purchase-block">
-            <span className="price-label">ONE-TIME PRICE</span>
+            <span>ONE-TIME PRICE</span>
             <strong>$5.99</strong>
-            <a className="pixel-button primary large" href="#top">Get PawPico <span>↓</span></a>
-            <small>Pay once · keep PawPico</small>
+            <a className="metal-button primary large" href="#top">Get PawPico <i>↓</i></a>
+            <small>PAY ONCE · NO SUBSCRIPTION</small>
           </div>
         </div>
       </section>
 
       <footer className="site-footer section-shell">
         <a className="brand" href="#top"><Brand /></a>
-        <p>Built for quiet company, curious motion, and very small paws.</p>
-        <span>© 2026 PAWPICO · WINDOWS</span>
+        <p>Quiet company. Curious motion. Very small paws.</p>
+        <span>© 2026 PAWPICO / WINDOWS</span>
       </footer>
     </main>
   );
