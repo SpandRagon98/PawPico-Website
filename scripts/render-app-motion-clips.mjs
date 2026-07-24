@@ -66,16 +66,6 @@ ctx.imageSmoothingEnabled = false;
 function draw(t) {
   ctx.fillStyle = "#eadcc4";
   ctx.fillRect(0, 0, 720, 480);
-  for (let x = 0; x < 720; x += 16) {
-    ctx.strokeStyle = "rgba(94,68,48,.045)";
-    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, 480); ctx.stroke();
-  }
-  for (let y = 0; y < 480; y += 16) {
-    ctx.strokeStyle = "rgba(94,68,48,.045)";
-    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(720, y); ctx.stroke();
-  }
-  ctx.fillStyle = "#453029";
-  ctx.fillRect(42, 414, 636, 5);
 
   const segment = sequences[scene].find(([, start, end]) => t >= start && t < end) || sequences[scene].at(-1);
   const [name, start] = segment;

@@ -92,10 +92,6 @@ def fit_text(draw: ImageDraw.ImageDraw, value: str, fnt, max_width: int) -> list
 
 def draw_grid(draw: ImageDraw.ImageDraw):
     draw.rectangle((0, 0, W, H), fill=COLORS["paper"])
-    for x in range(0, W, 16):
-        draw.line((x, 0, x, H), fill="#deceb4", width=1)
-    for y in range(0, H, 16):
-        draw.line((0, y, W, y), fill="#deceb4", width=1)
     draw.ellipse((-160, -210, 620, 570), fill="#f2e5d0")
 
 
@@ -112,17 +108,13 @@ def draw_window(draw: ImageDraw.ImageDraw, title: str, code: str, accent: str):
 
 
 def draw_cat_stage(canvas: Image.Image, draw: ImageDraw.ImageDraw, source: Image.Image):
-    rounded(draw, (57, 111, 670, 623), 16, "#d4c09f", "#6b4b3a", 3)
-    rounded(draw, (67, 121, 660, 612), 11, "#eadcc4", "#a18466", 2)
+    rounded(draw, (57, 111, 670, 623), 16, "#eadcc4", "#6b4b3a", 3)
 
     # Motion-only clips are rendered from the real application sprite system at
     # 720x480. Crop empty side space, never the cat, to fit this tall viewport.
     crop = source.crop((70, 0, 650, 480))
     crop = crop.resize((575, 472), Image.Resampling.LANCZOS)
     canvas.paste(crop, (76, 130))
-    draw.rectangle((76, 130, 651, 602), outline="#a68c70", width=1)
-    for y in range(132, 600, 5):
-        draw.line((77, y, 650, y), fill=(70, 44, 30, 11), width=1)
     rounded(draw, (82, 138, 254, 169), 5, "#f7ead6", "#82654f", 1)
     text(draw, (95, 153), "ACTUAL PAWPICO MOTION", F_MONO_11, COLORS["ink"], anchor="lm")
 
@@ -173,8 +165,8 @@ def gmail_scene(canvas: Image.Image, draw: ImageDraw.ImageDraw, source: Image.Im
 
     rounded(draw, (738, 292, 1184, 361), 9, "#e4d4bb", "#a58b6e")
     text(draw, (758, 313), "INBOX STATUS", F_MONO_11, COLORS["muted"])
-    text(draw, (758, 342), "12 unread", F_SANS_23, COLORS["ink"])
-    text(draw, (1162, 342), "UID 1842", F_MONO_11, COLORS["muted"], anchor="rm")
+    text(draw, (758, 330), "12 unread", F_SANS_23, COLORS["ink"])
+    text(draw, (1162, 337), "UID 1842", F_MONO_11, COLORS["muted"], anchor="rm")
 
     if t < 2.0:
         label(draw, 741, 391, "quiet baseline", COLORS["sage"])
@@ -196,9 +188,9 @@ def calendar_scene(canvas: Image.Image, draw: ImageDraw.ImageDraw, source: Image
 
     rounded(draw, (738, 292, 1184, 361), 9, "#e4d4bb", "#a58b6e")
     text(draw, (758, 313), "NEXT EVENT", F_MONO_11, COLORS["muted"])
-    text(draw, (758, 342), "Design review", F_SANS_23, COLORS["ink"])
+    text(draw, (758, 330), "Design review", F_SANS_23, COLORS["ink"])
     time_label = "10:30" if t < 6.2 else "NOW"
-    text(draw, (1162, 342), time_label, F_MONO_16, COLORS["sage"] if t < 6.2 else COLORS["coral"], anchor="rm")
+    text(draw, (1162, 337), time_label, F_MONO_16, COLORS["sage"] if t < 6.2 else COLORS["coral"], anchor="rm")
 
     if t < 2.7:
         label(draw, 741, 391, "upcoming", COLORS["sage"])
@@ -221,17 +213,17 @@ def notices_scene(canvas: Image.Image, draw: ImageDraw.ImageDraw, source: Image.
     if t < 3.2:
         rounded(draw, (738, 292, 1184, 361), 9, "#e4d4bb", "#a58b6e")
         text(draw, (758, 313), "ACTIVE-USE CHECK", F_MONO_11, COLORS["muted"])
-        text(draw, (758, 342), "Stretch with me", F_SANS_23, COLORS["ink"])
+        text(draw, (758, 330), "Stretch with me", F_SANS_23, COLORS["ink"])
         notice(draw, 391, "Spandan, take a short rest — stretch with me!", "plain", min(1, t / 0.6), ("Snooze", "OK"))
     elif t < 6.2:
         rounded(draw, (738, 292, 1184, 361), 9, "#e4d4bb", "#a58b6e")
         text(draw, (758, 313), "STAKEHOLDER MEETING", F_MONO_11, COLORS["muted"])
-        text(draw, (758, 342), "5 minute warning", F_SANS_23, COLORS["ink"])
+        text(draw, (758, 330), "5 minute warning", F_SANS_23, COLORS["ink"])
         notice(draw, 391, "Stakeholder Meeting in 5 minutes.", "warn", (t - 3.2) / 0.5, ("Snooze", "Done"))
     else:
         rounded(draw, (738, 292, 1184, 361), 9, "#ead0c8", "#b56757")
         text(draw, (758, 313), "STAKEHOLDER MEETING", F_MONO_11, COLORS["coral"])
-        text(draw, (758, 342), "Due now", F_SANS_23, COLORS["ink"])
+        text(draw, (758, 330), "Due now", F_SANS_23, COLORS["ink"])
         notice(draw, 391, "Stakeholder Meeting is now. Please join.", "due", (t - 6.2) / 0.5, ("Snooze", "Done"))
     text(draw, (62, 672), "TYPEWRITER REVEAL / 5 MIN SNOOZE / MARK DONE / ABOVE THE CAT / NEVER A WINDOWS POP-UP", F_MONO_11, "#785f4d", anchor="lm")
 

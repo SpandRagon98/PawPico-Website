@@ -192,7 +192,7 @@ const featureGroups = [
   },
   {
     id: "movement",
-    icon: "↗",
+    icon: "MV",
     title: "Movement & desktop physics",
     label: "28 motion states",
     video: "/videos/desktop-physics.mp4",
@@ -397,9 +397,34 @@ function PixelIcon({ children }: { children: ReactNode }) {
 export default function Home() {
   const [activeFilm, setActiveFilm] = useState(0);
   const [activeFilter, setActiveFilter] = useState("all");
+  const [showAllFeatures, setShowAllFeatures] = useState(false);
   const film = priorityFilms[activeFilm];
   const allowed = filterMap[activeFilter];
-  const visibleGroups = activeFilter === "all" ? featureGroups : featureGroups.filter((group) => allowed.includes(group.id));
+  const filteredGroups = activeFilter === "all" ? featureGroups : featureGroups.filter((group) => allowed.includes(group.id));
+  const featuredGroups = filteredGroups.slice(0, 3);
+  const additionalGroups = filteredGroups.slice(3);
+
+  const renderFeature = (group: (typeof featureGroups)[number], shouldPlay = true) => (
+    <article className="feature-drawer" key={group.id}>
+      <div className="drawer-head">
+        <PixelIcon>{group.icon}</PixelIcon>
+        <div className="drawer-title">
+          <small>{String(featureGroups.indexOf(group) + 1).padStart(2, "0")} / {group.label}</small>
+          <h3>{group.title}</h3>
+          <p>{group.lead}</p>
+        </div>
+        <div className="drawer-film">
+          <video autoPlay={shouldPlay} loop muted playsInline preload="metadata" aria-label={`${group.title} animation`}>
+            <source src={publicAsset(group.video)} type="video/mp4" />
+          </video>
+          <b>IN APP</b>
+        </div>
+      </div>
+      <ol>
+        {group.items.map((item, index) => <li key={item}><span>{String(index + 1).padStart(2, "0")}</span>{item}</li>)}
+      </ol>
+    </article>
+  );
 
   return (
     <main id="top">
@@ -411,7 +436,7 @@ export default function Home() {
           <a href="#motion">Animations</a>
           <a href="#privacy">Privacy</a>
         </nav>
-        <a className="metal-button compact" href="#download">Get PawPico <span>↓</span></a>
+        <a className="metal-button compact" href="#download">Get PawPico <span className="button-arrow down" aria-hidden="true" /></a>
       </header>
 
       <section className="hero section-shell">
@@ -424,7 +449,7 @@ export default function Home() {
             and connects to Gmail or Calendar only when invited.
           </p>
           <div className="hero-actions">
-            <a className="metal-button primary" href="#command-deck">Open the command deck <span>↘</span></a>
+            <a className="metal-button primary" href="#command-deck">Open the command deck <span className="button-arrow down-right" aria-hidden="true" /></a>
             <a className="text-link" href="#complete">Inspect every verified feature</a>
           </div>
           <div className="hero-readout">
@@ -446,7 +471,6 @@ export default function Home() {
               <video autoPlay loop muted playsInline preload="auto" poster={publicAsset("/pawpico-hero.png")}>
                 <source src={publicAsset("/pawpico-idle-reel.mp4")} type="video/mp4" />
               </video>
-              <span className="scanlines" />
               <span className="screen-label top">ACTUAL APP RENDERER</span>
               <span className="screen-label bottom">CHEER / SING / LISTEN / GROOM / REST</span>
             </div>
@@ -488,18 +512,17 @@ export default function Home() {
               >
                 <span>{String(index + 1).padStart(2, "0")}</span>
                 <b>{item.eyebrow.split(" / ")[1]}</b>
-                <i aria-hidden="true">↗</i>
+                <i className="button-arrow up-right" aria-hidden="true" />
               </button>
             ))}
           </div>
 
-          <div className={`console-display accent-${film.accent}`}>
+          <div className={`console-display accent-${film.accent}`} key={film.id}>
             <div className="console-film">
               <div className="console-titlebar"><span>{film.eyebrow.toUpperCase()} / VERIFIED FILM</span><Dots /></div>
               <video key={film.video} autoPlay loop muted playsInline controls preload="metadata" aria-label={`${film.title} feature film`}>
                 <source src={publicAsset(film.video)} type="video/mp4" />
               </video>
-              <span className="scanlines" />
             </div>
             <div className="console-copy">
               <div className="eyebrow">{film.eyebrow}</div>
@@ -524,34 +547,46 @@ export default function Home() {
 
           <div className="feature-filter" role="tablist" aria-label="Filter PawPico features">
             {filters.map(([id, label]) => (
-              <button type="button" key={id} className={activeFilter === id ? "active" : ""} onClick={() => setActiveFilter(id)}>{label}</button>
+              <button
+                type="button"
+                key={id}
+                className={activeFilter === id ? "active" : ""}
+                onClick={() => {
+                  setActiveFilter(id);
+                  setShowAllFeatures(false);
+                }}
+              >
+                {label}
+              </button>
             ))}
           </div>
 
           <div className="feature-directory">
-            {visibleGroups.map((group) => (
-              <article className="feature-drawer" key={group.id}>
-                <div className="drawer-head">
-                  <PixelIcon>{group.icon}</PixelIcon>
-                  <div className="drawer-title">
-                    <small>{String(featureGroups.indexOf(group) + 1).padStart(2, "0")} / {group.label}</small>
-                    <h3>{group.title}</h3>
-                    <p>{group.lead}</p>
-                  </div>
-                  <div className="drawer-film">
-                    <video autoPlay loop muted playsInline preload="metadata" aria-label={`${group.title} animation`}>
-                      <source src={publicAsset(group.video)} type="video/mp4" />
-                    </video>
-                    <span className="scanlines" />
-                    <b>IN APP</b>
+            {featuredGroups.map((group) => renderFeature(group))}
+          </div>
+
+          {additionalGroups.length > 0 && (
+            <>
+              <div className={`feature-expansion ${showAllFeatures ? "is-open" : ""}`} aria-hidden={!showAllFeatures}>
+                <div className="feature-expansion-inner">
+                  <div className="feature-directory feature-directory-more">
+                    {additionalGroups.map((group) => renderFeature(group, showAllFeatures))}
                   </div>
                 </div>
-                <ol>
-                  {group.items.map((item, index) => <li key={item}><span>{String(index + 1).padStart(2, "0")}</span>{item}</li>)}
-                </ol>
-              </article>
-            ))}
-          </div>
+              </div>
+              <div className="feature-expansion-control">
+                <button
+                  type="button"
+                  className="metal-button feature-expansion-button"
+                  aria-expanded={showAllFeatures}
+                  onClick={() => setShowAllFeatures((visible) => !visible)}
+                >
+                  {showAllFeatures ? "Show fewer features" : `See all ${filteredGroups.length} features`}
+                  <span className={`button-arrow down ${showAllFeatures ? "is-up" : ""}`} aria-hidden="true" />
+                </button>
+              </div>
+            </>
+          )}
         </div>
       </section>
 
@@ -617,7 +652,7 @@ export default function Home() {
           <div className="purchase-block">
             <span>ONE-TIME PRICE</span>
             <strong>$5.99</strong>
-            <a className="metal-button primary large" href="#top">Get PawPico <i>↓</i></a>
+            <a className="metal-button primary large" href="#top">Get PawPico <i className="button-arrow up" aria-hidden="true" /></a>
             <small>PAY ONCE · NO SUBSCRIPTION</small>
           </div>
         </div>

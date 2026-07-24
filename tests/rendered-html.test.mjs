@@ -78,6 +78,26 @@ test("ships the full source-verified directory with a relevant film for every gr
   assert.match(html, /\/og-v2\.png/);
 });
 
+test("shows three feature cards first, then expands the complete directory smoothly", async () => {
+  const response = await render();
+  const html = await response.text();
+  assert.match(html, /See all 13 features/);
+  assert.match(html, /aria-expanded="false"/);
+  assert.match(html, /class="feature-expansion(?:\s|")/);
+  assert.match(html, /aria-hidden="true"/);
+
+  const page = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
+  assert.match(page, /filteredGroups\.slice\(0,\s*3\)/);
+  assert.match(page, /filteredGroups\.slice\(3\)/);
+  assert.match(page, /setShowAllFeatures\(false\)/);
+
+  const css = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
+  assert.match(css, /grid-template-rows:\s*0fr/);
+  assert.match(css, /\.feature-expansion\.is-open\s*\{[^}]*grid-template-rows:\s*1fr/s);
+  assert.match(css, /@keyframes feature-reveal/);
+  assert.match(css, /@keyframes panel-swap/);
+});
+
 test("keeps the supplied logo, orange identity, end-only price, and premium responsive layout", async () => {
   const response = await render();
   const html = await response.text();
@@ -92,7 +112,9 @@ test("keeps the supplied logo, orange identity, end-only price, and premium resp
 
   const css = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
   assert.match(css, /--copper:\s*#c06643/);
-  assert.match(css, /var\(--font-cormorant\)/);
+  assert.match(css, /--display:\s*Georgia,\s*"Times New Roman",\s*serif/);
+  assert.match(css, /--sans:\s*Arial,\s*Helvetica,\s*sans-serif/);
+  assert.match(css, /--pixel:\s*"Courier New"/);
   assert.match(css, /backdrop-filter:\s*blur\(18px\)/);
   assert.match(css, /@media \(max-width: 1180px\)/);
   assert.match(css, /@media \(max-width: 760px\)/);
@@ -103,6 +125,20 @@ test("keeps the supplied logo, orange identity, end-only price, and premium resp
   assert.match(css, /scroll-snap-type:\s*x mandatory/);
   assert.match(css, /\.drawer-film\s*\{[^}]*aspect-ratio:\s*3\s*\/\s*2/s);
   assert.doesNotMatch(css, /data-theme|theme-cycle|palette-dots/);
+  assert.doesNotMatch(css, /repeating-linear-gradient|scanlines|font-cormorant/);
+
+  const layout = await readFile(new URL("../app/layout.tsx", import.meta.url), "utf8");
+  assert.doesNotMatch(layout, /Cormorant/);
+  assert.doesNotMatch(html, /scanlines|↓|↘|↗/);
+});
+
+test("connector-film generator keeps every animation stage clean and border-only", async () => {
+  const script = await readFile(new URL("../scripts/generate-connector-films.py", import.meta.url), "utf8");
+  const motionScript = await readFile(new URL("../scripts/render-app-motion-clips.mjs", import.meta.url), "utf8");
+  assert.doesNotMatch(script, /range\(0,\s*W,\s*16\)|range\(0,\s*H,\s*16\)|range\(132,\s*600,\s*5\)/);
+  assert.doesNotMatch(script, /draw\.rectangle\(\(76,\s*130,\s*651,\s*602\),\s*outline=/);
+  assert.match(script, /rounded\(draw,\s*\(57,\s*111,\s*670,\s*623\),\s*16/);
+  assert.doesNotMatch(motionScript, /x \+= 16|y \+= 16|fillRect\(42,\s*414,\s*636,\s*5\)/);
 });
 
 test("explains local-first privacy honestly now that opt-in connectors exist", async () => {
