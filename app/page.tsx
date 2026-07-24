@@ -22,7 +22,7 @@ const priorityFilms: Film[] = [
     id: "work",
     eyebrow: "01 / Work mode",
     title: "A tiny operator with real tools.",
-    copy: "A pixel lightning strike parks PawPico at a laptop in sunglasses. The console opens beside the cat and turns image and PDF conversion into a local desktop ritual.",
+    copy: "A pixel lightning strike parks MewMuze at a laptop in sunglasses. The console opens beside the cat and turns image and PDF conversion into a local desktop ritual.",
     video: "/videos/work-mode.mp4",
     accent: "amber",
     signals: ["parked pose", "local conversion", "smart placement"],
@@ -36,7 +36,7 @@ const priorityFilms: Film[] = [
     id: "gmail",
     eyebrow: "02 / Gmail connector",
     title: "New mail, delivered by cat.",
-    copy: "Connect with a Gmail address and Google app password. PawPico checks the inbox once per minute, then waves and surfaces only the newest sender and subject in its own notebook notice.",
+    copy: "Connect with a Gmail address and Google app password. MewMuze checks the inbox once per minute, then waves and surfaces only the newest sender and subject in its own notebook notice.",
     video: "/videos/gmail-connector.mp4",
     accent: "green",
     signals: ["60 s poll", "IMAP over TLS", "body never read"],
@@ -50,7 +50,7 @@ const priorityFilms: Film[] = [
     id: "calendar",
     eyebrow: "03 / Google Calendar",
     title: "Meetings arrive with a gentle warning.",
-    copy: "Paste a private Google Calendar iCal address and choose the warning window. PawPico turns upcoming timed events into early notices, then a more urgent starting-now reaction.",
+    copy: "Paste a private Google Calendar iCal address and choose the warning window. MewMuze turns upcoming timed events into early notices, then a more urgent starting-now reaction.",
     video: "/videos/calendar-connector.mp4",
     accent: "sage",
     signals: ["5 min sync", "0–120 min warning", "snooze"],
@@ -64,7 +64,7 @@ const priorityFilms: Film[] = [
     id: "notices",
     eyebrow: "04 / Smart notifications",
     title: "Reminders that feel like company.",
-    copy: "PawPico uses one compact, typewriter-style notice system for one-off appointments, interval reminders, work-rest checks, Gmail, Calendar, motivation, and session milestones.",
+    copy: "MewMuze uses one compact, typewriter-style notice system for one-off appointments, interval reminders, work-rest checks, Gmail, Calendar, motivation, and session milestones.",
     video: "/videos/smart-notifications.mp4",
     accent: "coral",
     signals: ["warn + due", "5 min snooze", "mark done"],
@@ -127,7 +127,7 @@ const featureGroups = [
       "Never reads or stores the email body",
       "First poll creates a baseline so existing mail never floods the screen",
       "Notification can be switched off without disconnecting",
-      "PawPico waves and optionally meows when a genuinely new UID appears",
+      "MewMuze waves and optionally meows when a genuinely new UID appears",
     ],
   },
   {
@@ -166,7 +166,7 @@ const featureGroups = [
       "Active-use tracking pauses while away, paused, hidden, or full-screen",
       "Pinned note rides beside the cat without fighting active notices",
       "Optional local display name personalizes messages",
-      "Typewriter reveal, single-line layout, and collision-aware placement above PawPico",
+      "Typewriter reveal, single-line layout, and collision-aware placement above MewMuze",
     ],
   },
   {
@@ -241,7 +241,7 @@ const featureGroups = [
       "Writing apps open a notebook and trigger animated note-taking",
       "Steady typing attacks a tiny keyboard with alternating paws",
       "Fast typing blushes and steams; a sustained streak escalates to panic",
-      "Scroll direction makes PawPico look up or down and unroll a paper strip",
+      "Scroll direction makes MewMuze look up or down and unroll a paper strip",
       "Sustained slow browser scrolling opens a book",
       "Coding apps and terminals automatically bring out glasses",
       "Foreground context uses only the executable basename",
@@ -264,7 +264,7 @@ const featureGroups = [
       "Detects only whether another application is actively capturing a microphone",
       "No microphone stream is opened, recorded, or transcribed",
       "Active capture starts a microphone singing animation",
-      "When capture ends, PawPico performs a small bow",
+      "When capture ends, MewMuze performs a small bow",
       "Optional synthesized meow, purr, landing tap, and sleep tone",
       "Sounds are off and muted by default, with rate limits for calm background use",
     ],
@@ -298,7 +298,7 @@ const featureGroups = [
     lead: "Two timer systems cover quick focus sessions and configurable Pomodoro cycles without making the cat frantic.",
     items: [
       "Right-click Focus mode counts upward in a steady green timer chip",
-      "Focus parks PawPico front-facing and suppresses cursor chasing",
+      "Focus parks MewMuze front-facing and suppresses cursor chasing",
       "A small happy nod or cheer appears every twenty to thirty-five seconds",
       "Break picker offers 5, 10, 15, 20, or 30 minutes",
       "Break timer counts down with a green-to-amber-to-red progress ramp",
@@ -315,7 +315,7 @@ const featureGroups = [
     title: "Local AI-agent companion",
     label: "Explicit file integration",
     video: "/videos/focus-and-agent.mp4",
-    lead: "Point PawPico at one JSON status file written by a local tool; the cat never scans beyond that exact path.",
+    lead: "Point MewMuze at one JSON status file written by a local tool; the cat never scans beyond that exact path.",
     items: [
       "Idle returns control to normal behavior",
       "Thinking raises a paw and looks upward",
@@ -336,7 +336,7 @@ const featureGroups = [
     lead: "A lightweight Tauri overlay behaves like desktop infrastructure while the cat remains full of personality.",
     items: [
       "Transparent, borderless, always-on-top virtual-desktop overlay with no taskbar entry",
-      "Dynamic click-through everywhere except PawPico, its drag, menus, and panels",
+      "Dynamic click-through everywhere except MewMuze, its drag, menus, and panels",
       "Automatic or manual corner peek during full-screen apps and presentations",
       "Cat Off waves goodbye, fades away, and remains available from the tray",
       "Tray actions: on/off, pause, pet, call, sleep, work, chase, sound, temperament, size, startup, reset, and settings",
@@ -386,7 +386,7 @@ function Brand() {
       <span className="brand-medallion">
         <Image src={publicAsset("/pawpico-face-logo.png")} alt="" aria-hidden="true" width={50} height={50} unoptimized />
       </span>
-      <span><strong>PawPico</strong><small>PERSONAL DESKTOP CAT</small></span>
+      <span><strong>MewMuze</strong><small>PERSONAL DESKTOP CAT</small></span>
     </span>
   );
 }
@@ -441,14 +441,14 @@ export default function Home() {
   return (
     <main id="top">
       <header className="site-header">
-        <a className="brand" href="#top" aria-label="PawPico home"><Brand /></a>
+        <a className="brand" href="#top" aria-label="MewMuze home"><Brand /></a>
         <nav aria-label="Primary navigation">
           <a href="#command-deck">Highlights</a>
           <a href="#complete">Every feature</a>
           <a href="#motion">Animations</a>
           <a href="#privacy">Privacy</a>
         </nav>
-        <a className="metal-button compact" href="#download">Get PawPico <span className="button-arrow down" aria-hidden="true" /></a>
+        <a className="metal-button compact" href="#download">Get MewMuze <span className="button-arrow down" aria-hidden="true" /></a>
       </header>
 
       <section className="hero section-shell">
@@ -456,7 +456,7 @@ export default function Home() {
           <div className="eyebrow"><span className="live-dot" /> WINDOWS COMPANION / CONNECTED WHEN YOU CHOOSE</div>
           <h1>Your desktop,<br /><em>now with a pulse.</em></h1>
           <p>
-            PawPico is an expressive pixel cat, a tiny productivity console, and a private
+            MewMuze is an expressive pixel cat, a tiny productivity console, and a private
             Windows companion in one. It lives on your windows, learns the rhythm of your work,
             and connects to Gmail or Calendar only when invited.
           </p>
@@ -472,10 +472,10 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="hero-terminal" aria-label="Animated PawPico personality reel">
+        <div className="hero-terminal" aria-label="Animated MewMuze personality reel">
           <div className="terminal-rim">
             <div className="terminal-head">
-              <span>PAWPICO PERSONALITY CORE / P-01</span>
+              <span>MEWMUZE PERSONALITY CORE / M-01</span>
               <span className="terminal-state"><i /> LIVE</span>
               <Dots />
             </div>
@@ -498,7 +498,7 @@ export default function Home() {
         </div>
       </section>
 
-      <div className="signal-strip" aria-label="PawPico highlights">
+      <div className="signal-strip" aria-label="MewMuze highlights">
         <div>{["WORKS", "NOTIFIES", "CLIMBS", "PURRS", "FOCUSES", "SINGS", "READS", "STRETCHES", "DREAMS", "CELEBRATES"].map((word) => <span key={word}>{word}<i>◆</i></span>)}</div>
       </div>
 
@@ -506,13 +506,13 @@ export default function Home() {
         <div className="section-heading">
           <div>
             <div className="eyebrow">THE ESSENTIAL FIVE</div>
-            <h2>Start with what makes<br /><em>PawPico indispensable.</em></h2>
+            <h2>Start with what makes<br /><em>MewMuze indispensable.</em></h2>
           </div>
           <p>These are the highest-impact systems in the current Windows build. Choose a module to see its real cat animation and exact product behavior.</p>
         </div>
 
         <div className="command-console">
-          <div className="console-nav" role="tablist" aria-label="Choose a primary PawPico feature">
+          <div className="console-nav" role="tablist" aria-label="Choose a primary MewMuze feature">
             {priorityFilms.map((item, index) => (
               <button
                 type="button"
@@ -556,7 +556,7 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="feature-filter" role="tablist" aria-label="Filter PawPico features">
+          <div className="feature-filter" role="tablist" aria-label="Filter MewMuze features">
             {filters.map(([id, label]) => (
               <button
                 type="button"
@@ -616,7 +616,7 @@ export default function Home() {
               <small>Movement · Rest · Cursor play · Emotion · Work</small>
             </div>
             <div className="motion-marquee">
-              <div className="motion-stream" aria-label={`PawPico motion states: ${animationStates.join(", ")}`}>
+              <div className="motion-stream" aria-label={`MewMuze motion states: ${animationStates.join(", ")}`}>
                 {animationStates.map((state, index) => <span key={`state-${index}`}>{state}</span>)}
                 {animationStates.map((state, index) => <span key={`repeat-${index}`} aria-hidden="true">{state}</span>)}
               </div>
@@ -631,9 +631,9 @@ export default function Home() {
             <div className="eyebrow">PRIVACY, WITH THE CONNECTORS EXPLAINED</div>
             <h2>Local-first.<br /><em>Network only by invitation.</em></h2>
             <p>
-              PawPico&apos;s desktop behavior stays on the computer. Gmail and Calendar are the only
+              MewMuze&apos;s desktop behavior stays on the computer. Gmail and Calendar are the only
               network features, both off until you connect them, and each talks directly to the
-              service you chose—never to PawPico analytics or an intermediary account.
+              service you chose—never to MewMuze analytics or an intermediary account.
             </p>
           </div>
           <div className="privacy-seal" aria-hidden="true"><span>NO</span><b>TRACKING</b><i>◆</i></div>
@@ -654,17 +654,17 @@ export default function Home() {
       <section className="download section-shell section-pad" id="download">
         <div className="download-card">
           <div className="download-logo">
-            <Image src={publicAsset("/pawpico-face-logo.png")} alt="PawPico orange pixel cat face logo with glossy green eyes" width={500} height={500} unoptimized />
+            <Image src={publicAsset("/pawpico-face-logo.png")} alt="MewMuze orange pixel cat face logo with glossy green eyes" width={500} height={500} unoptimized />
           </div>
           <div className="download-copy">
             <div className="eyebrow">WINDOWS 10 / 11 · 64-BIT</div>
             <h2>Put a small, bright<br /><em>presence on your desktop.</em></h2>
-            <p>Full-feature trial included. One offline license keeps the complete PawPico experience.</p>
+            <p>Full-feature trial included. One offline license keeps the complete MewMuze experience.</p>
           </div>
           <div className="purchase-block">
             <span>ONE-TIME PRICE</span>
             <strong>$5.99</strong>
-            <a className="metal-button primary large" href="#top">Get PawPico <i className="button-arrow up" aria-hidden="true" /></a>
+            <a className="metal-button primary large" href="#top">Get MewMuze <i className="button-arrow up" aria-hidden="true" /></a>
             <small>PAY ONCE · NO SUBSCRIPTION</small>
           </div>
         </div>
@@ -673,7 +673,7 @@ export default function Home() {
       <footer className="site-footer section-shell">
         <a className="brand" href="#top"><Brand /></a>
         <p>Quiet company. Curious motion. Very small paws.</p>
-        <span>© 2026 PAWPICO / WINDOWS</span>
+        <span>© 2026 MEWMUZE / WINDOWS</span>
       </footer>
     </main>
   );

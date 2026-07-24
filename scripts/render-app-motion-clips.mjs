@@ -1,5 +1,5 @@
 /**
- * Render three motion-only clips directly from PawPico's real sprite system.
+ * Render three motion-only clips directly from MewMuze's real sprite system.
  *
  * The application source is imported read-only and bundled into a temporary
  * browser page. No file in the application repository is created or changed.

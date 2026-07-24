@@ -1,4 +1,4 @@
-"""Generate connector feature films from PawPico's existing app-rendered footage.
+"""Generate connector feature films from MewMuze's existing app-rendered footage.
 
 This script never imports or writes to the application repository. It crops the
 cat motion from the already exported product films in public/videos, places it
@@ -116,7 +116,7 @@ def draw_cat_stage(canvas: Image.Image, draw: ImageDraw.ImageDraw, source: Image
     crop = crop.resize((575, 472), Image.Resampling.LANCZOS)
     canvas.paste(crop, (76, 130))
     rounded(draw, (82, 138, 254, 169), 5, "#f7ead6", "#82654f", 1)
-    text(draw, (95, 153), "ACTUAL PAWPICO MOTION", F_MONO_11, COLORS["ink"], anchor="lm")
+    text(draw, (95, 153), "ACTUAL MEWMUZE MOTION", F_MONO_11, COLORS["ink"], anchor="lm")
 
 
 def indicator(draw: ImageDraw.ImageDraw, x: int, y: int, label: str, on: bool = True):

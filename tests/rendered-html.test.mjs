@@ -13,12 +13,12 @@ async function render() {
   );
 }
 
-test("server-renders the complete current PawPico product story", async () => {
+test("server-renders the complete current MewMuze product story", async () => {
   const response = await render();
   assert.equal(response.status, 200);
   assert.match(response.headers.get("content-type") ?? "", /^text\/html\b/i);
   const html = await response.text();
-  assert.match(html, /<title>PawPico — One tiny cat\. An entire inner life\.<\/title>/i);
+  assert.match(html, /<title>MewMuze — One tiny cat\. An entire inner life\.<\/title>/i);
   assert.match(html, /Your desktop,/);
   assert.match(html, /87[\s\S]*motion states/);
   assert.match(html, /Work mode &amp; Quick Tools/);
@@ -99,7 +99,7 @@ test("shows three feature cards first, then expands the complete directory smoot
   assert.match(css, /\.feature-expansion\.is-open\s*\{[^}]*grid-template-rows:\s*1fr/s);
   assert.match(css, /@keyframes feature-reveal/);
   assert.match(css, /@keyframes panel-swap/);
-  assert.match(css, /\.feature-filter button\s*\{[^}]*font:\s*800 11px/s);
+  assert.match(css, /\.feature-filter button\s*\{[^}]*font:\s*800 12px[^;]*var\(--sans\)/s);
 });
 
 test("presents all 87 states as one motion banner instead of a box ledger", async () => {
@@ -107,7 +107,7 @@ test("presents all 87 states as one motion banner instead of a box ledger", asyn
   const html = await response.text();
   assert.match(html, /class="motion-banner"/);
   assert.match(html, /DEFINED[\s\S]*MOTION STATES/);
-  assert.match(html, /PawPico motion states:/);
+  assert.match(html, /MewMuze motion states:/);
   assert.doesNotMatch(html, /class="ledger-grid"|class="motion-orb"/);
 
   const css = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
@@ -131,7 +131,7 @@ test("keeps the supplied logo, orange identity, end-only price, and premium resp
   const css = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
   assert.match(css, /--copper:\s*#c06643/);
   assert.match(css, /--display:\s*Georgia,\s*"Times New Roman",\s*serif/);
-  assert.match(css, /--sans:\s*Arial,\s*Helvetica,\s*sans-serif/);
+  assert.match(css, /--sans:\s*"Gotham",\s*var\(--font-montserrat\),\s*"Avenir Next",\s*Arial,\s*Helvetica,\s*sans-serif/);
   assert.match(css, /--pixel:\s*"Courier New"/);
   assert.match(css, /backdrop-filter:\s*blur\(18px\)/);
   assert.match(css, /@media \(max-width: 1180px\)/);
@@ -147,8 +147,25 @@ test("keeps the supplied logo, orange identity, end-only price, and premium resp
   assert.doesNotMatch(css, /repeating-linear-gradient|scanlines|font-cormorant/);
 
   const layout = await readFile(new URL("../app/layout.tsx", import.meta.url), "utf8");
+  assert.match(layout, /Montserrat/);
   assert.doesNotMatch(layout, /Cormorant/);
   assert.doesNotMatch(html, /scanlines|↓|↘|↗/);
+});
+
+test("uses MewMuze throughout customer-facing copy and keeps button labels legible", async () => {
+  const response = await render();
+  const html = await response.text();
+  assert.match(html, /MewMuze is an expressive pixel cat/);
+  assert.match(html, /Get MewMuze/);
+  assert.match(html, /MEWMUZE PERSONALITY CORE/);
+  const page = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
+  const layout = await readFile(new URL("../app/layout.tsx", import.meta.url), "utf8");
+  assert.doesNotMatch(page, /\bPawPico\b/);
+  assert.doesNotMatch(layout, /\bPawPico\b/);
+
+  const css = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
+  assert.match(css, /\.metal-button\s*\{[^}]*font:\s*800 13px[^;]*var\(--sans\)/s);
+  assert.match(css, /\.metal-button\.large\s*\{[^}]*font-size:\s*14px/s);
 });
 
 test("connector-film generator keeps every animation stage clean and border-only", async () => {

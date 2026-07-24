@@ -1,4 +1,4 @@
-"""Composite PawPico's exact supplied logo and verified copy onto the social card."""
+"""Composite MewMuze's exact supplied logo and verified copy onto the social card."""
 
 from pathlib import Path
 
@@ -33,7 +33,7 @@ copper = "#b65b3f"
 muted = "#6d5c50"
 green = "#5e7d63"
 
-draw.text((700, 270), "PawPico", font=display, fill=ink)
+draw.text((700, 270), "MewMuze", font=display, fill=ink)
 draw.text((706, 384), "Your desktop,", font=display_italic, fill=copper)
 draw.text((706, 440), "now with a pulse.", font=display_italic, fill=copper)
 draw.text((710, 523), "AN EXPRESSIVE WINDOWS CAT + A TINY PRODUCTIVITY CONSOLE", font=mono, fill=muted)
