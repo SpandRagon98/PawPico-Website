@@ -27,7 +27,7 @@ test("server-renders the complete current PawPico product story", async () => {
   assert.match(html, /Notifications &amp; reminders/);
   assert.match(html, /Music, microphone &amp; sound/);
   assert.match(html, /Local AI-agent companion/);
-  assert.match(html, /THE COMPLETE MOTION LEDGER/);
+  assert.match(html, /THE COMPLETE MOTION ARCHIVE/);
   assert.doesNotMatch(html, /voice commands/i);
   assert.doesNotMatch(html, /codex-preview|SkeletonPreview|Your site is taking shape/i);
 });
@@ -90,12 +90,30 @@ test("shows three feature cards first, then expands the complete directory smoot
   assert.match(page, /filteredGroups\.slice\(0,\s*3\)/);
   assert.match(page, /filteredGroups\.slice\(3\)/);
   assert.match(page, /setShowAllFeatures\(false\)/);
+  assert.match(page, /key=\{`\$\{group\.id\}-\$\{shouldPlay \? "playing" : "paused"\}`\}/);
+  assert.match(page, /event\.currentTarget\.play\(\)/);
+  assert.doesNotMatch(html, /Nothing here is inferred from marketing copy/);
 
   const css = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
   assert.match(css, /grid-template-rows:\s*0fr/);
   assert.match(css, /\.feature-expansion\.is-open\s*\{[^}]*grid-template-rows:\s*1fr/s);
   assert.match(css, /@keyframes feature-reveal/);
   assert.match(css, /@keyframes panel-swap/);
+  assert.match(css, /\.feature-filter button\s*\{[^}]*font:\s*800 11px/s);
+});
+
+test("presents all 87 states as one motion banner instead of a box ledger", async () => {
+  const response = await render();
+  const html = await response.text();
+  assert.match(html, /class="motion-banner"/);
+  assert.match(html, /DEFINED[\s\S]*MOTION STATES/);
+  assert.match(html, /PawPico motion states:/);
+  assert.doesNotMatch(html, /class="ledger-grid"|class="motion-orb"/);
+
+  const css = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
+  assert.match(css, /@keyframes motion-stream/);
+  assert.match(css, /\.motion-banner-count b\s*\{[^}]*clamp\(88px,8vw,136px\)/s);
+  assert.doesNotMatch(css, /\.ledger-grid|\.motion-orb/);
 });
 
 test("keeps the supplied logo, orange identity, end-only price, and premium responsive layout", async () => {
@@ -124,6 +142,7 @@ test("keeps the supplied logo, orange identity, end-only price, and premium resp
   assert.match(css, /100svh/);
   assert.match(css, /scroll-snap-type:\s*x mandatory/);
   assert.match(css, /\.drawer-film\s*\{[^}]*aspect-ratio:\s*3\s*\/\s*2/s);
+  assert.match(css, /\.privacy-grid b\s*\{[^}]*font:\s*800 12px/s);
   assert.doesNotMatch(css, /data-theme|theme-cycle|palette-dots/);
   assert.doesNotMatch(css, /repeating-linear-gradient|scanlines|font-cormorant/);
 

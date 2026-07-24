@@ -350,13 +350,14 @@ const featureGroups = [
   },
 ];
 
-const animationLedger = [
+const animationLedger: Array<[string, string[]]> = [
   ["Movement · 28", ["idle", "side idle", "back idle", "walk", "stalk", "run", "sprint", "turn around", "turn left", "turn right", "look up", "look down", "jump", "small hop", "vertical jump", "long jump", "fall", "land", "soft land", "hard land", "climb", "climb up", "climb down", "step down", "balance", "hang—two paws", "hang—one paw", "pull up"]],
   ["Rest & rituals · 15", ["sit", "side sit", "cute nod", "lie down", "sleep", "wake up", "stretch", "yawn", "blink", "tail flick", "clean paw", "clean face", "scratch", "groom", "look around"]],
   ["Cursor play · 18", ["watch", "approach", "chase", "pounce", "swat", "paw swipe", "catch", "hold", "dragged by cursor", "cursor grab", "cursor swing", "lose grip", "land safe", "confused", "startled", "tired", "tail chase", "peek"]],
   ["Touch & emotion · 10", ["petted", "petted—eyes closed", "purr", "picked up", "dangle", "dragged—surprised", "placed down", "shake", "annoyed", "happy"]],
   ["Work & context · 16", ["knead", "overheat", "think", "celebrate", "wave", "write notes", "type keys", "sing", "bow", "Quick Tools", "panic", "sad", "placard", "read book", "dance bop", "embarrassed"]],
 ];
+const animationStates = animationLedger.flatMap(([, states]) => states);
 
 const filters = [
   ["all", "All systems"],
@@ -414,7 +415,18 @@ export default function Home() {
           <p>{group.lead}</p>
         </div>
         <div className="drawer-film">
-          <video autoPlay={shouldPlay} loop muted playsInline preload="metadata" aria-label={`${group.title} animation`}>
+          <video
+            key={`${group.id}-${shouldPlay ? "playing" : "paused"}`}
+            autoPlay={shouldPlay}
+            loop
+            muted
+            playsInline
+            preload="metadata"
+            aria-label={`${group.title} animation`}
+            onCanPlay={(event) => {
+              if (shouldPlay) void event.currentTarget.play().catch(() => undefined);
+            }}
+          >
             <source src={publicAsset(group.video)} type="video/mp4" />
           </video>
           <b>IN APP</b>
@@ -542,7 +554,6 @@ export default function Home() {
               <div className="eyebrow">SOURCE-VERIFIED SYSTEM DIRECTORY</div>
               <h2>Every feature.<br /><em>Down to the small ones.</em></h2>
             </div>
-            <p>Nothing here is inferred from marketing copy. Each detail is matched to the current application source, native Windows modules, tests, and installer build.</p>
           </div>
 
           <div className="feature-filter" role="tablist" aria-label="Filter PawPico features">
@@ -594,21 +605,22 @@ export default function Home() {
         <div className="section-shell">
           <div className="motion-intro">
             <div>
-              <div className="eyebrow light">THE COMPLETE MOTION LEDGER</div>
+              <div className="eyebrow light">THE COMPLETE MOTION ARCHIVE</div>
               <h2>Eighty-seven states.<br /><em>One coherent little animal.</em></h2>
             </div>
-            <div className="motion-orb">
-              <span><b>87</b><small>DEFINED<br />STATES</small></span>
-              <i />
-            </div>
           </div>
-          <div className="ledger-grid">
-            {animationLedger.map(([title, states]) => (
-              <article key={title as string}>
-                <header><span>{title}</span><i /></header>
-                <div>{(states as string[]).map((state) => <span key={state}>{state}</span>)}</div>
-              </article>
-            ))}
+          <div className="motion-banner">
+            <div className="motion-banner-count">
+              <b>87</b>
+              <span>DEFINED<br />MOTION STATES</span>
+              <small>Movement · Rest · Cursor play · Emotion · Work</small>
+            </div>
+            <div className="motion-marquee">
+              <div className="motion-stream" aria-label={`PawPico motion states: ${animationStates.join(", ")}`}>
+                {animationStates.map((state, index) => <span key={`state-${index}`}>{state}</span>)}
+                {animationStates.map((state, index) => <span key={`repeat-${index}`} aria-hidden="true">{state}</span>)}
+              </div>
+            </div>
           </div>
         </div>
       </section>
