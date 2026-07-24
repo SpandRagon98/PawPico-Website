@@ -116,7 +116,7 @@ h2 { margin-bottom: 0; font-size: clamp(54px, 5.6vw, 88px); line-height: .9; }
   border-radius: 10px;
   background: linear-gradient(180deg,#f8ead3,#cdb18c);
   box-shadow: 0 5px 0 #9a775c, inset 0 1px 0 #fff9ed;
-  font: 800 13px/1.1 var(--sans);
+  font: 800 13px/1.1 var(--pixel);
   letter-spacing: .035em;
   text-transform: uppercase;
   transition: transform .15s ease, box-shadow .15s ease;
@@ -335,7 +335,7 @@ h2 { margin-bottom: 0; font-size: clamp(54px, 5.6vw, 88px); line-height: .9; }
   background: linear-gradient(#f0e1cb,#d3bd9e);
   box-shadow: 0 3px 0 #9d8165, inset 0 1px 0 #fff8ec;
   cursor: pointer;
-  font: 800 12px/1.15 var(--sans);
+  font: 800 12px/1.15 var(--pixel);
   letter-spacing: .025em;
   text-transform: uppercase;
   transition: color .24s ease, background-color .24s ease, box-shadow .24s ease, transform .24s cubic-bezier(.22,1,.36,1);
@@ -472,8 +472,8 @@ h2 { margin-bottom: 0; font-size: clamp(54px, 5.6vw, 88px); line-height: .9; }
 .privacy-seal i { margin-top: 12px; font-style: normal; }
 .privacy-grid { grid-column: 1 / -1; margin-top: 28px; display: grid; grid-template-columns: repeat(3,1fr); border-top: 1px solid #ab9275; border-left: 1px solid #ab9275; }
 .privacy-grid span { min-height: 142px; padding: 24px; display: grid; align-content: start; gap: 11px; border-right: 1px solid #ab9275; border-bottom: 1px solid #ab9275; background: rgba(247,237,221,.25); }
-.privacy-grid b { font: 800 12px/1.35 var(--pixel); letter-spacing: .02em; }
-.privacy-grid small { color: #776459; font-size: 13px; line-height: 1.62; }
+.privacy-grid b { font: 800 14px/1.4 var(--pixel); letter-spacing: .02em; }
+.privacy-grid small { color: #776459; font-size: 15px; line-height: 1.65; }
 
 .download-card {
   min-height: 430px;

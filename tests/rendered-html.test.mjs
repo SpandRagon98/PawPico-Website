@@ -99,7 +99,7 @@ test("shows three feature cards first, then expands the complete directory smoot
   assert.match(css, /\.feature-expansion\.is-open\s*\{[^}]*grid-template-rows:\s*1fr/s);
   assert.match(css, /@keyframes feature-reveal/);
   assert.match(css, /@keyframes panel-swap/);
-  assert.match(css, /\.feature-filter button\s*\{[^}]*font:\s*800 12px[^;]*var\(--sans\)/s);
+  assert.match(css, /\.feature-filter button\s*\{[^}]*font:\s*800 12px[^;]*var\(--pixel\)/s);
 });
 
 test("presents all 87 states as one motion banner instead of a box ledger", async () => {
@@ -142,7 +142,8 @@ test("keeps the supplied logo, orange identity, end-only price, and premium resp
   assert.match(css, /100svh/);
   assert.match(css, /scroll-snap-type:\s*x mandatory/);
   assert.match(css, /\.drawer-film\s*\{[^}]*aspect-ratio:\s*3\s*\/\s*2/s);
-  assert.match(css, /\.privacy-grid b\s*\{[^}]*font:\s*800 12px/s);
+  assert.match(css, /\.privacy-grid b\s*\{[^}]*font:\s*800 14px/s);
+  assert.match(css, /\.privacy-grid small\s*\{[^}]*font-size:\s*15px/s);
   assert.doesNotMatch(css, /data-theme|theme-cycle|palette-dots/);
   assert.doesNotMatch(css, /repeating-linear-gradient|scanlines|font-cormorant/);
 
@@ -164,7 +165,7 @@ test("uses MewMuze throughout customer-facing copy and keeps button labels legib
   assert.doesNotMatch(layout, /\bPawPico\b/);
 
   const css = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
-  assert.match(css, /\.metal-button\s*\{[^}]*font:\s*800 13px[^;]*var\(--sans\)/s);
+  assert.match(css, /\.metal-button\s*\{[^}]*font:\s*800 13px[^;]*var\(--pixel\)/s);
   assert.match(css, /\.metal-button\.large\s*\{[^}]*font-size:\s*14px/s);
 });
 
