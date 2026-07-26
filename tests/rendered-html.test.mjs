@@ -2,12 +2,12 @@ import assert from "node:assert/strict";
 import { readFile, stat } from "node:fs/promises";
 import test from "node:test";
 
-async function render() {
+async function render(path = "/") {
   const workerUrl = new URL("../dist/server/index.js", import.meta.url);
   workerUrl.searchParams.set("test", `${process.pid}-${Date.now()}`);
   const { default: worker } = await import(workerUrl.href);
   return worker.fetch(
-    new Request("http://localhost/", { headers: { accept: "text/html" } }),
+    new Request(`http://localhost${path}`, { headers: { accept: "text/html" } }),
     { ASSETS: { fetch: async () => new Response("Not found", { status: 404 }) } },
     { waitUntil() {}, passThroughOnException() {} },
   );
@@ -189,4 +189,62 @@ test("explains local-first privacy honestly now that opt-in connectors exist", a
   assert.match(html, /No microphone audio/);
   assert.match(html, /Offline license check/);
   assert.doesNotMatch(html, /makes no network requests/i);
+});
+
+test("renders the lightweight Costume Store with clearly marked mock commerce", async () => {
+  const response = await render("/store");
+  assert.equal(response.status, 200);
+  const html = await response.text();
+  assert.match(html, /Dress[\s\S]*the muse\./);
+  assert.match(html, /Mock storefront/);
+  assert.match(html, /no payment processing/i);
+  assert.match(html, /Pick a new/);
+  assert.match(html, /Mecha Hero/);
+  assert.match(html, /Space Explorer/);
+  assert.match(html, /Open MewMuze|Install in MewMuze/);
+  assert.match(html, /From Store to cat/);
+  assert.match(html, /Development sample/);
+  assert.doesNotMatch(html, /Iron Man|Spider-Man|Captain America|Naruto|Itachi|Avengers/i);
+});
+
+test("keeps every dummy costume price between one and two dollars", async () => {
+  const source = await readFile(new URL("../data/store/catalog.ts", import.meta.url), "utf8");
+  const prices = Array.from(source.matchAll(/price:\s*(\d+\.\d+)/g), (match) => Number(match[1]));
+  assert.equal(prices.length, 10);
+  for (const price of prices) {
+    assert.ok(price >= 1 && price <= 2, `dummy price ${price} must be in the approved range`);
+  }
+  assert.match(source, /purchaseProductId/);
+  assert.match(source, /supportedBodies/);
+  assert.match(source, /minimumAppVersion/);
+  const commerce = await readFile(new URL("../lib/store/commerce.ts", import.meta.url), "utf8");
+  for (const method of [
+    "createCheckoutSession",
+    "getPurchaseStatus",
+    "getOwnedCostumes",
+    "createInstallationToken",
+    "refreshInstallationToken",
+    "requestSignedDownload",
+  ]) {
+    assert.match(commerce, new RegExp(method));
+  }
+});
+
+test("renders static costume detail pages and publishes the secure schema", async () => {
+  const response = await render("/store/space-explorer");
+  assert.equal(response.status, 200);
+  const html = await response.text();
+  assert.match(html, /Space Explorer/);
+  assert.match(html, /Mock buy/);
+  assert.match(html, /Visual only/);
+  const detailSource = await readFile(new URL("../app/store/[slug]/page.tsx", import.meta.url), "utf8");
+  assert.match(detailSource, /\["Front", "Side", "Movement"\]/);
+
+  const schema = JSON.parse(
+    await readFile(new URL("../public/store/specs/costume-manifest.schema.json", import.meta.url), "utf8"),
+  );
+  assert.equal(schema.properties.schemaVersion.const, 1);
+  assert.equal(schema.properties.signatureKeyId.const, "store-key-2026-01");
+  assert.equal(schema.properties.assets.maxItems, 12);
+  assert.ok((await stat(new URL("../public/store/samples/space-explorer-sample.mewcostume", import.meta.url))).size > 0);
 });

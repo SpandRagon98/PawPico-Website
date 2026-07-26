@@ -443,6 +443,7 @@ export default function Home() {
       <header className="site-header">
         <a className="brand" href="#top" aria-label="MewMuze home"><Brand /></a>
         <nav aria-label="Primary navigation">
+          <a href={`${publicBasePath}/store/`}>Store</a>
           <a href="#command-deck">Highlights</a>
           <a href="#complete">Every feature</a>
           <a href="#motion">Animations</a>
