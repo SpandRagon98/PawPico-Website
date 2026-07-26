@@ -52,9 +52,9 @@ const manifest = {
   schemaVersion: 1,
   id: "mewmuze.iron-man-cat.v1",
   name: "Iron Man Cat",
-  version: "1.0.0",
+  version: "1.0.1",
   creator: "MewMuze Studio",
-  description: "A red-and-gold armored cat costume with an opening faceplate and intermittent glowing helmet eyes.",
+  description: "Fitted red-and-gold armor worn over your existing MewMuze cat, with an opening faceplate and intermittent glowing helmet eyes.",
   category: "heroes",
   supportedBodies: ["classic", "chonk", "fluffy", "siamese", "kitten"],
   minimumAppVersion: "0.1.0",
@@ -73,7 +73,7 @@ const manifest = {
   assetHashes,
   packageSize: 0,
   licenseId: "mock-iron-man-cat-v1",
-  signatureKeyId: "store-key-mecha-2026-01"
+  signatureKeyId: "store-key-mecha-2026-02"
 };
 const entitlement = {
   costumeId: manifest.id,

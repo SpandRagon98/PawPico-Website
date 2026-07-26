@@ -2,9 +2,9 @@
   "schemaVersion": 1,
   "id": "mewmuze.iron-man-cat.v1",
   "name": "Iron Man Cat",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "creator": "MewMuze Studio",
-  "description": "A red-and-gold armored cat costume with an opening faceplate and intermittent glowing helmet eyes.",
+  "description": "Fitted red-and-gold armor worn over your existing MewMuze cat, with an opening faceplate and intermittent glowing helmet eyes.",
   "category": "heroes",
   "supportedBodies": [
     "classic",
@@ -90,8 +90,8 @@
     }
   ],
   "assetHashes": {
-    "thumbnail.png": "1ffcce1803372d67b252c161d0992a8d8d0bf1f5c60b063977b7c0ae1ba52897",
-    "preview.png": "8c1f431197cb756384edc42956dd46de380c0c8ee338c5b99df058ffb76b4053",
+    "thumbnail.png": "5c9f719fe405b1ee6d47baa5e7e521bdc40aed491af79829a9e81dbebec35936",
+    "preview.png": "9390be4e07fb05ff6a864ed58062adf2cc03862f34d22fe3275c96b6daf8d6cb",
     "assets/body-front.png": "bf243f018930663ba78b372546d7f9f99984fbc7ec5b68a977c765572a37d8ac",
     "assets/body-front-open.png": "5e76aeedf0d1d6e24e0cf0fc1a7823f218a07063a89d5113f305a7dce8700e5b",
     "assets/body-front-glow.png": "04d69875da74f7ae06c298b892067cb9f45b01dbea5d6e4908bc51fc2dc0c55f",
@@ -102,5 +102,5 @@
   },
   "packageSize": 0,
   "licenseId": "mock-iron-man-cat-v1",
-  "signatureKeyId": "store-key-mecha-2026-01"
+  "signatureKeyId": "store-key-mecha-2026-02"
 }

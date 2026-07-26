@@ -29,8 +29,8 @@ export function CostumeArtwork({
           src={sitePath(product.artworkPath)}
           alt=""
           aria-hidden="true"
-          width={1256}
-          height={1256}
+          width={1024}
+          height={1024}
           unoptimized
           priority={size === "hero"}
         />

@@ -247,6 +247,7 @@ test("renders static costume detail pages and publishes the secure schema", asyn
   assert.deepEqual(schema.properties.signatureKeyId.enum, [
     "store-key-2026-01",
     "store-key-mecha-2026-01",
+    "store-key-mecha-2026-02",
   ]);
   assert.equal(schema.properties.assets.maxItems, 12);
   assert.ok((await stat(new URL("../public/store/samples/space-explorer-sample.mewcostume", import.meta.url))).size > 0);
