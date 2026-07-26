@@ -1,9 +1,20 @@
 import type { Metadata } from "next";
 import "./store.css";
 
+const siteUrl =
+  process.env.NEXT_PUBLIC_SITE_URL ?? "https://spandragon98.github.io/PawPico-Website";
+
 export const metadata: Metadata = {
-  title: "MewMuze Costume Store — Original local-install cat costumes",
-  description: "Browse original MewMuze costumes, preview compatibility, and try the clearly marked mock checkout.",
+  title: "MewMuze Store — Coming Soon",
+  description:
+    "Preview upcoming original costume concepts for MewMuze, your personal desktop cat.",
+  alternates: { canonical: `${siteUrl}/store/` },
+  openGraph: {
+    title: "MewMuze Store — Coming Soon",
+    description:
+      "Preview upcoming original costume concepts for MewMuze, your personal desktop cat.",
+    url: `${siteUrl}/store/`,
+  },
 };
 
 export default function StoreLayout({ children }: { children: React.ReactNode }) {

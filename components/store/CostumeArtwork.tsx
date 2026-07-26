@@ -1,56 +1,43 @@
 import Image from "next/image";
+import type { CSSProperties } from "react";
+import type { StoreConcept } from "../../data/store/catalog";
 import { sitePath } from "../../lib/site-path";
-import type { StoreProduct } from "../../data/store/catalog";
 
 export function CostumeArtwork({
-  product,
+  concept,
   size = "card",
   label,
 }: {
-  product: StoreProduct;
+  concept: StoreConcept;
   size?: "card" | "hero" | "detail";
   label?: string;
 }) {
   return (
     <div
-      className={`costume-art costume-art-${size}`}
+      className={`concept-art concept-art-${size}`}
       style={{
-        "--costume-a": product.palette[0],
-        "--costume-b": product.palette[1],
-        "--costume-c": product.palette[2],
-      } as React.CSSProperties}
+        "--concept-a": concept.palette[0],
+        "--concept-b": concept.palette[1],
+        "--concept-c": concept.palette[2],
+      } as CSSProperties}
       role={label ? "img" : undefined}
       aria-label={label}
     >
-      <span className="costume-halo" aria-hidden="true" />
-      {product.artworkPath ? (
-        <Image
-          className="costume-product-image"
-          src={sitePath(product.artworkPath)}
-          alt=""
-          aria-hidden="true"
-          width={1024}
-          height={1024}
-          unoptimized
-          priority={size === "hero"}
-        />
-      ) : (
-        <>
-          <Image
-            src={sitePath("/pawpico-cat-idle.png")}
-            alt=""
-            aria-hidden="true"
-            width={420}
-            height={420}
-            unoptimized
-            priority={size === "hero"}
-          />
-          <span className={`costume-shell costume-${product.visual}`} aria-hidden="true">
-            <i>{product.glyph}</i>
-          </span>
-        </>
-      )}
-      <small aria-hidden="true">{product.name}</small>
+      <span className={`concept-shape concept-${concept.visual}`} aria-hidden="true">
+        <i>{concept.glyph}</i>
+      </span>
+      <Image
+        className="concept-cat"
+        src={sitePath("/mewmuze-flower-cat.png")}
+        alt=""
+        aria-hidden="true"
+        width={55}
+        height={86}
+        unoptimized
+        priority={size === "hero"}
+      />
+      <span className="concept-grid" aria-hidden="true" />
+      <small aria-hidden="true">ORIGINAL CONCEPT / {concept.stage.toUpperCase()}</small>
     </div>
   );
 }
