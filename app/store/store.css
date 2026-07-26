@@ -147,6 +147,10 @@
   filter: drop-shadow(0 18px 18px rgba(48, 29, 20, .22));
 }
 
+.costume-art img.costume-product-image {
+  width: min(88%, 470px);
+}
+
 .costume-halo {
   position: absolute;
   z-index: 0;
@@ -413,7 +417,17 @@
 
 .library-row > span:nth-child(2) { display: grid; gap: 4px; }
 .library-row small { color: #887164; font: 700 8px/1 var(--pixel); }
-.library-row button { padding: 9px; font-size: 7px; }
+.library-row button,
+.library-row a {
+  padding: 9px;
+  border: 1px solid rgba(91,63,47,.45);
+  border-radius: 6px;
+  color: var(--ink);
+  background: #f8eedc;
+  font: 700 7px/1 var(--pixel);
+  text-align: center;
+  text-decoration: none;
+}
 .library-row button:disabled { opacity: .45; cursor: not-allowed; }
 .library-glyph { width: 40px; height: 40px; display: grid; place-items: center; border-radius: 8px; color: #fff; }
 

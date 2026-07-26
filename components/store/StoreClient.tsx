@@ -99,7 +99,13 @@ export function StoreClient() {
                     View details
                   </Link>
                   {isOwned ? (
-                    <button className="metal-button compact primary" onClick={() => void launch(product)}>Install</button>
+                    product.packagePath ? (
+                      <a className="metal-button compact primary" href={sitePath(product.packagePath)} download>
+                        Download
+                      </a>
+                    ) : (
+                      <button className="metal-button compact primary" onClick={() => void launch(product)}>Install</button>
+                    )
                   ) : (
                     <button
                       className="metal-button compact primary"
@@ -135,13 +141,23 @@ export function StoreClient() {
                   <div className="library-row" key={id}>
                     <span className="library-glyph" style={{ background: product.palette[0] }}>{product.glyph}</span>
                     <span><b>{product.name}</b><small>Mock purchase · v{product.version}</small></span>
-                    <button onClick={() => void launch(product)}>Install in MewMuze</button>
+                    {product.packagePath ? (
+                      <a href={sitePath(product.packagePath)} download>Download &amp; install</a>
+                    ) : (
+                      <button onClick={() => void launch(product)}>Install in MewMuze</button>
+                    )}
                     <button
-                      onClick={() => void mockCommerce.createInstallationToken(product.slug).then((value) => navigator.clipboard.writeText(value.installUrl))}
+                      onClick={() => product.packagePath
+                        ? void navigator.clipboard.writeText(`${window.location.origin}${sitePath(product.packagePath)}`)
+                        : void mockCommerce.createInstallationToken(product.slug).then((value) => navigator.clipboard.writeText(value.installUrl))}
                     >
                       Copy link
                     </button>
-                    <button disabled title="Signed downloads require the production backend">Download package</button>
+                    {product.packagePath ? (
+                      <a href={sitePath(product.packagePath)} download>Download package</a>
+                    ) : (
+                      <button disabled title="Signed downloads require the production backend">Download package</button>
+                    )}
                   </div>
                 );
               })

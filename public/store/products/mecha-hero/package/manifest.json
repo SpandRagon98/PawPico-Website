@@ -1,0 +1,106 @@
+{
+  "schemaVersion": 1,
+  "id": "mewmuze.iron-man-cat.v1",
+  "name": "Iron Man Cat",
+  "version": "1.0.0",
+  "creator": "MewMuze Studio",
+  "description": "A red-and-gold armored cat costume with an opening faceplate and intermittent glowing helmet eyes.",
+  "category": "heroes",
+  "supportedBodies": [
+    "classic",
+    "chonk",
+    "fluffy",
+    "siamese",
+    "kitten"
+  ],
+  "minimumAppVersion": "0.1.0",
+  "maximumAppVersion": null,
+  "thumbnail": "thumbnail.png",
+  "preview": "preview.png",
+  "assets": [
+    {
+      "path": "assets/body-front.png",
+      "view": "front",
+      "layer": "overlay",
+      "variant": "base",
+      "offsetX": 0,
+      "offsetY": 0,
+      "scale": 1,
+      "opacity": 1
+    },
+    {
+      "path": "assets/body-front-open.png",
+      "view": "front",
+      "layer": "overlay",
+      "variant": "maskOpen",
+      "offsetX": 0,
+      "offsetY": 0,
+      "scale": 1,
+      "opacity": 1
+    },
+    {
+      "path": "assets/body-front-glow.png",
+      "view": "front",
+      "layer": "overlay",
+      "variant": "eyeGlow",
+      "offsetX": 0,
+      "offsetY": 0,
+      "scale": 1,
+      "opacity": 1
+    },
+    {
+      "path": "assets/body-side.png",
+      "view": "side",
+      "layer": "overlay",
+      "variant": "base",
+      "offsetX": 0,
+      "offsetY": 0,
+      "scale": 1,
+      "opacity": 1
+    },
+    {
+      "path": "assets/body-side-open.png",
+      "view": "side",
+      "layer": "overlay",
+      "variant": "maskOpen",
+      "offsetX": 0,
+      "offsetY": 0,
+      "scale": 1,
+      "opacity": 1
+    },
+    {
+      "path": "assets/body-side-glow.png",
+      "view": "side",
+      "layer": "overlay",
+      "variant": "eyeGlow",
+      "offsetX": 0,
+      "offsetY": 0,
+      "scale": 1,
+      "opacity": 1
+    },
+    {
+      "path": "assets/body-back.png",
+      "view": "back",
+      "layer": "overlay",
+      "variant": "base",
+      "offsetX": 0,
+      "offsetY": 0,
+      "scale": 1,
+      "opacity": 1
+    }
+  ],
+  "assetHashes": {
+    "thumbnail.png": "1ffcce1803372d67b252c161d0992a8d8d0bf1f5c60b063977b7c0ae1ba52897",
+    "preview.png": "8c1f431197cb756384edc42956dd46de380c0c8ee338c5b99df058ffb76b4053",
+    "assets/body-front.png": "bf243f018930663ba78b372546d7f9f99984fbc7ec5b68a977c765572a37d8ac",
+    "assets/body-front-open.png": "5e76aeedf0d1d6e24e0cf0fc1a7823f218a07063a89d5113f305a7dce8700e5b",
+    "assets/body-front-glow.png": "04d69875da74f7ae06c298b892067cb9f45b01dbea5d6e4908bc51fc2dc0c55f",
+    "assets/body-side.png": "4b433a305f6ab6e222d568c4e4a5c30592f4496b2f9cf47be8bf64acc26e3dda",
+    "assets/body-side-open.png": "e051449ec717be0b7879db201342194e523148e0a097357697b48cdaf17d9689",
+    "assets/body-side-glow.png": "29bb2ad75e67fa5aa15b425aee4cef2bcd57f0952a3836e180538da9202a74c5",
+    "assets/body-back.png": "6cc5cb51c871b83a8c36274ef6de121a623bdc07aef7c8db02b6fc3e70bb5f30"
+  },
+  "packageSize": 0,
+  "licenseId": "mock-iron-man-cat-v1",
+  "signatureKeyId": "store-key-mecha-2026-01"
+}

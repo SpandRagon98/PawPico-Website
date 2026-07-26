@@ -34,6 +34,7 @@ for (const file of [
   "../out/store/space-explorer/index.html",
   "../out/store/specs/costume-manifest.schema.json",
   "../out/store/samples/space-explorer-sample.mewcostume",
+  "../out/store/products/mecha-hero/iron-man-cat.mewcostume",
 ]) {
   assert.ok((await stat(new URL(file, import.meta.url))).size > 0, `${file} is empty`);
 }

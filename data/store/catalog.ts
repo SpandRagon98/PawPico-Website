@@ -34,33 +34,37 @@ export interface StoreProduct {
   visual: string;
   glyph: string;
   palette: [string, string, string];
+  artworkPath?: string;
+  packagePath?: string;
 }
 
 const allBodies: BodyType[] = ["classic", "chonk", "fluffy", "siamese", "kitten"];
 
 export const storeCatalog: StoreProduct[] = [
   {
-    id: "mewmuze.mecha-hero.v1",
+    id: "mewmuze.iron-man-cat.v1",
     slug: "mecha-hero",
-    name: "Mecha Hero",
-    description: "A burnished mechanical suit with a bright little core.",
-    longDescription: "A wholly original hero silhouette: copper armor plates, a mint energy core, and movement-ready side panels.",
+    name: "Iron Man Cat",
+    description: "Red-and-gold powered armor with an opening helmet and glowing eyes.",
+    longDescription: "An Iron Man cat costume with articulated red-and-gold armor, a luminous chest reactor, a faceplate that periodically opens to reveal your cat, and helmet eyes that glow from time to time.",
     category: "Heroes",
     price: 1.99,
     currency: "USD",
-    packageSizeKb: 684,
+    packageSizeKb: 1239,
     version: "1.0.0",
     minimumAppVersion: "0.1.0",
     supportedBodies: allBodies,
     featured: true,
     availability: "available",
-    purchaseProductId: "mock_mecha-hero",
-    releaseNotes: ["First Store preview release", "Front, side, back, and motion overlays"],
-    includedElements: ["Copper body plates", "Mint chest light", "Soft boot highlights"],
+    purchaseProductId: "mock_iron-man-cat",
+    releaseNotes: ["Signed installable package", "Opening faceplate", "Intermittent eye glow"],
+    includedElements: ["Red-and-gold body armor", "Opening helmet", "Glowing helmet eyes", "Chest reactor"],
     creator: "MewMuze Studio",
     visual: "mecha",
     glyph: "◆",
-    palette: ["#c86a43", "#63a477", "#f1bd5a"],
+    palette: ["#ab2626", "#f0b137", "#63e7ff"],
+    artworkPath: "/store/products/mecha-hero/iron-man-cat.png",
+    packagePath: "/store/products/mecha-hero/iron-man-cat.mewcostume",
   },
   {
     id: "mewmuze.shield-guardian.v1",

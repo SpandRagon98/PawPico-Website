@@ -22,7 +22,7 @@ The canonical manifest schema is published at `public/store/specs/costume-manife
 
 ## Visual layers
 
-Each package declares at most one overlay for each `front`, `side`, `back`, or `all` view. A layer is a transparent PNG or WebP drawn over the procedural cat. `offsetX`, `offsetY`, `scale`, and `opacity` are bounded declarative values. Eyes, facial expressions, physics, movement, props, and application behavior remain owned by MewMuze.
+Each package declares at most one overlay per view and visual variant. Views are `front`, `side`, `back`, or `all`; variants are `base`, `maskOpen`, or `eyeGlow`. Packages without a variant use `base`, preserving compatibility with existing costumes. A layer is a transparent PNG or WebP drawn over the procedural cat. `offsetX`, `offsetY`, `scale`, and `opacity` are bounded declarative values. Eyes, facial expressions, physics, movement, props, and application behavior remain owned by MewMuze.
 
 ## Limits
 

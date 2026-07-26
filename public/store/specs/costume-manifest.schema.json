@@ -74,6 +74,10 @@
           },
           "view": { "enum": ["front", "side", "back", "all"] },
           "layer": { "const": "overlay" },
+          "variant": {
+            "enum": ["base", "maskOpen", "eyeGlow"],
+            "default": "base"
+          },
           "offsetX": { "type": "integer", "minimum": -512, "maximum": 512, "default": 0 },
           "offsetY": { "type": "integer", "minimum": -512, "maximum": 512, "default": 0 },
           "scale": { "type": "number", "minimum": 0.25, "maximum": 4, "default": 1 },
@@ -93,7 +97,9 @@
     },
     "packageSize": { "type": "integer", "minimum": 0, "maximum": 20971520 },
     "licenseId": { "type": "string", "minLength": 1, "maxLength": 120 },
-    "signatureKeyId": { "const": "store-key-2026-01" }
+    "signatureKeyId": {
+      "enum": ["store-key-2026-01", "store-key-mecha-2026-01"]
+    }
   },
   "$defs": {
     "version": {

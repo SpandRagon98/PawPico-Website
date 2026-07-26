@@ -24,7 +24,7 @@ The application downloads or reads into temporary storage, verifies the package 
 
 ## Rendering
 
-The procedural cat remains the base. A selected costume contributes transparent view overlays that are composited into the sprite before normal scaling, mirroring, and mochi deformation. This preserves gaze, eyes, expressions, animation timing, cursor tracking, movement, dragging, and physics.
+The procedural cat remains the base. A selected costume contributes transparent view overlays that are composited into the sprite before normal scaling, mirroring, and mochi deformation. Optional signed `maskOpen` and `eyeGlow` variants can be selected by the renderer on fixed visual-only timing cycles. This preserves gaze, eyes, expressions, animation timing, cursor tracking, movement, dragging, and physics.
 
 The user’s body is never changed silently. If the selected package does not support it, Appearance Studio lists supported bodies and requires the user to choose one.
 
@@ -32,6 +32,8 @@ The user’s body is never changed silently. If the selected package does not su
 
 - Select: loads verified local assets and persists the costume ID.
 - Disable: unloads the visual without removing files.
-- Uninstall: confirms, clears the selected costume if necessary, removes only the registered costume folder, and preserves all unrelated appearance settings.
+- Delete: confirms, clears the selected costume if necessary, removes only the registered costume folder, and preserves all unrelated appearance settings. The same signed package can be installed again later.
 - Update: manual or at most once daily; validates like a new install and promotes atomically.
 - Offline: a successfully installed costume uses its signed local receipt without requiring a startup network check.
+
+MewMuze stores at most five installed costumes at once. Installing a sixth asks the user to delete one first; reinstalling or replacing an existing costume ID does not consume another slot.

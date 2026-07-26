@@ -199,12 +199,12 @@ test("renders the lightweight Costume Store with clearly marked mock commerce", 
   assert.match(html, /Mock storefront/);
   assert.match(html, /no payment processing/i);
   assert.match(html, /Pick a new/);
-  assert.match(html, /Mecha Hero/);
+  assert.match(html, /Iron Man Cat/);
   assert.match(html, /Space Explorer/);
   assert.match(html, /Open MewMuze|Install in MewMuze/);
   assert.match(html, /From Store to cat/);
   assert.match(html, /Development sample/);
-  assert.doesNotMatch(html, /Iron Man|Spider-Man|Captain America|Naruto|Itachi|Avengers/i);
+  assert.doesNotMatch(html, /Spider-Man|Captain America|Naruto|Itachi|Avengers/i);
 });
 
 test("keeps every dummy costume price between one and two dollars", async () => {
@@ -244,7 +244,11 @@ test("renders static costume detail pages and publishes the secure schema", asyn
     await readFile(new URL("../public/store/specs/costume-manifest.schema.json", import.meta.url), "utf8"),
   );
   assert.equal(schema.properties.schemaVersion.const, 1);
-  assert.equal(schema.properties.signatureKeyId.const, "store-key-2026-01");
+  assert.deepEqual(schema.properties.signatureKeyId.enum, [
+    "store-key-2026-01",
+    "store-key-mecha-2026-01",
+  ]);
   assert.equal(schema.properties.assets.maxItems, 12);
   assert.ok((await stat(new URL("../public/store/samples/space-explorer-sample.mewcostume", import.meta.url))).size > 0);
+  assert.ok((await stat(new URL("../public/store/products/mecha-hero/iron-man-cat.mewcostume", import.meta.url))).size > 0);
 });
