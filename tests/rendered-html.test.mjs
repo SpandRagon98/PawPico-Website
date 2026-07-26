@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { readFile, stat } from "node:fs/promises";
+import { access, readFile, stat } from "node:fs/promises";
 import test from "node:test";
 
 async function render(path = "/") {
@@ -13,243 +13,290 @@ async function render(path = "/") {
   );
 }
 
-test("server-renders the complete current MewMuze product story", async () => {
+async function source(path) {
+  return readFile(new URL(path, import.meta.url), "utf8");
+}
+
+test("renders the exact MewMuze hero, brand, and primary story actions", async () => {
   const response = await render();
   assert.equal(response.status, 200);
   assert.match(response.headers.get("content-type") ?? "", /^text\/html\b/i);
   const html = await response.text();
-  assert.match(html, /<title>MewMuze — One tiny cat\. An entire inner life\.<\/title>/i);
-  assert.match(html, /Your desktop,/);
-  assert.match(html, /87[\s\S]*motion states/);
-  assert.match(html, /Work mode &amp; Quick Tools/);
-  assert.match(html, /Gmail connector/);
-  assert.match(html, /Google Calendar connector/);
-  assert.match(html, /Notifications &amp; reminders/);
-  assert.match(html, /Music, microphone &amp; sound/);
-  assert.match(html, /Local AI-agent companion/);
-  assert.match(html, /THE COMPLETE MOTION ARCHIVE/);
-  assert.doesNotMatch(html, /voice commands/i);
-  assert.doesNotMatch(html, /codex-preview|SkeletonPreview|Your site is taking shape/i);
-});
 
-test("leads with the five priority systems and ships accurate connector films", async () => {
-  const response = await render();
-  const html = await response.text();
-  for (const label of ["Work mode", "Gmail connector", "Google Calendar", "Smart notifications", "Appearance studio"]) {
-    assert.match(html, new RegExp(label));
-  }
-  for (const video of [
-    "work-mode.mp4",
-    "gmail-connector.mp4",
-    "calendar-connector.mp4",
-    "smart-notifications.mp4",
-    "customization-studio.mp4",
-  ]) {
-    assert.match(html, new RegExp(video.replace(".", "\\.")));
-    assert.ok((await stat(new URL(`../public/videos/${video}`, import.meta.url))).size > 70_000);
-  }
-  const page = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
-  assert.match(page, /60 s poll/);
-  assert.match(page, /5 min sync/);
-  assert.match(page, /mark done/);
-});
-
-test("ships the full source-verified directory with a relevant film for every group", async () => {
-  const response = await render();
-  const html = await response.text();
-  assert.equal((html.match(/class="feature-drawer"/g) ?? []).length, 13);
-  assert.equal((html.match(/class="drawer-film"/g) ?? []).length, 13);
-  for (const label of [
-    "Movement &amp; desktop physics",
-    "Cursor, petting &amp; mochi",
-    "Context-aware companion",
-    "Personality, moods &amp; rest",
-    "Focus, breaks &amp; Pomodoro",
-    "Windows behavior &amp; controls",
-  ]) {
-    assert.match(html, new RegExp(label));
-  }
+  assert.match(html, /<title>MewMuze — Your Personal Desktop Cat<\/title>/);
+  assert.match(html, /A PERSONAL DESKTOP CAT FOR WINDOWS/);
+  assert.match(html, /Your screen could use a little more life\./);
+  assert.match(html, /MewMuze lives quietly on your desktop/);
+  assert.match(html, /Hi\. I live here now\./);
+  assert.match(html, />Explore Now/);
+  assert.match(html, />See every feature/);
+  assert.match(html, /mewmuze-flower-cat\.png/);
   assert.match(html, /aria-label="Primary navigation"/);
-  assert.match(html, /href="#command-deck"/);
-  assert.match(html, /href="#complete"/);
-  assert.match(html, /href="#motion"/);
-  assert.match(html, /href="#privacy"/);
-  assert.match(html, /og:image/);
-  assert.match(html, /\/og-v2\.png/);
+  assert.match(html, /Store[\s\S]*Coming Soon/);
+  assert.doesNotMatch(await source("../app/page.tsx"), /\bPawPico\b/);
 });
 
-test("shows three feature cards first, then expands the complete directory smoothly", async () => {
-  const response = await render();
-  const html = await response.text();
-  assert.match(html, /See all 13 features/);
-  assert.match(html, /aria-expanded="false"/);
-  assert.match(html, /class="feature-expansion(?:\s|")/);
-  assert.match(html, /aria-hidden="true"/);
+test("implements one lightweight cursor loop with touch and reduced-motion fallbacks", async () => {
+  const page = await source("../app/page.tsx");
+  const css = await source("../app/globals.css");
 
-  const page = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
-  assert.match(page, /filteredGroups\.slice\(0,\s*3\)/);
-  assert.match(page, /filteredGroups\.slice\(3\)/);
-  assert.match(page, /setShowAllFeatures\(false\)/);
-  assert.match(page, /key=\{`\$\{group\.id\}-\$\{shouldPlay \? "playing" : "paused"\}`\}/);
-  assert.match(page, /event\.currentTarget\.play\(\)/);
-  assert.doesNotMatch(html, /Nothing here is inferred from marketing copy/);
+  assert.match(page, /requestAnimationFrame/);
+  assert.match(page, /window\.addEventListener\("pointermove", track/);
+  assert.match(page, /IntersectionObserver/);
+  assert.match(page, /visibilitychange/);
+  assert.match(page, /prefers-reduced-motion: reduce/);
+  assert.match(page, /\(pointer: fine\)/);
+  assert.match(page, /leftPupilRef/);
+  assert.match(page, /catMotionRef/);
+  assert.match(page, /touch-look/);
+  assert.doesNotMatch(
+    page.match(/const track =[\s\S]*?const observer =/)?.[0] ?? "",
+    /set[A-Z]\w*\(/,
+  );
 
-  const css = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
-  assert.match(css, /grid-template-rows:\s*0fr/);
-  assert.match(css, /\.feature-expansion\.is-open\s*\{[^}]*grid-template-rows:\s*1fr/s);
-  assert.match(css, /@keyframes feature-reveal/);
-  assert.match(css, /@keyframes panel-swap/);
-  assert.match(css, /\.feature-filter button\s*\{[^}]*font:\s*800 12px[^;]*var\(--pixel\)/s);
+  assert.match(css, /\.cat-pupil/);
+  assert.match(css, /\.touch-look \.hero-cat/);
+  assert.match(css, /@media \(prefers-reduced-motion: reduce\)/);
+  assert.match(css, /\.cat-pupil,[\s\S]*\.hero-cat-motion[\s\S]*transform: none !important/);
 });
 
-test("presents all 87 states as one motion banner instead of a box ledger", async () => {
-  const response = await render();
-  const html = await response.text();
-  assert.match(html, /class="motion-banner"/);
-  assert.match(html, /DEFINED[\s\S]*MOTION STATES/);
-  assert.match(html, /MewMuze motion states:/);
-  assert.doesNotMatch(html, /class="ledger-grid"|class="motion-orb"/);
+test("moves Explore Now into the feature experience and restores focus", async () => {
+  const page = await source("../app/page.tsx");
+  const css = await source("../app/globals.css");
 
-  const css = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
-  assert.match(css, /@keyframes motion-stream/);
-  assert.match(css, /\.motion-banner-count b\s*\{[^}]*clamp\(88px,8vw,136px\)/s);
-  assert.doesNotMatch(css, /\.ledger-grid|\.motion-orb/);
+  assert.match(page, /setJourneyState\("moving"\)/);
+  assert.match(page, /querySelector\("#features"\)\?\.scrollIntoView/);
+  assert.match(page, /theatreHeadingRef\.current\?\.focus/);
+  assert.match(page, /journeyState === "moving"/);
+  assert.match(css, /@keyframes cat-travel/);
+  assert.match(css, /\.hero-cat-motion\.is-travelling/);
 });
 
-test("keeps the supplied logo, orange identity, end-only price, and premium responsive layout", async () => {
+test("ships a one-at-a-time, keyboard and touch accessible 20-feature theatre", async () => {
   const response = await render();
   const html = await response.text();
-  assert.match(html, /\/pawpico-idle-reel\.mp4/);
-  assert.match(html, /\/pawpico-face-logo\.png/);
-  assert.equal((html.match(/\$5\.99/g) ?? []).length, 1);
-  assert.match(html, /ONE-TIME PRICE/);
-  assert.match(html, /ACTUAL IN-APP ANIMATION/);
+  const page = await source("../app/page.tsx");
+  const features = await source("../data/features.ts");
 
-  const page = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
-  assert.doesNotMatch(page, /setInterval|data-theme|paletteIndex|Soft gray|Blush pink/);
+  assert.match(html, /THE FEATURE THEATRE/);
+  assert.match(html, /aria-roledescription="carousel"/);
+  assert.match(html, /Previous feature/);
+  assert.match(html, /Next feature/);
+  assert.equal((html.match(/<video/g) ?? []).length, 1);
+  assert.equal((features.match(/number: "\d\d"/g) ?? []).length, 20);
 
-  const css = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
-  assert.match(css, /--copper:\s*#c06643/);
-  assert.match(css, /--display:\s*Georgia,\s*"Times New Roman",\s*serif/);
-  assert.match(css, /--sans:\s*"Gotham",\s*var\(--font-montserrat\),\s*"Avenir Next",\s*Arial,\s*Helvetica,\s*sans-serif/);
-  assert.match(css, /--pixel:\s*"Courier New"/);
-  assert.match(css, /backdrop-filter:\s*blur\(18px\)/);
+  for (const title of [
+    "Cursor companion",
+    "Petting",
+    "Doze and sleep",
+    "Work Mode",
+    "Clipboard Assistant",
+    "Focus Mode",
+    "Pomodoro",
+    "Break and water reminders",
+    "Custom reminders",
+    "Gmail",
+    "Google Calendar",
+    "Desktop Physics",
+    "Context aware",
+    "Music",
+    "Microphone reaction",
+    "Appearance Studio",
+    "Personality and rest",
+    "Peek Mode",
+    "Local Agent Status",
+    "Lightweight Windows companion",
+  ]) {
+    assert.match(features, new RegExp(title));
+  }
+
+  for (const key of ["ArrowLeft", "ArrowRight", "Home", "End"]) {
+    assert.match(page, new RegExp(`"${key}"`));
+  }
+  assert.match(page, /event\.pointerType !== "mouse"/);
+  assert.match(page, /Math\.abs\(distance\) > 46/);
+  assert.match(page, /disabled=\{activeIndex === 0\}/);
+  assert.match(page, /disabled=\{activeIndex === featureStories\.length - 1\}/);
+});
+
+test("keeps every checked-in feature film relevant and renders only the active one", async () => {
+  const features = await source("../data/features.ts");
+  const paths = Array.from(features.matchAll(/video: "(\/[^"]+\.mp4)"/g), (match) => match[1]);
+  assert.equal(paths.length, 20);
+
+  for (const path of new Set(paths)) {
+    assert.ok((await stat(new URL(`../public${path}`, import.meta.url))).size > 10_000, path);
+  }
+
+  const page = await source("../app/page.tsx");
+  assert.match(page, /key=\{feature\.id\}/);
+  assert.match(page, /autoPlay/);
+  assert.match(page, /muted/);
+  assert.match(page, /playsInline/);
+  assert.doesNotMatch(page, /setInterval/);
+});
+
+test("renders the connected companionship narrative and complete grouped directory", async () => {
+  const response = await render();
+  const html = await response.text();
+
+  assert.match(html, /Most desktops do their job\./);
+  assert.match(html, /They just don&#x27;t keep you company\./);
+  assert.match(html, /Then a tiny pair of green eyes appears\./);
+  for (const moment of ["8:47", "10:30", "1:15", "3:00", "5:48"]) {
+    assert.match(html, new RegExp(moment.replace(":", "[:]")));
+  }
+  for (const group of [
+    "Helps me work",
+    "Keeps me on track",
+    "Lives on my desktop",
+    "Reacts to my day",
+    "Looks like mine",
+    "Respects my privacy",
+  ]) {
+    assert.match(html, new RegExp(group));
+  }
+  assert.equal((html.match(/class="directory-dot/g) ?? []).length, 20);
+});
+
+test("presents the accurate Appearance Studio and current Flower Band preset", async () => {
+  const response = await render();
+  const html = await response.text();
+
+  for (const body of ["Classic", "Chonk", "Fluffy", "Siamese", "Kitten"]) {
+    assert.match(html, new RegExp(`>${body}<`));
+  }
+  for (const pattern of ["Solid", "Tuxedo", "Tabby", "Socks", "Spotted", "Calico", "Bicolour"]) {
+    assert.match(html, new RegExp(`>${pattern}<`));
+  }
+  assert.match(html, /Fur · eyes · inner ears/);
+  assert.match(html, /Small · medium · large/);
+  assert.match(html, /None · Flower Band/);
+  assert.match(html, /FLOWER BAND/);
+  assert.match(html, /Exact body and coat rendering remains inside the app/);
+  assert.doesNotMatch(html, /12 accessories/);
+});
+
+test("explains privacy without inventing screen, email-body, or microphone access", async () => {
+  const response = await render();
+  const html = await response.text();
+
+  assert.match(html, /Local file work/);
+  assert.match(html, /Gmail envelope only/);
+  assert.match(html, /never the email body/);
+  assert.match(html, /Private calendar feed/);
+  assert.match(html, /No microphone audio/);
+  assert.match(html, /not a recording or transcription/);
+  assert.match(html, /No hidden screen reading/);
+  assert.match(html, /Your reminders/);
+  assert.doesNotMatch(html, /voice command/i);
+});
+
+test("uses the professional white tactile design system at every target breakpoint", async () => {
+  const css = await source("../app/globals.css");
+
+  for (const token of [
+    "--background: #f5f6f7",
+    "--surface: #ffffff",
+    "--recessed: #e8eaed",
+    "--text: #202326",
+    "--mint: #a9d8bd",
+    "--pink: #e7a5b8",
+    "--lavender: #bbb7e8",
+    "--powder: #b5d5ed",
+    "--peach: #f2c7a7",
+    "--yellow: #f5dfa0",
+  ]) {
+    assert.match(css, new RegExp(token.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
+  }
+  assert.match(css, /\.skeuo-button/);
+  assert.match(css, /min-height: 48px/);
   assert.match(css, /@media \(max-width: 1180px\)/);
+  assert.match(css, /@media \(max-width: 960px\)/);
   assert.match(css, /@media \(max-width: 760px\)/);
   assert.match(css, /@media \(max-width: 430px\)/);
-  assert.match(css, /safe-area-inset/);
-  assert.match(css, /\.section-shell\s*\{\s*width:\s*min\(1540px/);
-  assert.match(css, /100svh/);
-  assert.match(css, /scroll-snap-type:\s*x mandatory/);
-  assert.match(css, /\.drawer-film\s*\{[^}]*aspect-ratio:\s*3\s*\/\s*2/s);
-  assert.match(css, /\.privacy-grid b\s*\{[^}]*font:\s*800 14px/s);
-  assert.match(css, /\.privacy-grid small\s*\{[^}]*font-size:\s*15px/s);
-  assert.doesNotMatch(css, /data-theme|theme-cycle|palette-dots/);
-  assert.doesNotMatch(css, /repeating-linear-gradient|scanlines|font-cormorant/);
-
-  const layout = await readFile(new URL("../app/layout.tsx", import.meta.url), "utf8");
-  assert.match(layout, /Montserrat/);
-  assert.doesNotMatch(layout, /Cormorant/);
-  assert.doesNotMatch(html, /scanlines|↓|↘|↗/);
+  assert.match(css, /image-rendering: pixelated/);
+  assert.doesNotMatch(css, /backdrop-filter|repeating-linear-gradient|linear-gradient|radial-gradient/i);
 });
 
-test("uses MewMuze throughout customer-facing copy and keeps button labels legible", async () => {
-  const response = await render();
-  const html = await response.text();
-  assert.match(html, /MewMuze is an expressive pixel cat/);
-  assert.match(html, /Get MewMuze/);
-  assert.match(html, /MEWMUZE PERSONALITY CORE/);
-  const page = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
-  const layout = await readFile(new URL("../app/layout.tsx", import.meta.url), "utf8");
-  assert.doesNotMatch(page, /\bPawPico\b/);
-  assert.doesNotMatch(layout, /\bPawPico\b/);
+test("uses the supplied authentic cat as a transparent crisp asset and social card", async () => {
+  const cat = await readFile(new URL("../public/mewmuze-flower-cat.png", import.meta.url));
+  assert.equal(cat.toString("ascii", 1, 4), "PNG");
+  assert.equal(cat.readUInt32BE(16), 55);
+  assert.equal(cat.readUInt32BE(20), 86);
+  assert.equal(cat[25], 6, "cat PNG must retain RGBA transparency");
 
-  const css = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
-  assert.match(css, /\.metal-button\s*\{[^}]*font:\s*800 13px[^;]*var\(--pixel\)/s);
-  assert.match(css, /\.metal-button\.large\s*\{[^}]*font-size:\s*14px/s);
+  const social = await stat(new URL("../public/og-mewmuze.png", import.meta.url));
+  assert.ok(social.size > 20_000);
+  const layout = await source("../app/layout.tsx");
+  assert.match(layout, /og-mewmuze\.png/);
+  assert.match(layout, /themeColor: "#f5f6f7"/);
 });
 
-test("connector-film generator keeps every animation stage clean and border-only", async () => {
-  const script = await readFile(new URL("../scripts/generate-connector-films.py", import.meta.url), "utf8");
-  const motionScript = await readFile(new URL("../scripts/render-app-motion-clips.mjs", import.meta.url), "utf8");
-  assert.doesNotMatch(script, /range\(0,\s*W,\s*16\)|range\(0,\s*H,\s*16\)|range\(132,\s*600,\s*5\)/);
-  assert.doesNotMatch(script, /draw\.rectangle\(\(76,\s*130,\s*651,\s*602\),\s*outline=/);
-  assert.match(script, /rounded\(draw,\s*\(57,\s*111,\s*670,\s*623\),\s*16/);
-  assert.doesNotMatch(motionScript, /x \+= 16|y \+= 16|fillRect\(42,\s*414,\s*636,\s*5\)/);
-});
-
-test("explains local-first privacy honestly now that opt-in connectors exist", async () => {
-  const response = await render();
-  const html = await response.text();
-  assert.match(html, /Local-first\./);
-  assert.match(html, /Network only by invitation\./);
-  assert.match(html, /Gmail: envelope only/);
-  assert.match(html, /Calendar: private feed/);
-  assert.match(html, /No screen capture/);
-  assert.match(html, /No microphone audio/);
-  assert.match(html, /Offline license check/);
-  assert.doesNotMatch(html, /makes no network requests/i);
-});
-
-test("renders the lightweight Costume Store with clearly marked mock commerce", async () => {
+test("renders an original-concepts-only Coming Soon store with no order flow", async () => {
   const response = await render("/store");
   assert.equal(response.status, 200);
   const html = await response.text();
-  assert.match(html, /Dress[\s\S]*the muse\./);
-  assert.match(html, /Mock storefront/);
-  assert.match(html, /no payment processing/i);
-  assert.match(html, /Pick a new/);
-  assert.match(html, /Iron Man Cat/);
-  assert.match(html, /Space Explorer/);
-  assert.match(html, /Open MewMuze|Install in MewMuze/);
-  assert.match(html, /From Store to cat/);
-  assert.match(html, /Development sample/);
-  assert.doesNotMatch(html, /Spider-Man|Captain America|Naruto|Itachi|Avengers/i);
-});
+  const catalog = await source("../data/store/catalog.ts");
 
-test("keeps every dummy costume price between one and two dollars", async () => {
-  const source = await readFile(new URL("../data/store/catalog.ts", import.meta.url), "utf8");
-  const prices = Array.from(source.matchAll(/price:\s*(\d+\.\d+)/g), (match) => Number(match[1]));
-  assert.equal(prices.length, 10);
-  for (const price of prices) {
-    assert.ok(price >= 1 && price <= 2, `dummy price ${price} must be in the approved range`);
-  }
-  assert.match(source, /purchaseProductId/);
-  assert.match(source, /supportedBodies/);
-  assert.match(source, /minimumAppVersion/);
-  const commerce = await readFile(new URL("../lib/store/commerce.ts", import.meta.url), "utf8");
-  for (const method of [
-    "createCheckoutSession",
-    "getPurchaseStatus",
-    "getOwnedCostumes",
-    "createInstallationToken",
-    "refreshInstallationToken",
-    "requestSignedDownload",
+  assert.match(html, /<title>MewMuze Store — Coming Soon<\/title>/);
+  assert.match(html, /THE MEWMUZE WARDROBE/);
+  assert.match(html, /The wardrobe is still being stitched\./);
+  assert.match(html, /New looks are on the way/);
+  assert.equal((html.match(/class="concept-card"/g) ?? []).length, 10);
+
+  for (const concept of [
+    "Mecha Hero",
+    "Shield Guardian",
+    "Web Scout",
+    "Shadow Ninja",
+    "Winter Star",
+    "Cosmic Explorer",
+    "Moon Mage",
+    "Pixel Knight",
+    "Cozy Barista",
+    "Royal Wanderer",
   ]) {
-    assert.match(commerce, new RegExp(method));
+    assert.match(html, new RegExp(concept));
   }
+
+  assert.doesNotMatch(catalog, /price|currency|purchase|packagePath|availability/i);
+  assert.doesNotMatch(
+    html,
+    /\$\d+\.\d{2}|Dummy total|USD|Mock|Add to|Buy now|Verify & install|download=/i,
+  );
+  assert.doesNotMatch(html, /Iron Man|Spider-Man|Captain America|Avengers|Naruto|Itachi/i);
 });
 
-test("renders static costume detail pages and publishes the secure schema", async () => {
-  const response = await render("/store/space-explorer");
+test("renders static Coming Soon concept notes without packages or installation actions", async () => {
+  const response = await render("/store/mecha-hero");
   assert.equal(response.status, 200);
   const html = await response.text();
-  assert.match(html, /Space Explorer/);
-  assert.match(html, /Mock buy/);
-  assert.match(html, /Visual only/);
-  const detailSource = await readFile(new URL("../app/store/[slug]/page.tsx", import.meta.url), "utf8");
-  assert.match(detailSource, /\["Front", "Side", "Movement"\]/);
 
-  const schema = JSON.parse(
-    await readFile(new URL("../public/store/specs/costume-manifest.schema.json", import.meta.url), "utf8"),
-  );
-  assert.equal(schema.properties.schemaVersion.const, 1);
-  assert.deepEqual(schema.properties.signatureKeyId.enum, [
-    "store-key-2026-01",
-    "store-key-mecha-2026-01",
-    "store-key-mecha-2026-02",
-  ]);
-  assert.equal(schema.properties.assets.maxItems, 12);
-  assert.ok((await stat(new URL("../public/store/samples/space-explorer-sample.mewcostume", import.meta.url))).size > 0);
-  assert.ok((await stat(new URL("../public/store/products/mecha-hero/iron-man-cat.mewcostume", import.meta.url))).size > 0);
+  assert.match(html, /Mecha Hero/);
+  assert.match(html, /Coming Soon/);
+  assert.match(html, /A direction/);
+  assert.match(html, /not a finished product/);
+  assert.match(html, /Nothing can be ordered/);
+  assert.doesNotMatch(html, /Mock buy|Install in MewMuze|\.mewcostume|\$\d/i);
+
+  await assert.rejects(access(new URL("../public/store", import.meta.url)));
+  await assert.rejects(access(new URL("../scripts/generate-iron-man-cat-costume.mjs", import.meta.url)));
+});
+
+test("keeps GitHub Pages routing and canonical metadata base-path safe", async () => {
+  const nextConfig = await source("../next.config.ts");
+  const helper = await source("../lib/site-path.ts");
+  const workflow = await source("../.github/workflows/deploy.yml");
+  const layout = await source("../app/layout.tsx");
+  const storeLayout = await source("../app/store/layout.tsx");
+
+  assert.match(nextConfig, /output: "export"/);
+  assert.match(nextConfig, /basePath: pagesBasePath/);
+  assert.match(nextConfig, /assetPrefix: pagesBasePath/);
+  assert.match(helper, /NEXT_PUBLIC_BASE_PATH/);
+  assert.match(workflow, /npm run build:pages/);
+  assert.match(layout, /alternates: \{ canonical/);
+  assert.match(storeLayout, /MewMuze Store — Coming Soon/);
+  assert.match(storeLayout, /Preview upcoming original costume concepts/);
 });

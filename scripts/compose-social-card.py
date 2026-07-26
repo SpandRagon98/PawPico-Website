@@ -1,55 +1,88 @@
-"""Composite MewMuze's exact supplied logo and verified copy onto the social card."""
+"""Compose MewMuze's social card from the exact supplied flower-band cat asset."""
 
 from pathlib import Path
 
-from PIL import Image, ImageDraw, ImageFont, ImageFilter
+from PIL import Image, ImageDraw, ImageFont
 
 
 ROOT = Path(__file__).resolve().parents[1]
 PUBLIC = ROOT / "public"
+WIDTH, HEIGHT = 1200, 630
 
-background = Image.open(PUBLIC / "og-console-background.png").convert("RGB")
-logo = Image.open(PUBLIC / "pawpico-face-logo.png").convert("RGB")
-draw = ImageDraw.Draw(background)
 
-display = ImageFont.truetype("C:/Windows/Fonts/georgiab.ttf", 96)
-display_italic = ImageFont.truetype("C:/Windows/Fonts/georgiai.ttf", 50)
-sans = ImageFont.truetype("C:/Windows/Fonts/bahnschrift.ttf", 31)
-mono = ImageFont.truetype("C:/Windows/Fonts/consolab.ttf", 21)
+def font(name: str, size: int) -> ImageFont.FreeTypeFont:
+    return ImageFont.truetype(f"C:/Windows/Fonts/{name}", size)
 
-# Preserve the exact logo image while giving it a clean circular medallion crop.
-logo = logo.resize((500, 500), Image.Resampling.LANCZOS)
-mask = Image.new("L", logo.size, 0)
-ImageDraw.Draw(mask).ellipse((5, 5, 495, 495), fill=255)
-shadow = Image.new("RGBA", background.size, (0, 0, 0, 0))
-shadow_draw = ImageDraw.Draw(shadow)
-shadow_draw.ellipse((132, 212, 652, 732), fill=(60, 35, 24, 72))
-shadow = shadow.filter(ImageFilter.GaussianBlur(18))
-background.paste(shadow, (0, 0), shadow)
-background.paste(logo, (142, 198), mask)
 
-ink = "#2a1f1a"
-copper = "#b65b3f"
-muted = "#6d5c50"
-green = "#5e7d63"
+canvas = Image.new("RGB", (WIDTH, HEIGHT), "#f5f6f7")
+draw = ImageDraw.Draw(canvas)
 
-draw.text((700, 270), "MewMuze", font=display, fill=ink)
-draw.text((706, 384), "Your desktop,", font=display_italic, fill=copper)
-draw.text((706, 440), "now with a pulse.", font=display_italic, fill=copper)
-draw.text((710, 523), "AN EXPRESSIVE WINDOWS CAT + A TINY PRODUCTIVITY CONSOLE", font=mono, fill=muted)
+# Single white tactile surface with a consistent upper-left light.
+draw.rounded_rectangle((28, 24, 1172, 594), radius=34, fill="#c9cdd1")
+draw.rounded_rectangle(
+    (28, 18, 1172, 588),
+    radius=34,
+    fill="#ffffff",
+    outline="#bfc3c8",
+    width=2,
+)
+draw.line((44, 38, 1156, 38), fill="#ffffff", width=3)
 
-features = ["WORK MODE", "GMAIL", "CALENDAR", "87 MOTION STATES"]
-x = 708
-for index, feature in enumerate(features):
-    box = draw.textbbox((0, 0), feature, font=mono)
-    width = box[2] - box[0] + 36
-    fill = green if index in (1, 2) else copper
-    draw.rounded_rectangle((x, 589, x + width, 639), radius=24, fill=fill)
-    draw.text((x + 18, 615), feature, font=mono, fill="#fff5e6", anchor="lm")
-    x += width + 14
+# The authentic current cat, enlarged only with nearest-neighbour sampling.
+cat = Image.open(PUBLIC / "mewmuze-flower-cat.png").convert("RGBA")
+cat = cat.resize((275, 430), Image.Resampling.NEAREST)
+canvas.paste(cat, (-32, 105), cat)
+draw.rectangle((25, 44, 38, 568), fill="#e3e5e7", outline="#bfc3c8", width=1)
 
-draw.text((710, 700), "Local-first. Connected only when you choose.", font=sans, fill=ink)
-draw.text((710, 754), "Windows 10 / 11  •  one-time license  •  no subscription", font=sans, fill=muted)
+sans_bold = font("bahnschrift.ttf", 70)
+sans_small = font("bahnschrift.ttf", 22)
+mono = font("consola.ttf", 17)
+mono_small = font("consola.ttf", 14)
 
-background.save(PUBLIC / "og-v2.png", optimize=True)
-print(PUBLIC / "og-v2.png")
+draw.ellipse((325, 103, 339, 117), fill="#a9d8bd", outline="#467c57", width=2)
+draw.text(
+    (354, 99),
+    "A PERSONAL DESKTOP CAT FOR WINDOWS",
+    font=mono,
+    fill="#4f555b",
+)
+
+headline_lines = ["Your screen could use", "a little more life."]
+for index, line in enumerate(headline_lines):
+    draw.text((322, 153 + index * 82), line, font=sans_bold, fill="#202326")
+
+copy = (
+    "Quiet company, local tools, gentle reminders and a little more life "
+    "for an ordinary Windows workday."
+)
+words = copy.split()
+line = ""
+lines: list[str] = []
+for word in words:
+    probe = f"{line} {word}".strip()
+    if draw.textbbox((0, 0), probe, font=sans_small)[2] <= 760:
+        line = probe
+    else:
+        lines.append(line)
+        line = word
+lines.append(line)
+for index, text_line in enumerate(lines):
+    draw.text((324, 350 + index * 34), text_line, font=sans_small, fill="#666b72")
+
+draw.rounded_rectangle(
+    (322, 479, 520, 535),
+    radius=13,
+    fill="#a9d8bd",
+    outline="#76a986",
+    width=2,
+)
+draw.text((350, 497), "MEET MEWMUZE", font=mono_small, fill="#202326")
+draw.text(
+    (558, 498),
+    "LOCAL-FIRST / WINDOWS 10 + 11",
+    font=mono_small,
+    fill="#666b72",
+)
+
+canvas.save(PUBLIC / "og-mewmuze.png", optimize=True)
+print(f"Saved {PUBLIC / 'og-mewmuze.png'}")

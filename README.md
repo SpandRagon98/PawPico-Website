@@ -1,6 +1,12 @@
 # MewMuze Website
 
-The official product website for **MewMuze**, an expressive Windows desktop cat with Work mode, opt-in Gmail and Calendar connectors, smart reminders, tactile desktop physics, focus tools, and 87 defined animation states.
+The official product website for **MewMuze**, an expressive Windows desktop cat with Work mode, opt-in Gmail and Calendar connectors, smart reminders, tactile desktop physics, focus tools, and a customizable personality.
+
+The landing page follows one connected companionship story with a cursor-aware
+flower-band MewMuze hero, a keyboard- and touch-accessible Feature Theatre, a
+complete verified feature directory, accurate Appearance Studio choices, and a
+local-first privacy explanation. The Wardrobe route is a Coming Soon preview of
+original concepts only; no order or download flow is active.
 
 ## Local development
 
@@ -19,7 +25,7 @@ Open [http://localhost:3000](http://localhost:3000).
 npm test
 ```
 
-This builds the Vinext output and verifies the rendered product story, primary feature films, full source-verified directory, branding, end-only pricing, privacy wording, and responsive breakpoints.
+This builds the Vinext output and verifies the rendered product story, Feature Theatre, full source-verified directory, authentic flower-band cat asset, privacy wording, Coming Soon Wardrobe, and responsive behavior.
 
 For the static GitHub Pages export:
 

@@ -3,22 +3,28 @@ import { sitePath } from "../../lib/site-path";
 
 export function StoreHeader() {
   return (
-    <header className="site-header store-header">
-      <a className="brand" href={sitePath("/")} aria-label="MewMuze home">
-        <span className="brand-lockup">
-          <span className="brand-medallion">
-            <Image src={sitePath("/pawpico-face-logo.png")} alt="" width={50} height={50} unoptimized />
-          </span>
-          <span><strong>MewMuze</strong><small>COSTUME STORE</small></span>
+    <header className="store-nav">
+      <a className="store-brand" href={sitePath("/")} aria-label="MewMuze home">
+        <span>
+          <Image
+            src={sitePath("/mewmuze-flower-cat.png")}
+            alt=""
+            width={55}
+            height={86}
+            unoptimized
+          />
+        </span>
+        <span>
+          <strong>MewMuze</strong>
+          <small>the wardrobe</small>
         </span>
       </a>
       <nav aria-label="Store navigation">
-        <a href={sitePath("/")}>Home</a>
-        <a href="#catalog">Costumes</a>
-        <a href="#library">Library</a>
-        <a href="#install">Installation</a>
+        <a href={sitePath("/")}>Story</a>
+        <a href="#catalog">Concepts</a>
+        <a href="#how-it-works">What happens next</a>
       </nav>
-      <a className="metal-button compact" href={sitePath("/#download")}>Get MewMuze</a>
+      <span className="store-status">Coming Soon</span>
     </header>
   );
 }
