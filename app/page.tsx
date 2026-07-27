@@ -499,6 +499,7 @@ export default function Home() {
   const theatreHeadingRef = useRef<HTMLHeadingElement>(null);
   const forcedLookRef = useRef(false);
   const transitionTimersRef = useRef<number[]>([]);
+  const transitionScrollRafRef = useRef<number | null>(null);
 
   useEffect(() => {
     const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -532,6 +533,9 @@ export default function Home() {
   useEffect(
     () => () => {
       transitionTimersRef.current.forEach((timer) => window.clearTimeout(timer));
+      if (transitionScrollRafRef.current !== null) {
+        window.cancelAnimationFrame(transitionScrollRafRef.current);
+      }
     },
     [],
   );
@@ -644,14 +648,44 @@ export default function Home() {
     transitionTimersRef.current.forEach((timer) => window.clearTimeout(timer));
     transitionTimersRef.current = [];
 
-    const finish = (smooth: boolean) => {
-      document.querySelector("#features")?.scrollIntoView({
-        behavior: smooth ? "smooth" : "auto",
-        block: "start",
-      });
+    const focusTheatre = () => {
       window.requestAnimationFrame(() => {
         theatreHeadingRef.current?.focus({ preventScroll: true });
       });
+    };
+
+    const finish = (smooth: boolean) => {
+      const featureSection = document.querySelector<HTMLElement>("#features");
+      if (!featureSection) return;
+
+      const targetY = Math.max(
+        0,
+        featureSection.getBoundingClientRect().top + window.scrollY - 124,
+      );
+      if (!smooth) {
+        window.scrollTo({ top: targetY, behavior: "instant" });
+        focusTheatre();
+        return;
+      }
+
+      const startY = window.scrollY;
+      const startedAt = window.performance.now();
+      const duration = 640;
+      const scroll = (now: number) => {
+        const progress = Math.min(1, (now - startedAt) / duration);
+        const eased = 1 - Math.pow(1 - progress, 3);
+        window.scrollTo({
+          top: startY + (targetY - startY) * eased,
+          behavior: "instant",
+        });
+        if (progress < 1) {
+          transitionScrollRafRef.current = window.requestAnimationFrame(scroll);
+        } else {
+          transitionScrollRafRef.current = null;
+          focusTheatre();
+        }
+      };
+      transitionScrollRafRef.current = window.requestAnimationFrame(scroll);
     };
 
     if (reducedMotion) {
@@ -665,12 +699,12 @@ export default function Home() {
     setJourneyState("reacting");
     transitionTimersRef.current = [
       window.setTimeout(() => setJourneyState("travelling"), 230),
-      window.setTimeout(() => setExperienceUnlocked(true), 720),
-      window.setTimeout(() => finish(true), 1080),
+      window.setTimeout(() => setExperienceUnlocked(true), 620),
+      window.setTimeout(() => finish(true), 720),
       window.setTimeout(() => {
         forcedLookRef.current = false;
         setJourneyState("ready");
-      }, 1650),
+      }, 1580),
     ];
   };
 

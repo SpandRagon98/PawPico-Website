@@ -96,9 +96,12 @@ test("assembles and focuses the Feature Theatre after the polished Explore trans
   assert.match(page, /setJourneyState\("reacting"\)/);
   assert.match(page, /setJourneyState\("travelling"\)/);
   assert.match(page, /setJourneyState\("ready"\)/);
-  assert.match(page, /querySelector\("#features"\)\?\.scrollIntoView/);
+  assert.match(page, /const duration = 640/);
+  assert.match(page, /top: startY \+ \(targetY - startY\) \* eased/);
+  assert.match(page, /behavior: "instant"/);
+  assert.match(page, /cancelAnimationFrame\(transitionScrollRafRef\.current\)/);
   assert.match(page, /theatreHeadingRef\.current\?\.focus/);
-  assert.match(page, /1650/);
+  assert.match(page, /1580/);
   assert.match(css, /@keyframes cat-travel-hd/);
   assert.match(css, /@keyframes theatre-console-assemble/);
   assert.match(css, /\.hero-explore\.is-pressed/);
