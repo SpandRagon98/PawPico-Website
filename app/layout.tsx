@@ -11,7 +11,9 @@ const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"]
 
 const siteUrl =
   process.env.NEXT_PUBLIC_SITE_URL ?? "https://spandragon98.github.io/PawPico-Website";
-const catIcon = `${siteUrl}/mewmuze-flower-cat.png`;
+const catIcon = `${siteUrl}/cat/mewmuze-face-logo-192.png`;
+const shortcutIcon = `${siteUrl}/cat/mewmuze-face-logo-32.png`;
+const appleIcon = `${siteUrl}/cat/mewmuze-face-logo-180.png`;
 const socialImage = `${siteUrl}/og-mewmuze.png`;
 const title = "MewMuze — Your Personal Desktop Cat";
 const description =
@@ -25,8 +27,8 @@ export const metadata: Metadata = {
   applicationName: "MewMuze",
   icons: {
     icon: catIcon,
-    shortcut: catIcon,
-    apple: catIcon,
+    shortcut: shortcutIcon,
+    apple: appleIcon,
   },
   openGraph: {
     title,

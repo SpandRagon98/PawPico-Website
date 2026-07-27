@@ -62,9 +62,9 @@
 }
 
 .store-brand img {
-  width: 28px;
+  width: 40px;
   height: auto;
-  image-rendering: pixelated;
+  image-rendering: auto;
 }
 
 .store-brand > span:last-child {
@@ -450,7 +450,7 @@
   width: 30%;
   height: auto;
   max-width: 150px;
-  image-rendering: pixelated;
+  image-rendering: auto;
 }
 
 .concept-art-hero .concept-cat {

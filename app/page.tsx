@@ -15,18 +15,17 @@ import {
 import { featureGroups, featureStories, type FeatureStory } from "../data/features";
 import { sitePath } from "../lib/site-path";
 
-const CAT_ASSET = "/mewmuze-flower-cat.png";
+const CAT_ASSET = "/cat/mewmuze-hero-reference-hd.png";
+const HERO_CAT_ASSET = "/cat/mewmuze-hero-peek-hd.png";
+const HERO_CAT_BLINK_ASSET = "/cat/mewmuze-hero-peek-hd-blink.png";
+const HERO_CAT_EARS_ASSET = "/cat/mewmuze-hero-peek-hd-ears.png";
+const FACE_LOGO_ASSET = "/cat/mewmuze-face-logo-hd.png";
 
 function CatFigure({
   className = "",
-  pupilRefs,
   priority = false,
 }: {
   className?: string;
-  pupilRefs?: [
-    RefObject<HTMLSpanElement | null>,
-    RefObject<HTMLSpanElement | null>,
-  ];
   priority?: boolean;
 }) {
   return (
@@ -34,17 +33,55 @@ function CatFigure({
       <Image
         src={sitePath(CAT_ASSET)}
         alt=""
-        width={55}
-        height={86}
+        width={768}
+        height={768}
         unoptimized
         priority={priority}
       />
-      <span className="cat-eye-glint cat-eye-glint-left">
-        <span ref={pupilRefs?.[0]} className="cat-pupil" />
+    </span>
+  );
+}
+
+function HeroCat({
+  leftPupilRef,
+  rightPupilRef,
+}: {
+  leftPupilRef: RefObject<HTMLSpanElement | null>;
+  rightPupilRef: RefObject<HTMLSpanElement | null>;
+}) {
+  return (
+    <span className="hero-cat-art" aria-hidden="true">
+      <Image
+        className="hero-cat-layer hero-cat-base"
+        src={sitePath(HERO_CAT_ASSET)}
+        alt=""
+        width={768}
+        height={768}
+        unoptimized
+        priority
+      />
+      <span className="hero-eye-track hero-eye-track-left">
+        <span ref={leftPupilRef} className="hero-pupil" />
       </span>
-      <span className="cat-eye-glint cat-eye-glint-right">
-        <span ref={pupilRefs?.[1]} className="cat-pupil" />
+      <span className="hero-eye-track hero-eye-track-right">
+        <span ref={rightPupilRef} className="hero-pupil" />
       </span>
+      <Image
+        className="hero-cat-layer hero-cat-expression hero-cat-ears"
+        src={sitePath(HERO_CAT_EARS_ASSET)}
+        alt=""
+        width={768}
+        height={768}
+        unoptimized
+      />
+      <Image
+        className="hero-cat-layer hero-cat-expression hero-cat-blink"
+        src={sitePath(HERO_CAT_BLINK_ASSET)}
+        alt=""
+        width={768}
+        height={768}
+        unoptimized
+      />
     </span>
   );
 }
@@ -90,7 +127,7 @@ function SiteBrand() {
   return (
     <span className="site-brand">
       <span className="brand-medallion">
-        <Image src={sitePath(CAT_ASSET)} alt="" width={55} height={86} unoptimized />
+        <Image src={sitePath(FACE_LOGO_ASSET)} alt="" width={512} height={512} unoptimized />
       </span>
       <span>
         <strong>MewMuze</strong>
@@ -127,8 +164,8 @@ function SiteNavigation() {
         <summary aria-label="Open navigation">Menu</summary>
         <nav aria-label="Mobile navigation">{links}</nav>
       </details>
-      <SkeuoButton href="#download" variant="secondary" className="nav-cta">
-        Get MewMuze
+      <SkeuoButton href="#pricing" variant="secondary" className="nav-cta">
+        View the price
       </SkeuoButton>
     </div>
   );
@@ -151,19 +188,117 @@ function FeatureFilm({
   }
 
   return (
-    <video
+    <Image
       key={feature.id}
-      className="feature-video"
-      autoPlay
-      loop
-      muted
-      playsInline
-      controls
-      preload="auto"
-      aria-label={`${feature.title} feature film`}
+      className="feature-media-cat"
+      src={sitePath(`/cat/features/${feature.id}.webp`)}
+      alt={`Authentic MewMuze animation for ${feature.title}`}
+      width={512}
+      height={512}
+      unoptimized
+    />
+  );
+}
+
+const appearanceShowcase = [
+  ["white-grey-flower", "White & grey · Flower Band · curious"],
+  ["orange-happy", "Orange · happy"],
+  ["calico-wave", "Calico · wave"],
+  ["tuxedo-placard", "Tuxedo · placard"],
+  ["tabby-groom", "Tabby · groom"],
+  ["fluffy-stretch", "Fluffy · stretch"],
+  ["kitten-yawn", "Kitten · yawn"],
+  ["siamese-celebrate", "Siamese · celebration"],
+] as const;
+
+function AppearanceShowcase({ reducedMotion }: { reducedMotion: boolean }) {
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [previousIndex, setPreviousIndex] = useState<number | null>(null);
+  const [isVisible, setIsVisible] = useState(false);
+  const stageRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const stage = stageRef.current;
+    if (!stage) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => setIsVisible(entry.isIntersecting),
+      { rootMargin: "120px" },
+    );
+    observer.observe(stage);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (reducedMotion || !isVisible) return;
+    const interval = window.setInterval(() => {
+      setActiveIndex((current) => {
+        setPreviousIndex(current);
+        return (current + 1) % appearanceShowcase.length;
+      });
+    }, 3400);
+    return () => window.clearInterval(interval);
+  }, [isVisible, reducedMotion]);
+
+  const [activeId, activeLabel] = appearanceShowcase[activeIndex];
+  const previous = previousIndex === null ? null : appearanceShowcase[previousIndex];
+
+  return (
+    <div
+      ref={stageRef}
+      className={`appearance-showcase ${isVisible ? "is-visible" : ""}`}
+      aria-label="Authentic MewMuze appearances and emotions"
     >
-      <source src={sitePath(feature.video)} type="video/mp4" />
-    </video>
+      <span className="showcase-window-bar" aria-hidden="true">
+        <i />
+        <i />
+        <i />
+      </span>
+      <div className="showcase-cat-well">
+        {reducedMotion || !isVisible ? (
+          <Image
+            className="showcase-cat-static"
+            src={sitePath(CAT_ASSET)}
+            alt="MewMuze in the white and grey Flower Band appearance"
+            width={768}
+            height={768}
+            unoptimized
+          />
+        ) : (
+          <>
+            {previous ? (
+              <Image
+                key={`previous-${previous[0]}`}
+                className="showcase-cat-media is-previous"
+                src={sitePath(`/cat/appearance/${previous[0]}.webp`)}
+                alt=""
+                width={512}
+                height={512}
+                unoptimized
+              />
+            ) : null}
+            <Image
+              key={activeId}
+              className="showcase-cat-media is-current"
+              src={sitePath(`/cat/appearance/${activeId}.webp`)}
+              alt=""
+              width={512}
+              height={512}
+              unoptimized
+            />
+          </>
+        )}
+      </div>
+      <span className="showcase-ticket">
+        <small>LIVE APPEARANCE / AUTHENTIC RENDERER</small>
+        <strong>{activeLabel}</strong>
+      </span>
+      <div className="showcase-progress" aria-hidden="true">
+        {appearanceShowcase.map(([id], index) => (
+          <span key={id} className={index === activeIndex ? "is-active" : ""} />
+        ))}
+      </div>
+      <p aria-live="polite">{activeLabel}</p>
+    </div>
   );
 }
 
@@ -256,7 +391,7 @@ function FeatureTheatre({
         <div className="theatre-stage">
           <div className="theatre-media">
             <div className="media-label">
-              <span>VERIFIED FEATURE FILM · EARLIER COAT PRESET</span>
+              <span>AUTHENTIC APP-RENDERED MOTION · TRANSPARENT</span>
               <i aria-hidden="true" />
             </div>
             <FeatureFilm feature={feature} reducedMotion={reducedMotion} />
@@ -353,12 +488,17 @@ const futureConcepts = ["Mecha Hero", "Shield Guardian", "Web Scout", "Moon Mage
 export default function Home() {
   const [reducedMotion, setReducedMotion] = useState(false);
   const [finePointer, setFinePointer] = useState(true);
-  const [journeyState, setJourneyState] = useState<"idle" | "moving">("idle");
+  const [experienceUnlocked, setExperienceUnlocked] = useState(false);
+  const [journeyState, setJourneyState] = useState<
+    "idle" | "reacting" | "travelling" | "ready"
+  >("idle");
   const heroRef = useRef<HTMLElement>(null);
   const catMotionRef = useRef<HTMLSpanElement>(null);
   const leftPupilRef = useRef<HTMLSpanElement>(null);
   const rightPupilRef = useRef<HTMLSpanElement>(null);
   const theatreHeadingRef = useRef<HTMLHeadingElement>(null);
+  const forcedLookRef = useRef(false);
+  const transitionTimersRef = useRef<number[]>([]);
 
   useEffect(() => {
     const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -377,20 +517,61 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
+    document.documentElement.classList.toggle(
+      "mewmuze-scroll-locked",
+      !experienceUnlocked,
+    );
+    document.body.classList.toggle("mewmuze-scroll-locked", !experienceUnlocked);
+    if (!experienceUnlocked) window.scrollTo(0, 0);
+    return () => {
+      document.documentElement.classList.remove("mewmuze-scroll-locked");
+      document.body.classList.remove("mewmuze-scroll-locked");
+    };
+  }, [experienceUnlocked]);
+
+  useEffect(
+    () => () => {
+      transitionTimersRef.current.forEach((timer) => window.clearTimeout(timer));
+    },
+    [],
+  );
+
+  useEffect(() => {
     if (reducedMotion || !finePointer) return;
 
     let frame = 0;
     let isVisible = true;
     const target = { x: 0, y: 0 };
-    const current = { x: 0, y: 0 };
+    const pupil = { x: 0, y: 0 };
+    const head = { x: 0, y: 0 };
 
     const render = () => {
-      current.x += (target.x - current.x) * 0.11;
-      current.y += (target.y - current.y) * 0.11;
-      const pupilX = current.x * 6.5;
-      const pupilY = current.y * 4.5;
-      const headX = current.x * 7;
-      const headY = current.y * 4;
+      if (forcedLookRef.current) {
+        const button = document.querySelector<HTMLElement>(".hero-explore");
+        const cat = catMotionRef.current?.getBoundingClientRect();
+        const buttonRect = button?.getBoundingClientRect();
+        if (cat && buttonRect) {
+          const centreX = cat.left + cat.width * 0.49;
+          const centreY = cat.top + cat.height * 0.32;
+          target.x = Math.max(
+            -1,
+            Math.min(1, (buttonRect.left + buttonRect.width / 2 - centreX) / 520),
+          );
+          target.y = Math.max(
+            -1,
+            Math.min(1, (buttonRect.top + buttonRect.height / 2 - centreY) / 380),
+          );
+        }
+      }
+
+      pupil.x += (target.x - pupil.x) * 0.28;
+      pupil.y += (target.y - pupil.y) * 0.28;
+      head.x += (target.x - head.x) * 0.075;
+      head.y += (target.y - head.y) * 0.075;
+      const pupilX = pupil.x * 13;
+      const pupilY = pupil.y * 9;
+      const headX = head.x * 8;
+      const headY = head.y * 4.5;
 
       leftPupilRef.current?.style.setProperty(
         "transform",
@@ -402,7 +583,7 @@ export default function Home() {
       );
       catMotionRef.current?.style.setProperty(
         "--look-transform",
-        `translate3d(${headX}px, ${headY}px, 0) rotate(${current.x * 1.4}deg)`,
+        `translate3d(${headX}px, ${headY}px, 0) rotate(${head.x * 1.25}deg)`,
       );
 
       if (isVisible && document.visibilityState === "visible") {
@@ -417,6 +598,12 @@ export default function Home() {
       const centreY = cat.top + cat.height * 0.33;
       target.x = Math.max(-1, Math.min(1, (event.clientX - centreX) / (window.innerWidth * 0.42)));
       target.y = Math.max(-1, Math.min(1, (event.clientY - centreY) / (window.innerHeight * 0.4)));
+    };
+
+    const returnToNeutral = () => {
+      if (forcedLookRef.current) return;
+      target.x = 0;
+      target.y = 0;
     };
 
     const observer = new IntersectionObserver(([entry]) => {
@@ -434,40 +621,74 @@ export default function Home() {
       }
     };
 
-    if (heroRef.current) observer.observe(heroRef.current);
+    const heroElement = heroRef.current;
+    if (heroElement) observer.observe(heroElement);
     window.addEventListener("pointermove", track, { passive: true });
+    heroElement?.addEventListener("pointerleave", returnToNeutral, {
+      passive: true,
+    });
     document.addEventListener("visibilitychange", resume);
     frame = window.requestAnimationFrame(render);
 
     return () => {
       observer.disconnect();
       window.removeEventListener("pointermove", track);
+      heroElement?.removeEventListener("pointerleave", returnToNeutral);
       document.removeEventListener("visibilitychange", resume);
       window.cancelAnimationFrame(frame);
     };
   }, [finePointer, reducedMotion]);
 
   const explore = () => {
-    if (journeyState === "moving") return;
+    if (journeyState !== "idle") return;
+    transitionTimersRef.current.forEach((timer) => window.clearTimeout(timer));
+    transitionTimersRef.current = [];
+
+    const finish = (smooth: boolean) => {
+      document.querySelector("#features")?.scrollIntoView({
+        behavior: smooth ? "smooth" : "auto",
+        block: "start",
+      });
+      window.requestAnimationFrame(() => {
+        theatreHeadingRef.current?.focus({ preventScroll: true });
+      });
+    };
+
     if (reducedMotion) {
-      document.querySelector("#features")?.scrollIntoView();
-      theatreHeadingRef.current?.focus({ preventScroll: true });
+      setExperienceUnlocked(true);
+      setJourneyState("ready");
+      window.requestAnimationFrame(() => finish(false));
       return;
     }
 
-    setJourneyState("moving");
-    window.setTimeout(() => {
-      document.querySelector("#features")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    forcedLookRef.current = true;
+    setJourneyState("reacting");
+    transitionTimersRef.current = [
+      window.setTimeout(() => setJourneyState("travelling"), 230),
+      window.setTimeout(() => setExperienceUnlocked(true), 720),
+      window.setTimeout(() => finish(true), 1080),
       window.setTimeout(() => {
-        theatreHeadingRef.current?.focus({ preventScroll: true });
-        setJourneyState("idle");
-      }, 650);
-    }, 860);
+        forcedLookRef.current = false;
+        setJourneyState("ready");
+      }, 1650),
+    ];
   };
 
   return (
-    <main id="top">
-      <a className="skip-link" href="#story">
+    <main
+      id="top"
+      className={`experience-${experienceUnlocked ? "unlocked" : "locked"} journey-${journeyState}`}
+    >
+      <a
+        className="skip-link"
+        href="#features"
+        onClick={(event) => {
+          if (!experienceUnlocked) {
+            event.preventDefault();
+            explore();
+          }
+        }}
+      >
         Skip to the MewMuze story
       </a>
 
@@ -480,13 +701,11 @@ export default function Home() {
         <div className="hero-cat-peek">
           <span
             ref={catMotionRef}
-            className={`hero-cat-motion ${journeyState === "moving" ? "is-travelling" : ""}`}
+            className={`hero-cat-motion ${
+              journeyState === "reacting" ? "is-reacting" : ""
+            } ${journeyState === "travelling" ? "is-travelling" : ""}`}
           >
-            <CatFigure
-              className="hero-cat"
-              pupilRefs={[leftPupilRef, rightPupilRef]}
-              priority
-            />
+            <HeroCat leftPupilRef={leftPupilRef} rightPupilRef={rightPupilRef} />
           </span>
           <span className="cat-speech">Hi. I live here now.</span>
         </div>
@@ -499,10 +718,13 @@ export default function Home() {
             little things and making an ordinary workday feel a little less ordinary.
           </p>
           <div className="hero-actions">
-            <SkeuoButton onClick={explore}>
+            <SkeuoButton
+              onClick={explore}
+              className={`hero-explore ${journeyState !== "idle" ? "is-pressed" : ""}`}
+            >
               Explore Now <span aria-hidden="true">↓</span>
             </SkeuoButton>
-            <SkeuoButton href="#directory" variant="quiet">
+            <SkeuoButton onClick={explore} variant="quiet">
               See every feature
             </SkeuoButton>
           </div>
@@ -537,22 +759,7 @@ export default function Home() {
           </p>
           <p className="story-turn">Then a tiny pair of green eyes appears.</p>
         </div>
-        <div className="desktop-story" aria-label="A quiet desktop becomes a companion">
-          <span className="story-window story-window-one">
-            <i />
-            <i />
-            <i />
-          </span>
-          <span className="story-window story-window-two">
-            <i />
-            <i />
-          </span>
-          <span className="story-cursor" aria-hidden="true">
-            ↖
-          </span>
-          <CatFigure className="story-cat" />
-          <span className="story-whisper">oh, hello.</span>
-        </div>
+        <AppearanceShowcase reducedMotion={reducedMotion} />
       </section>
 
       <FeatureTheatre reducedMotion={reducedMotion} headingRef={theatreHeadingRef} />
@@ -758,6 +965,57 @@ export default function Home() {
         </div>
       </section>
 
+      <section className="pricing section-pad" id="pricing" aria-labelledby="pricing-title">
+        <div className="section-shell pricing-shell">
+          <div className="pricing-card">
+            <div className="pricing-brand">
+              <Image
+                src={sitePath(FACE_LOGO_ASSET)}
+                alt=""
+                width={512}
+                height={512}
+                unoptimized
+              />
+              <span>
+                <small>MEWMUZE FOR WINDOWS</small>
+                <strong>MewMuze</strong>
+              </span>
+            </div>
+            <div className="pricing-price">
+              <small>ONE-TIME PRICE</small>
+              <strong id="pricing-title">$5.99</strong>
+              <span>No monthly or annual subscription.</span>
+            </div>
+            <ul>
+              <li>Personal Windows desktop cat</li>
+              <li>Expressive authentic animations</li>
+              <li>Focus and reminder tools</li>
+              <li>Local Quick Tools</li>
+              <li>Smart Clipboard Assistant</li>
+              <li>Appearance customization</li>
+              <li>Local-first privacy</li>
+              <li>Future feature improvements</li>
+            </ul>
+            <button className="skeuo-button skeuo-button-primary pricing-coming" type="button" disabled>
+              Coming Soon
+            </button>
+            <p>Purchasing is not live yet. No order or payment is created here.</p>
+          </div>
+          <div className="pricing-copy">
+            <Eyebrow>ONE CAT. ONE PRICE.</Eyebrow>
+            <h2>
+              A tiny desktop companion.
+              <br />
+              <em>Without another subscription.</em>
+            </h2>
+            <p>
+              The planned one-time MewMuze price is clear now, while checkout remains
+              honestly unavailable until the launch path is ready.
+            </p>
+          </div>
+        </div>
+      </section>
+
       <section className="final-cta section-shell section-pad" id="download">
         <div className="cta-cat">
           <CatFigure />
@@ -771,7 +1029,7 @@ export default function Home() {
             ordinary minutes in between.
           </p>
           <div className="hero-actions">
-            <SkeuoButton href="#top">Get MewMuze</SkeuoButton>
+            <SkeuoButton href="#pricing">View the $5.99 price</SkeuoButton>
             <SkeuoButton href="#directory" variant="quiet">
               See every feature
             </SkeuoButton>

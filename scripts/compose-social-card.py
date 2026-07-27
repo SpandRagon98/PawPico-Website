@@ -1,4 +1,4 @@
-"""Compose MewMuze's social card from the exact supplied flower-band cat asset."""
+"""Compose MewMuze's social card from the authentic high-density face mark."""
 
 from pathlib import Path
 
@@ -28,10 +28,10 @@ draw.rounded_rectangle(
 )
 draw.line((44, 38, 1156, 38), fill="#ffffff", width=3)
 
-# The authentic current cat, enlarged only with nearest-neighbour sampling.
-cat = Image.open(PUBLIC / "mewmuze-flower-cat.png").convert("RGBA")
-cat = cat.resize((275, 430), Image.Resampling.NEAREST)
-canvas.paste(cat, (-32, 105), cat)
+# The face mark is cropped from the app's procedural high-density renderer.
+cat = Image.open(PUBLIC / "cat" / "mewmuze-face-logo-hd.png").convert("RGBA")
+cat = cat.resize((360, 360), Image.Resampling.LANCZOS)
+canvas.paste(cat, (-12, 132), cat)
 draw.rectangle((25, 44, 38, 568), fill="#e3e5e7", outline="#bfc3c8", width=1)
 
 sans_bold = font("bahnschrift.ttf", 70)

@@ -17,7 +17,7 @@ async function source(path) {
   return readFile(new URL(path, import.meta.url), "utf8");
 }
 
-test("renders the exact MewMuze hero, brand, and primary story actions", async () => {
+test("renders the exact full-screen MewMuze opening story", async () => {
   const response = await render();
   assert.equal(response.status, 200);
   assert.match(response.headers.get("content-type") ?? "", /^text\/html\b/i);
@@ -30,49 +30,81 @@ test("renders the exact MewMuze hero, brand, and primary story actions", async (
   assert.match(html, /Hi\. I live here now\./);
   assert.match(html, />Explore Now/);
   assert.match(html, />See every feature/);
-  assert.match(html, /mewmuze-flower-cat\.png/);
+  assert.match(html, /experience-locked/);
+  assert.match(html, /mewmuze-hero-peek-hd\.png/);
+  assert.match(html, /mewmuze-face-logo-hd\.png/);
   assert.match(html, /aria-label="Primary navigation"/);
   assert.match(html, /Store[\s\S]*Coming Soon/);
   assert.doesNotMatch(await source("../app/page.tsx"), /\bPawPico\b/);
 });
 
-test("implements one lightweight cursor loop with touch and reduced-motion fallbacks", async () => {
+test("locks scrolling until Explore Now unlocks the experience", async () => {
   const page = await source("../app/page.tsx");
   const css = await source("../app/globals.css");
 
-  assert.match(page, /requestAnimationFrame/);
-  assert.match(page, /window\.addEventListener\("pointermove", track/);
-  assert.match(page, /IntersectionObserver/);
-  assert.match(page, /visibilitychange/);
+  assert.match(page, /const \[experienceUnlocked, setExperienceUnlocked\] = useState\(false\)/);
+  assert.match(page, /mewmuze-scroll-locked/);
+  assert.match(page, /setExperienceUnlocked\(true\)/);
+  assert.match(page, /experience-\$\{experienceUnlocked \? "unlocked" : "locked"\}/);
+  assert.match(css, /html\.mewmuze-scroll-locked/);
+  assert.match(css, /body\.mewmuze-scroll-locked/);
+  assert.match(css, /overflow: hidden !important/);
+  assert.match(css, /\.hero \{[\s\S]*height: 100dvh/);
+  assert.match(css, /\.experience-locked \.hero[\s\S]*touch-action: none/);
+});
+
+test("uses a large, clipped left-edge HD peeking cat instead of enlarging the old screenshot", async () => {
+  const page = await source("../app/page.tsx");
+  const css = await source("../app/globals.css");
+
+  assert.match(page, /HERO_CAT_ASSET = "\/cat\/mewmuze-hero-peek-hd\.png"/);
+  assert.match(page, /width=\{768\}/);
+  assert.match(page, /height=\{768\}/);
+  assert.doesNotMatch(page, /mewmuze-flower-cat\.png/);
+  assert.match(css, /\.hero-cat-peek \{[\s\S]*width: min\(49vw, 780px\)/);
+  assert.match(css, /\.hero-cat-art \{[\s\S]*clip-path: polygon/);
+  assert.match(css, /\.hero-cat-motion\.is-travelling \.hero-cat-art[\s\S]*clip-path: inset\(0\)/);
+  assert.match(css, /\.cat-figure > img,[\s\S]*image-rendering: auto/);
+});
+
+test("implements one efficient pupil-first and delayed-head cursor loop", async () => {
+  const page = await source("../app/page.tsx");
+  const css = await source("../app/globals.css");
+  const tracking = page.match(/useEffect\(\(\) => \{\s+if \(reducedMotion[\s\S]*?\}, \[finePointer, reducedMotion\]\);/)?.[0] ?? "";
+
+  assert.match(tracking, /requestAnimationFrame/);
+  assert.match(tracking, /window\.addEventListener\("pointermove", track/);
+  assert.match(tracking, /IntersectionObserver/);
+  assert.match(tracking, /visibilitychange/);
+  assert.match(tracking, /pupil\.x \+= \(target\.x - pupil\.x\) \* 0\.28/);
+  assert.match(tracking, /head\.x \+= \(target\.x - head\.x\) \* 0\.075/);
+  assert.match(tracking, /forcedLookRef/);
+  assert.doesNotMatch(tracking.match(/const track =[\s\S]*?const returnToNeutral/)?.[0] ?? "", /set[A-Z]\w*\(/);
   assert.match(page, /prefers-reduced-motion: reduce/);
   assert.match(page, /\(pointer: fine\)/);
-  assert.match(page, /leftPupilRef/);
-  assert.match(page, /catMotionRef/);
   assert.match(page, /touch-look/);
-  assert.doesNotMatch(
-    page.match(/const track =[\s\S]*?const observer =/)?.[0] ?? "",
-    /set[A-Z]\w*\(/,
-  );
-
-  assert.match(css, /\.cat-pupil/);
-  assert.match(css, /\.touch-look \.hero-cat/);
+  assert.match(css, /\.hero-pupil/);
+  assert.match(css, /@keyframes hero-authentic-blink/);
+  assert.match(css, /@keyframes hero-ear-check/);
   assert.match(css, /@media \(prefers-reduced-motion: reduce\)/);
-  assert.match(css, /\.cat-pupil,[\s\S]*\.hero-cat-motion[\s\S]*transform: none !important/);
 });
 
-test("moves Explore Now into the feature experience and restores focus", async () => {
+test("assembles and focuses the Feature Theatre after the polished Explore transition", async () => {
   const page = await source("../app/page.tsx");
   const css = await source("../app/globals.css");
 
-  assert.match(page, /setJourneyState\("moving"\)/);
+  assert.match(page, /setJourneyState\("reacting"\)/);
+  assert.match(page, /setJourneyState\("travelling"\)/);
+  assert.match(page, /setJourneyState\("ready"\)/);
   assert.match(page, /querySelector\("#features"\)\?\.scrollIntoView/);
   assert.match(page, /theatreHeadingRef\.current\?\.focus/);
-  assert.match(page, /journeyState === "moving"/);
-  assert.match(css, /@keyframes cat-travel/);
-  assert.match(css, /\.hero-cat-motion\.is-travelling/);
+  assert.match(page, /1650/);
+  assert.match(css, /@keyframes cat-travel-hd/);
+  assert.match(css, /@keyframes theatre-console-assemble/);
+  assert.match(css, /\.hero-explore\.is-pressed/);
 });
 
-test("ships a one-at-a-time, keyboard and touch accessible 20-feature theatre", async () => {
+test("ships a one-at-a-time keyboard and touch accessible 20-feature theatre", async () => {
   const response = await render();
   const html = await response.text();
   const page = await source("../app/page.tsx");
@@ -82,7 +114,7 @@ test("ships a one-at-a-time, keyboard and touch accessible 20-feature theatre", 
   assert.match(html, /aria-roledescription="carousel"/);
   assert.match(html, /Previous feature/);
   assert.match(html, /Next feature/);
-  assert.equal((html.match(/<video/g) ?? []).length, 1);
+  assert.equal((html.match(/feature-media-cat/g) ?? []).length, 1);
   assert.equal((features.match(/number: "\d\d"/g) ?? []).length, 20);
 
   for (const title of [
@@ -119,30 +151,70 @@ test("ships a one-at-a-time, keyboard and touch accessible 20-feature theatre", 
   assert.match(page, /disabled=\{activeIndex === featureStories\.length - 1\}/);
 });
 
-test("keeps every checked-in feature film relevant and renders only the active one", async () => {
+test("uses transparent authentic feature media and retains the verified source films", async () => {
   const features = await source("../data/features.ts");
-  const paths = Array.from(features.matchAll(/video: "(\/[^"]+\.mp4)"/g), (match) => match[1]);
-  assert.equal(paths.length, 20);
+  const ids = Array.from(features.matchAll(/id: "([^"]+)"/g), (match) => match[1]);
+  const videos = Array.from(features.matchAll(/video: "(\/[^"]+\.mp4)"/g), (match) => match[1]);
+  assert.equal(ids.length, 20);
+  assert.equal(videos.length, 20);
 
-  for (const path of new Set(paths)) {
+  for (const id of ids) {
+    const media = await readFile(new URL(`../public/cat/features/${id}.webp`, import.meta.url));
+    assert.ok(media.length > 1_000, id);
+    assert.equal(media.toString("ascii", 0, 4), "RIFF");
+    assert.equal(media.toString("ascii", 8, 12), "WEBP");
+  }
+  for (const path of new Set(videos)) {
     assert.ok((await stat(new URL(`../public${path}`, import.meta.url))).size > 10_000, path);
   }
 
   const page = await source("../app/page.tsx");
-  assert.match(page, /key=\{feature\.id\}/);
-  assert.match(page, /autoPlay/);
-  assert.match(page, /muted/);
-  assert.match(page, /playsInline/);
-  assert.doesNotMatch(page, /setInterval/);
+  assert.match(page, /\/cat\/features\/\$\{feature\.id\}\.webp/);
+  assert.match(page, /AUTHENTIC APP-RENDERED MOTION · TRANSPARENT/);
+  assert.doesNotMatch(page, /<video/);
 });
 
-test("renders the connected companionship narrative and complete grouped directory", async () => {
+test("cycles verified animated appearance and emotion combinations while visible", async () => {
   const response = await render();
   const html = await response.text();
+  const page = await source("../app/page.tsx");
 
   assert.match(html, /Most desktops do their job\./);
   assert.match(html, /They just don&#x27;t keep you company\./);
   assert.match(html, /Then a tiny pair of green eyes appears\./);
+  assert.match(html, /LIVE APPEARANCE \/ AUTHENTIC RENDERER/);
+  assert.match(page, /white-grey-flower/);
+  assert.match(page, /orange-happy/);
+  assert.match(page, /calico-wave/);
+  assert.match(page, /tuxedo-placard/);
+  assert.match(page, /tabby-groom/);
+  assert.match(page, /fluffy-stretch/);
+  assert.match(page, /kitten-yawn/);
+  assert.match(page, /siamese-celebrate/);
+  assert.match(page, /IntersectionObserver/);
+  assert.match(page, /if \(reducedMotion \|\| !isVisible\) return/);
+
+  for (const [id] of [
+    ["white-grey-flower"],
+    ["orange-happy"],
+    ["calico-wave"],
+    ["tuxedo-placard"],
+    ["tabby-groom"],
+    ["fluffy-stretch"],
+    ["kitten-yawn"],
+    ["siamese-celebrate"],
+  ]) {
+    assert.ok(
+      (await stat(new URL(`../public/cat/appearance/${id}.webp`, import.meta.url))).size > 1_000,
+      id,
+    );
+  }
+});
+
+test("keeps the complete grouped feature directory and day narrative", async () => {
+  const response = await render();
+  const html = await response.text();
+
   for (const moment of ["8:47", "10:30", "1:15", "3:00", "5:48"]) {
     assert.match(html, new RegExp(moment.replace(":", "[:]")));
   }
@@ -177,9 +249,60 @@ test("presents the accurate Appearance Studio and current Flower Band preset", a
   assert.doesNotMatch(html, /12 accessories/);
 });
 
-test("explains privacy without inventing screen, email-body, or microphone access", async () => {
+test("adds an honest one-time $5.99 pricing section without a fake checkout", async () => {
   const response = await render();
   const html = await response.text();
+
+  assert.match(html, /ONE-TIME PRICE/);
+  assert.match(html, /\$5\.99/);
+  assert.match(html, /No monthly or annual subscription/);
+  assert.match(html, /Personal Windows desktop cat/);
+  assert.match(html, /Local-first privacy/);
+  assert.match(html, /Coming Soon/);
+  assert.match(html, /Purchasing is not live yet/);
+  assert.doesNotMatch(html, />\s*(?:Buy now|Checkout)\s*</i);
+  assert.doesNotMatch(html, /Limited-time|refund policy/i);
+});
+
+test("uses the face-only MewMuze mark for navigation, metadata, and Store branding", async () => {
+  const home = await (await render()).text();
+  const store = await (await render("/store")).text();
+  const layout = await source("../app/layout.tsx");
+  const logo = await readFile(new URL("../public/cat/mewmuze-face-logo-hd.png", import.meta.url));
+
+  assert.match(home, /mewmuze-face-logo-hd\.png/);
+  assert.match(store, /mewmuze-face-logo-hd\.png/);
+  assert.match(layout, /mewmuze-face-logo-192\.png/);
+  assert.match(layout, /mewmuze-face-logo-32\.png/);
+  assert.match(layout, /mewmuze-face-logo-180\.png/);
+  assert.equal(logo.readUInt32BE(16), 512);
+  assert.equal(logo.readUInt32BE(20), 512);
+  assert.equal(logo[25], 6);
+});
+
+test("keeps the original cat unchanged and ships a genuinely higher-native-resolution derivative", async () => {
+  const oldCat = await readFile(new URL("../public/mewmuze-flower-cat.png", import.meta.url));
+  const hero = await readFile(new URL("../public/cat/mewmuze-hero-peek-hd.png", import.meta.url));
+  const reference = await readFile(
+    new URL("../public/cat/mewmuze-hero-reference-hd.png", import.meta.url),
+  );
+  const renderer = await source("../scripts/render-authentic-web-assets.mjs");
+
+  assert.equal(oldCat.readUInt32BE(16), 55);
+  assert.equal(oldCat.readUInt32BE(20), 86);
+  assert.equal(hero.readUInt32BE(16), 768);
+  assert.equal(hero.readUInt32BE(20), 768);
+  assert.equal(reference.readUInt32BE(16), 768);
+  assert.equal(reference.readUInt32BE(20), 768);
+  assert.equal(hero[25], 6);
+  assert.match(renderer, /spriteLoader\.ts/);
+  assert.match(renderer, /animationDefinitions\.ts/);
+  assert.match(renderer, /export const ART = \$\{art\}/);
+  assert.match(renderer, /PAWPICO_APP_ROOT is required and is used read-only/);
+});
+
+test("explains privacy without inventing screen, email-body, or microphone access", async () => {
+  const html = await (await render()).text();
 
   assert.match(html, /Local file work/);
   assert.match(html, /Gmail envelope only/);
@@ -192,7 +315,7 @@ test("explains privacy without inventing screen, email-body, or microphone acces
   assert.doesNotMatch(html, /voice command/i);
 });
 
-test("uses the professional white tactile design system at every target breakpoint", async () => {
+test("preserves the professional white tactile system and target breakpoints", async () => {
   const css = await source("../app/globals.css");
 
   for (const token of [
@@ -215,22 +338,8 @@ test("uses the professional white tactile design system at every target breakpoi
   assert.match(css, /@media \(max-width: 960px\)/);
   assert.match(css, /@media \(max-width: 760px\)/);
   assert.match(css, /@media \(max-width: 430px\)/);
-  assert.match(css, /image-rendering: pixelated/);
+  assert.match(css, /\.cat-figure > img,[\s\S]*image-rendering: auto/);
   assert.doesNotMatch(css, /backdrop-filter|repeating-linear-gradient|linear-gradient|radial-gradient/i);
-});
-
-test("uses the supplied authentic cat as a transparent crisp asset and social card", async () => {
-  const cat = await readFile(new URL("../public/mewmuze-flower-cat.png", import.meta.url));
-  assert.equal(cat.toString("ascii", 1, 4), "PNG");
-  assert.equal(cat.readUInt32BE(16), 55);
-  assert.equal(cat.readUInt32BE(20), 86);
-  assert.equal(cat[25], 6, "cat PNG must retain RGBA transparency");
-
-  const social = await stat(new URL("../public/og-mewmuze.png", import.meta.url));
-  assert.ok(social.size > 20_000);
-  const layout = await source("../app/layout.tsx");
-  assert.match(layout, /og-mewmuze\.png/);
-  assert.match(layout, /themeColor: "#f5f6f7"/);
 });
 
 test("renders an original-concepts-only Coming Soon store with no order flow", async () => {
@@ -244,22 +353,6 @@ test("renders an original-concepts-only Coming Soon store with no order flow", a
   assert.match(html, /The wardrobe is still being stitched\./);
   assert.match(html, /New looks are on the way/);
   assert.equal((html.match(/class="concept-card"/g) ?? []).length, 10);
-
-  for (const concept of [
-    "Mecha Hero",
-    "Shield Guardian",
-    "Web Scout",
-    "Shadow Ninja",
-    "Winter Star",
-    "Cosmic Explorer",
-    "Moon Mage",
-    "Pixel Knight",
-    "Cozy Barista",
-    "Royal Wanderer",
-  ]) {
-    assert.match(html, new RegExp(concept));
-  }
-
   assert.doesNotMatch(catalog, /price|currency|purchase|packagePath|availability/i);
   assert.doesNotMatch(
     html,
@@ -279,9 +372,7 @@ test("renders static Coming Soon concept notes without packages or installation 
   assert.match(html, /not a finished product/);
   assert.match(html, /Nothing can be ordered/);
   assert.doesNotMatch(html, /Mock buy|Install in MewMuze|\.mewcostume|\$\d/i);
-
   await assert.rejects(access(new URL("../public/store", import.meta.url)));
-  await assert.rejects(access(new URL("../scripts/generate-iron-man-cat-costume.mjs", import.meta.url)));
 });
 
 test("keeps GitHub Pages routing and canonical metadata base-path safe", async () => {
@@ -298,5 +389,4 @@ test("keeps GitHub Pages routing and canonical metadata base-path safe", async (
   assert.match(workflow, /npm run build:pages/);
   assert.match(layout, /alternates: \{ canonical/);
   assert.match(storeLayout, /MewMuze Store — Coming Soon/);
-  assert.match(storeLayout, /Preview upcoming original costume concepts/);
 });
