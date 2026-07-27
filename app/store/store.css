@@ -978,3 +978,85 @@
     animation-duration: 0.01ms !important;
   }
 }
+
+/* Native app pixels and a readable minimum size for every store label. */
+
+.store-brand small {
+  font-size: 11px;
+  line-height: 1.2;
+}
+
+.store-nav nav a,
+.store-status,
+.store-eyebrow,
+.store-button,
+.store-honesty strong,
+.concept-back,
+.detail-coming {
+  font-size: 12px;
+  line-height: 1.3;
+}
+
+.store-honesty span {
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.workbench-note strong,
+.workbench-note small,
+.concept-art > small {
+  font-size: 11px;
+  line-height: 1.25;
+}
+
+.concept-card-meta > span,
+.concept-card-meta > small,
+.concept-card-meta > b {
+  font-size: 11px;
+  line-height: 1.15;
+}
+
+.concept-card-copy > p {
+  font-size: 16px;
+  line-height: 1.65;
+}
+
+.concept-progress > span {
+  font-size: 11px;
+  line-height: 1.2;
+}
+
+.concept-card-copy > a {
+  font-size: 12px;
+  line-height: 1.2;
+}
+
+.store-process li > span,
+.detail-honesty strong {
+  font-size: 12px;
+}
+
+.store-process p,
+.concept-notes li,
+.detail-honesty p {
+  font-size: 15px;
+  line-height: 1.65;
+}
+
+.store-footer {
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+@media (max-width: 760px) {
+  .store-status {
+    font-size: 11px;
+  }
+
+  .store-eyebrow,
+  .store-button,
+  .concept-back,
+  .detail-coming {
+    font-size: 11px;
+  }
+}

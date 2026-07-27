@@ -15,12 +15,21 @@ import {
 import { featureGroups, featureStories, type FeatureStory } from "../data/features";
 import { sitePath } from "../lib/site-path";
 
-const CAT_ASSET = "/cat/mewmuze-hero-reference-hd.png";
+const CAT_ASSET = "/cat/mewmuze-hero-reference-app.png";
 const HERO_CAT_BODY_ASSET = "/cat/mewmuze-hero-front-body-app.png";
+const HERO_CAT_BODY_ALIVE_ASSET = "/cat/mewmuze-hero-front-body-alive.webp";
 const HERO_CAT_HEAD_ASSET = "/cat/mewmuze-hero-front-head-app.png";
 const HERO_CAT_BLINK_ASSET = "/cat/mewmuze-hero-front-head-blink-app.png";
 const HERO_CAT_EARS_ASSET = "/cat/mewmuze-hero-front-head-ears-app.png";
 const FACE_LOGO_ASSET = "/cat/mewmuze-face-logo-hd.png";
+
+const heroEmotionAssets = {
+  happy: "/cat/hero-emotions/happy.webp",
+  sad: "/cat/hero-emotions/sad.webp",
+  cheerful: "/cat/hero-emotions/cheerful.webp",
+} as const;
+
+type HeroEmotion = "neutral" | keyof typeof heroEmotionAssets;
 
 function CatFigure({
   className = "",
@@ -34,8 +43,8 @@ function CatFigure({
       <Image
         src={sitePath(CAT_ASSET)}
         alt=""
-        width={768}
-        height={768}
+        width={128}
+        height={128}
         unoptimized
         priority={priority}
       />
@@ -47,16 +56,22 @@ function HeroCat({
   headUnitRef,
   leftPupilRef,
   rightPupilRef,
+  emotion,
+  reducedMotion,
 }: {
   headUnitRef: RefObject<HTMLSpanElement | null>;
   leftPupilRef: RefObject<HTMLSpanElement | null>;
   rightPupilRef: RefObject<HTMLSpanElement | null>;
+  emotion: HeroEmotion;
+  reducedMotion: boolean;
 }) {
   return (
-    <span className="hero-cat-art" aria-hidden="true">
+    <span className={`hero-cat-art emotion-${emotion}`} aria-hidden="true">
       <Image
         className="hero-cat-layer hero-cat-body"
-        src={sitePath(HERO_CAT_BODY_ASSET)}
+        src={sitePath(
+          reducedMotion ? HERO_CAT_BODY_ASSET : HERO_CAT_BODY_ALIVE_ASSET,
+        )}
         alt=""
         width={128}
         height={128}
@@ -96,6 +111,18 @@ function HeroCat({
           unoptimized
         />
       </span>
+      {Object.entries(heroEmotionAssets).map(([name, asset]) => (
+        <Image
+          key={name}
+          className={`hero-cat-layer hero-cat-emotion hero-cat-emotion-${name}`}
+          src={sitePath(asset)}
+          alt=""
+          width={128}
+          height={128}
+          loading="eager"
+          unoptimized
+        />
+      ))}
     </span>
   );
 }
@@ -207,8 +234,8 @@ function FeatureFilm({
       className="feature-media-cat"
       src={sitePath(`/cat/features/${feature.id}.webp`)}
       alt={`Authentic MewMuze animation for ${feature.title}`}
-      width={256}
-      height={256}
+      width={128}
+      height={128}
       unoptimized
     />
   );
@@ -245,11 +272,11 @@ function AppearanceShowcase({ reducedMotion }: { reducedMotion: boolean }) {
     if (reducedMotion || !isVisible) return;
     const interval = window.setInterval(() => {
       setActiveIndex((current) => (current + 1) % appearanceShowcase.length);
-    }, 2800);
+    }, 2200);
     return () => window.clearInterval(interval);
   }, [isVisible, reducedMotion]);
 
-  const [activeId, activeLabel] = appearanceShowcase[activeIndex];
+  const [, activeLabel] = appearanceShowcase[activeIndex];
 
   return (
     <div
@@ -263,25 +290,31 @@ function AppearanceShowcase({ reducedMotion }: { reducedMotion: boolean }) {
         <i />
       </span>
       <div className="showcase-cat-well">
-        {reducedMotion || !isVisible ? (
+        {reducedMotion ? (
           <Image
             className="showcase-cat-static"
             src={sitePath(CAT_ASSET)}
             alt="MewMuze in the white and grey Flower Band appearance"
-            width={768}
-            height={768}
+            width={128}
+            height={128}
             unoptimized
           />
         ) : (
-          <Image
-            key={activeId}
-            className="showcase-cat-media is-current"
-            src={sitePath(`/cat/appearance/${activeId}.webp`)}
-            alt=""
-            width={256}
-            height={256}
-            unoptimized
-          />
+          appearanceShowcase.map(([id, label], index) => (
+            <Image
+              key={id}
+              className={`showcase-cat-media ${
+                index === activeIndex ? "is-current" : ""
+              }`}
+              src={sitePath(`/cat/appearance/${id}.webp`)}
+              alt={index === activeIndex ? `MewMuze appearance: ${label}` : ""}
+              aria-hidden={index === activeIndex ? undefined : "true"}
+              width={128}
+              height={128}
+              loading="eager"
+              unoptimized
+            />
+          ))
         )}
       </div>
       <span className="showcase-ticket">
@@ -551,8 +584,8 @@ function AppearanceStudio() {
               className="studio-cat-media"
               src={sitePath(asset)}
               alt={`Animated ${bodyLabel} MewMuze cat with the ${patternLabel} coat pattern`}
-              width={256}
-              height={256}
+              width={128}
+              height={128}
               unoptimized
             />
             <span className="studio-live-badge" aria-hidden="true">
@@ -673,6 +706,7 @@ export default function Home() {
   const [reducedMotion, setReducedMotion] = useState(false);
   const [finePointer, setFinePointer] = useState(true);
   const [experienceUnlocked, setExperienceUnlocked] = useState(false);
+  const [heroEmotion, setHeroEmotion] = useState<HeroEmotion>("neutral");
   const heroRef = useRef<HTMLElement>(null);
   const catMotionRef = useRef<HTMLSpanElement>(null);
   const heroHeadRef = useRef<HTMLSpanElement>(null);
@@ -707,6 +741,37 @@ export default function Home() {
       document.body.classList.remove("mewmuze-scroll-locked");
     };
   }, [experienceUnlocked]);
+
+  useEffect(() => {
+    if (reducedMotion) {
+      const neutralTimer = window.setTimeout(() => setHeroEmotion("neutral"), 0);
+      return () => window.clearTimeout(neutralTimer);
+    }
+
+    const emotions: Exclude<HeroEmotion, "neutral">[] = [
+      "happy",
+      "cheerful",
+      "sad",
+    ];
+    let emotionIndex = 0;
+    let neutralTimer = 0;
+
+    const showNextEmotion = () => {
+      setHeroEmotion(emotions[emotionIndex]);
+      emotionIndex = (emotionIndex + 1) % emotions.length;
+      window.clearTimeout(neutralTimer);
+      neutralTimer = window.setTimeout(() => setHeroEmotion("neutral"), 1900);
+    };
+
+    const openingTimer = window.setTimeout(showNextEmotion, 3600);
+    const emotionTimer = window.setInterval(showNextEmotion, 7200);
+
+    return () => {
+      window.clearTimeout(openingTimer);
+      window.clearTimeout(neutralTimer);
+      window.clearInterval(emotionTimer);
+    };
+  }, [reducedMotion]);
 
   useEffect(() => {
     const sections = Array.from(
@@ -863,6 +928,8 @@ export default function Home() {
               headUnitRef={heroHeadRef}
               leftPupilRef={leftPupilRef}
               rightPupilRef={rightPupilRef}
+              emotion={heroEmotion}
+              reducedMotion={reducedMotion}
             />
           </span>
           <span className="cat-speech">Hi. I live here now.</span>
@@ -893,9 +960,11 @@ export default function Home() {
         </div>
 
         <div className="hero-status" aria-hidden="true">
-          <span>CURIOUS</span>
+          <span>{heroEmotion === "neutral" ? "CURIOUS" : heroEmotion.toUpperCase()}</span>
           <i />
-          <small>cursor noticed</small>
+          <small>
+            {heroEmotion === "neutral" ? "cursor noticed" : "tiny mood moment"}
+          </small>
         </div>
       </section>
 

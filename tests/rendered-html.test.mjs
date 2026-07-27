@@ -31,7 +31,7 @@ test("renders the exact full-screen MewMuze opening story", async () => {
   assert.match(html, />Explore Now/);
   assert.match(html, />See every feature/);
   assert.match(html, /experience-locked/);
-  assert.match(html, /mewmuze-hero-front-body-app\.png/);
+  assert.match(html, /mewmuze-hero-front-body-alive\.webp/);
   assert.match(html, /mewmuze-hero-front-head-app\.png/);
   assert.match(html, /mewmuze-face-logo-hd\.png/);
   assert.match(html, /aria-label="Primary navigation"/);
@@ -59,6 +59,7 @@ test("uses a large, seated app-density pixel cat with independent head and eye l
   const css = await source("../app/globals.css");
 
   assert.match(page, /HERO_CAT_BODY_ASSET = "\/cat\/mewmuze-hero-front-body-app\.png"/);
+  assert.match(page, /HERO_CAT_BODY_ALIVE_ASSET = "\/cat\/mewmuze-hero-front-body-alive\.webp"/);
   assert.match(page, /HERO_CAT_HEAD_ASSET = "\/cat\/mewmuze-hero-front-head-app\.png"/);
   assert.match(page, /HERO_CAT_BLINK_ASSET = "\/cat\/mewmuze-hero-front-head-blink-app\.png"/);
   assert.match(page, /HERO_CAT_EARS_ASSET = "\/cat\/mewmuze-hero-front-head-ears-app\.png"/);
@@ -71,6 +72,37 @@ test("uses a large, seated app-density pixel cat with independent head and eye l
   assert.match(css, /\.hero-cat-head-unit \{[\s\S]*will-change: transform/);
   assert.match(css, /\.hero-cat-layer \{[\s\S]*image-rendering: pixelated/);
   assert.match(css, /\.cat-figure > img,[\s\S]*image-rendering: pixelated/);
+});
+
+test("gives the landing cat an authentic moving tail and rotating emotional life", async () => {
+  const page = await source("../app/page.tsx");
+  const css = await source("../app/globals.css");
+  const renderer = await source("../scripts/render-authentic-web-assets.mjs");
+
+  for (const emotion of ["happy", "sad", "cheerful"]) {
+    const media = await readFile(
+      new URL(`../public/cat/hero-emotions/${emotion}.webp`, import.meta.url),
+    );
+    assert.ok(media.length > 1_000, emotion);
+    assert.equal(media.toString("ascii", 0, 4), "RIFF");
+    assert.equal(media.toString("ascii", 8, 12), "WEBP");
+    assert.match(
+      page,
+      new RegExp(`${emotion}: "/cat/hero-emotions/${emotion}\\.webp"`),
+    );
+  }
+
+  const tail = await readFile(
+    new URL("../public/cat/mewmuze-hero-front-body-alive.webp", import.meta.url),
+  );
+  assert.ok(tail.length > 1_000);
+  assert.equal(tail.toString("ascii", 0, 4), "RIFF");
+  assert.match(page, /const \[heroEmotion, setHeroEmotion\]/);
+  assert.match(page, /"happy",\s+"cheerful",\s+"sad"/);
+  assert.match(page, /setHeroEmotion\("neutral"\)/);
+  assert.match(renderer, /renderHeroTailBody/);
+  assert.match(renderer, /tailPhase < 40/);
+  assert.match(css, /\.hero-cat-art\.emotion-happy \.hero-cat-emotion-happy/);
 });
 
 test("implements one efficient pupil-first and delayed-head cursor loop", async () => {
@@ -200,9 +232,12 @@ test("hard-cuts through varied authentic cats and emotions while visible", async
   assert.match(page, /kitten-yawn/);
   assert.match(page, /siamese-celebrate/);
   assert.doesNotMatch(page, /previousIndex|is-previous/);
-  assert.match(page, /window\.setInterval\(\(\) => \{[\s\S]*\}, 2800\)/);
+  assert.match(page, /window\.setInterval\(\(\) => \{[\s\S]*\}, 2200\)/);
   assert.match(page, /IntersectionObserver/);
   assert.match(page, /if \(reducedMotion \|\| !isVisible\) return/);
+  assert.match(page, /appearanceShowcase\.map\(\(\[id, label\], index\)/);
+  assert.match(page, /loading="eager"/);
+  assert.match(await source("../app/globals.css"), /\.showcase-cat-media \{[\s\S]*display: none/);
 
   for (const [id] of [
     ["white-grey-flower"],
@@ -327,6 +362,9 @@ test("keeps the original reference and ships native app-density seated layers", 
   const reference = await readFile(
     new URL("../public/cat/mewmuze-hero-reference-hd.png", import.meta.url),
   );
+  const appReference = await readFile(
+    new URL("../public/cat/mewmuze-hero-reference-app.png", import.meta.url),
+  );
   const renderer = await source("../scripts/render-authentic-web-assets.mjs");
 
   assert.equal(oldCat.readUInt32BE(16), 55);
@@ -337,6 +375,8 @@ test("keeps the original reference and ships native app-density seated layers", 
   assert.equal(heroHead.readUInt32BE(20), 128);
   assert.equal(reference.readUInt32BE(16), 768);
   assert.equal(reference.readUInt32BE(20), 768);
+  assert.equal(appReference.readUInt32BE(16), 128);
+  assert.equal(appReference.readUInt32BE(20), 128);
   assert.equal(heroBody[25], 6);
   assert.equal(heroHead[25], 6);
   assert.match(renderer, /spriteLoader\.ts/);
@@ -344,6 +384,8 @@ test("keeps the original reference and ships native app-density seated layers", 
   assert.match(renderer, /export const ART = \$\{art\}/);
   assert.match(renderer, /PAWPICO_APP_ROOT is required and is used read-only/);
   assert.match(renderer, /Math\.round\(60 \/ meta\.fps\)/);
+  assert.match(renderer, /openRenderer\(browser, 128, false\)/);
+  assert.match(renderer, /featureRenderer = await openRenderer\(browser, 128, false\)/);
   assert.match(renderer, /durations\.push\(outputIndex % 3 === 2 \? 16 : 17\)/);
   assert.match(renderer, /furColor: "#eeeae3"/);
   assert.match(renderer, /pattern: "solid"/);

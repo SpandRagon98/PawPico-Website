@@ -4123,3 +4123,233 @@ body.mewmuze-scroll-locked {
     margin-top: 42vh;
   }
 }
+
+/* Living hero, native app pixels, and legible interface type. */
+
+.hero-cat-emotion {
+  z-index: 6;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.hero-cat-art:not(.emotion-neutral) > .hero-cat-body,
+.hero-cat-art:not(.emotion-neutral) > .hero-cat-head-unit {
+  opacity: 0;
+}
+
+.hero-cat-art.emotion-happy .hero-cat-emotion-happy,
+.hero-cat-art.emotion-sad .hero-cat-emotion-sad,
+.hero-cat-art.emotion-cheerful .hero-cat-emotion-cheerful {
+  opacity: 1;
+}
+
+.showcase-cat-media {
+  display: none;
+}
+
+.showcase-cat-media.is-current {
+  display: block;
+  animation: none;
+}
+
+.feature-theatre.section-shell {
+  width: min(1560px, calc(100% - 32px));
+}
+
+.theatre-stage {
+  min-height: 660px;
+}
+
+.theatre-media {
+  min-height: 620px;
+}
+
+.eyebrow {
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.cat-speech {
+  font-size: 12px;
+  line-height: 1.2;
+}
+
+.privacy-note {
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.hero-status span {
+  font-size: 11px;
+}
+
+.hero-status small {
+  font-size: 11px;
+  line-height: 1.2;
+}
+
+.site-brand small {
+  font-size: 11px;
+  line-height: 1.15;
+}
+
+.desktop-nav > a {
+  font-size: 12px;
+}
+
+.coming-pill {
+  font-size: 11px;
+  line-height: 1;
+}
+
+.showcase-window-bar::before,
+.showcase-ticket small {
+  font-size: 11px;
+  line-height: 1.2;
+}
+
+.showcase-ticket strong {
+  font-size: 15px;
+}
+
+.media-label span,
+.media-caption {
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+.feature-index small,
+.feature-scene {
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.feature-detail {
+  font-size: 16px;
+  line-height: 1.65;
+}
+
+.theatre-copy li {
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.theatre-arrow small,
+.theatre-counter small {
+  font-size: 11px;
+  line-height: 1.2;
+}
+
+.theatre-counter strong {
+  font-size: 18px;
+}
+
+.theatre-progress button > span {
+  font-size: 11px;
+}
+
+.theatre-progress small {
+  font-size: 11px;
+  line-height: 1.25;
+}
+
+.directory-panel > h3 > button > span,
+.directory-panel > h3 > button small,
+.directory-grid article > small {
+  font-size: 11px;
+  line-height: 1.2;
+}
+
+.directory-grid p {
+  font-size: 15px;
+}
+
+.directory-grid li {
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.studio-titlebar span,
+.preset-ticket small,
+.studio-live-badge {
+  font-size: 11px;
+  line-height: 1.2;
+}
+
+.preset-ticket strong,
+.choice-block > span,
+.choice-block button,
+.appearance-specs small,
+.concept-stack small {
+  font-size: 11px;
+  line-height: 1.25;
+}
+
+.studio-window > p {
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.privacy-grid h3 {
+  font-size: 17px;
+}
+
+.privacy-grid p {
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+.pricing-brand small,
+.pricing-price small,
+.pricing-card > p {
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.pricing-price span,
+.pricing-card li {
+  font-size: 15px;
+}
+
+.cta-cat > span {
+  font-size: 11px;
+  line-height: 1.2;
+}
+
+.final-cta > div:last-child > small {
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.site-footer p,
+.site-footer > div > span,
+.site-footer nav {
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+@media (max-width: 1100px) {
+  .feature-theatre.section-shell {
+    width: min(100% - 24px, 980px);
+  }
+
+  .theatre-stage,
+  .theatre-media {
+    min-height: 0;
+  }
+}
+
+@media (max-width: 760px) {
+  .eyebrow,
+  .privacy-note {
+    font-size: 11px;
+  }
+
+  .site-navigation summary {
+    font-size: 11px;
+  }
+
+  .theatre-progress small {
+    font-size: 11px;
+  }
+}

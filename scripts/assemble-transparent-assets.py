@@ -40,6 +40,42 @@ def assemble_webp(frames_dir: Path, output: Path, durations_file: Path) -> None:
         frame.close()
 
 
+def assemble_body_webp(frames_dir: Path, output: Path, durations_file: Path) -> None:
+    """Pack full renderer frames as an animated body-only hero layer."""
+
+    frame_paths = sorted(frames_dir.glob("*.png"))
+    if not frame_paths:
+        raise RuntimeError(f"No PNG frames found in {frames_dir}")
+
+    durations = json.loads(durations_file.read_text(encoding="utf-8"))
+    if len(durations) != len(frame_paths):
+        raise RuntimeError("Frame and duration counts do not match")
+
+    frames: list[Image.Image] = []
+    for path in frame_paths:
+        frame = Image.open(path).convert("RGBA")
+        frame.paste(
+            (0, 0, 0, 0),
+            (0, 0, frame.width, round(frame.height * 0.56)),
+        )
+        frames.append(frame)
+
+    output.parent.mkdir(parents=True, exist_ok=True)
+    frames[0].save(
+        output,
+        format="WEBP",
+        save_all=True,
+        append_images=frames[1:],
+        duration=durations,
+        loop=0,
+        lossless=True,
+        method=6,
+        minimize_size=True,
+    )
+    for frame in frames:
+        frame.close()
+
+
 def face_crop(source: Path, output_dir: Path) -> None:
     image = Image.open(source).convert("RGBA")
     alpha_box = image.getbbox()
@@ -129,6 +165,11 @@ def main() -> None:
     webp_parser.add_argument("--durations", type=Path, required=True)
     webp_parser.add_argument("--output", type=Path, required=True)
 
+    body_webp_parser = subparsers.add_parser("body-webp")
+    body_webp_parser.add_argument("--frames", type=Path, required=True)
+    body_webp_parser.add_argument("--durations", type=Path, required=True)
+    body_webp_parser.add_argument("--output", type=Path, required=True)
+
     face_parser = subparsers.add_parser("face")
     face_parser.add_argument("--source", type=Path, required=True)
     face_parser.add_argument("--output-dir", type=Path, required=True)
@@ -142,6 +183,8 @@ def main() -> None:
     args = parser.parse_args()
     if args.command == "webp":
         assemble_webp(args.frames, args.output, args.durations)
+    elif args.command == "body-webp":
+        assemble_body_webp(args.frames, args.output, args.durations)
     elif args.command == "hero":
         hero_layers(args.base, args.blink, args.ears, args.output_dir)
     else:
