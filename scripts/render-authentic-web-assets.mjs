@@ -372,6 +372,40 @@ async function renderAnimation(page, id, animations, appearance, output) {
   ]);
 }
 
+async function renderHeroTailBody(page, output) {
+  const frames = join(tempRoot, "frames", "hero-tail-body");
+  await mkdir(frames, { recursive: true });
+  const durations = [];
+
+  for (let tailPhase = 0; tailPhase < 40; tailPhase += 1) {
+    await renderPng(
+      page,
+      join(frames, `${String(tailPhase).padStart(4, "0")}.png`),
+      {
+        name: "idle",
+        frameIndex: 0,
+        appearance: currentAppearance,
+        tailPhase,
+        overrides: { tail: "wrap" },
+      },
+    );
+    durations.push(110);
+  }
+
+  const durationsFile = join(frames, "durations.json");
+  await writeFile(durationsFile, JSON.stringify(durations), "utf8");
+  await run(python, [
+    helper,
+    "body-webp",
+    "--frames",
+    frames,
+    "--durations",
+    durationsFile,
+    "--output",
+    output,
+  ]);
+}
+
 await mkdir(publicCat, { recursive: true });
 const browser = await chromium.launch(
   process.env.BROWSER_EXE
@@ -381,13 +415,24 @@ const browser = await chromium.launch(
 
 try {
   const completeHero = await openRenderer(browser, 768, false);
+  const completeApp = await openRenderer(browser, 128, false);
   const pupilFreeHero = await openRenderer(browser, 128, true);
-  const featureRenderer = await openRenderer(browser, 256, false);
+  const featureRenderer = await openRenderer(browser, 128, false);
 
   try {
     await renderPng(
       completeHero.page,
       join(publicCat, "mewmuze-hero-reference-hd.png"),
+      {
+        name: "idle",
+        frameIndex: 0,
+        appearance: currentAppearance,
+        overrides: { tail: "wrap" },
+      },
+    );
+    await renderPng(
+      completeApp.page,
+      join(publicCat, "mewmuze-hero-reference-app.png"),
       {
         name: "idle",
         frameIndex: 0,
@@ -442,6 +487,23 @@ try {
       "--output-dir",
       publicCat,
     ]);
+    await renderHeroTailBody(
+      pupilFreeHero.page,
+      join(publicCat, "mewmuze-hero-front-body-alive.webp"),
+    );
+    for (const [emotion, animation] of [
+      ["happy", "happy"],
+      ["sad", "sad"],
+      ["cheerful", "celebrate"],
+    ]) {
+      await renderAnimation(
+        completeApp.page,
+        `hero-emotion-${emotion}`,
+        [animation],
+        currentAppearance,
+        join(publicCat, "hero-emotions", `${emotion}.webp`),
+      );
+    }
 
     await run(python, [
       helper,
@@ -493,6 +555,7 @@ try {
     }
   } finally {
     await completeHero.context.close();
+    await completeApp.context.close();
     await pupilFreeHero.context.close();
     await featureRenderer.context.close();
   }
