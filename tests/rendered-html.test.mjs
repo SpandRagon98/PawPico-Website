@@ -105,7 +105,7 @@ test("gives the landing cat an authentic moving tail and rotating emotional life
   assert.match(css, /\.hero-cat-art\.emotion-happy \.hero-cat-emotion-happy/);
 });
 
-test("implements one efficient pupil-first and delayed-head cursor loop", async () => {
+test("implements one efficient, lively pupil-first and delayed-head cursor loop", async () => {
   const page = await source("../app/page.tsx");
   const css = await source("../app/globals.css");
   const tracking = page.match(/useEffect\(\(\) => \{\s+if \(reducedMotion[\s\S]*?\}, \[finePointer, reducedMotion\]\);/)?.[0] ?? "";
@@ -114,8 +114,13 @@ test("implements one efficient pupil-first and delayed-head cursor loop", async 
   assert.match(tracking, /window\.addEventListener\("pointermove", track/);
   assert.match(tracking, /IntersectionObserver/);
   assert.match(tracking, /visibilitychange/);
-  assert.match(tracking, /pupil\.x \+= \(target\.x - pupil\.x\) \* 0\.22/);
-  assert.match(tracking, /head\.x \+= \(target\.x - head\.x\) \* 0\.065/);
+  assert.match(tracking, /pupil\.x \+= \(target\.x - pupil\.x\) \* 0\.34/);
+  assert.match(tracking, /head\.x \+= \(target\.x - head\.x\) \* 0\.105/);
+  assert.match(tracking, /const pupilX = pupil\.x \* 14\.5/);
+  assert.match(tracking, /const pupilY = pupil\.y \* 9/);
+  assert.match(tracking, /const headX = head\.x \* 16/);
+  assert.match(tracking, /const headTilt = head\.x \* 3\.2/);
+  assert.match(tracking, /Math\.hypot\(head\.x, head\.y\)/);
   assert.match(tracking, /heroHeadRef\.current\.style\.transform/);
   assert.doesNotMatch(tracking, /forcedLookRef/);
   assert.doesNotMatch(tracking.match(/const track =[\s\S]*?const returnToNeutral/)?.[0] ?? "", /set[A-Z]\w*\(/);
@@ -408,6 +413,7 @@ test("explains privacy without inventing screen, email-body, or microphone acces
 
 test("preserves the professional white tactile system and target breakpoints", async () => {
   const css = await source("../app/globals.css");
+  const storeCss = await source("../app/store/store.css");
 
   for (const token of [
     "--background: #f5f6f7",
@@ -431,6 +437,11 @@ test("preserves the professional white tactile system and target breakpoints", a
   assert.match(css, /@media \(max-width: 430px\)/);
   assert.match(css, /\.cat-figure > img,[\s\S]*image-rendering: pixelated/);
   assert.match(css, /\.hero-cat-layer \{[\s\S]*image-rendering: pixelated/);
+  assert.match(css, /Final type rhythm/);
+  assert.match(css, /\.hero h1 \{[\s\S]*line-height: 0\.95/);
+  assert.match(css, /\.section-heading \{[\s\S]*gap: clamp\(32px, 4vw, 52px\)/);
+  assert.match(storeCss, /Store typography follows the same measured rhythm/);
+  assert.match(storeCss, /\.store-hero h1,[\s\S]*line-height: 0\.94/);
   assert.doesNotMatch(css, /backdrop-filter|repeating-linear-gradient|linear-gradient|radial-gradient/i);
 });
 
