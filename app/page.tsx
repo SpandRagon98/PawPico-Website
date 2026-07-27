@@ -806,14 +806,17 @@ export default function Home() {
     const head = { x: 0, y: 0 };
 
     const render = () => {
-      pupil.x += (target.x - pupil.x) * 0.22;
-      pupil.y += (target.y - pupil.y) * 0.22;
-      head.x += (target.x - head.x) * 0.065;
-      head.y += (target.y - head.y) * 0.065;
-      const pupilX = pupil.x * 8;
-      const pupilY = pupil.y * 5.5;
-      const headX = head.x * 4.5;
-      const headY = head.y * 2.4;
+      pupil.x += (target.x - pupil.x) * 0.34;
+      pupil.y += (target.y - pupil.y) * 0.34;
+      head.x += (target.x - head.x) * 0.105;
+      head.y += (target.y - head.y) * 0.105;
+      const pupilX = pupil.x * 14.5;
+      const pupilY = pupil.y * 9;
+      const headX = head.x * 16;
+      const headY = head.y * 8;
+      const headTilt = head.x * 3.2 - head.y * 0.45;
+      const headScale =
+        1 + Math.min(1, Math.hypot(head.x, head.y)) * 0.012;
 
       leftPupilRef.current?.style.setProperty(
         "transform",
@@ -825,7 +828,7 @@ export default function Home() {
       );
       if (heroHeadRef.current) {
         heroHeadRef.current.style.transform =
-          `translate3d(${headX}px, ${headY}px, 0) rotate(${head.x * 0.55}deg)`;
+          `translate3d(${headX}px, ${headY}px, 0) rotate(${headTilt}deg) scale(${headScale})`;
       }
 
       if (isVisible && document.visibilityState === "visible") {
@@ -838,8 +841,14 @@ export default function Home() {
       if (!cat) return;
       const centreX = cat.left + cat.width * 0.55;
       const centreY = cat.top + cat.height * 0.33;
-      target.x = Math.max(-1, Math.min(1, (event.clientX - centreX) / (window.innerWidth * 0.42)));
-      target.y = Math.max(-1, Math.min(1, (event.clientY - centreY) / (window.innerHeight * 0.4)));
+      target.x = Math.max(
+        -1,
+        Math.min(1, (event.clientX - centreX) / (window.innerWidth * 0.28)),
+      );
+      target.y = Math.max(
+        -1,
+        Math.min(1, (event.clientY - centreY) / (window.innerHeight * 0.3)),
+      );
     };
 
     const returnToNeutral = () => {
