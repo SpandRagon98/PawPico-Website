@@ -80,6 +80,46 @@ def face_crop(source: Path, output_dir: Path) -> None:
     image.close()
 
 
+def hero_layers(base: Path, blink: Path, ears: Path, output_dir: Path) -> None:
+    """Split the seated hero into a stable body and independently moving head."""
+
+    output_dir.mkdir(parents=True, exist_ok=True)
+    base_image = Image.open(base).convert("RGBA")
+    blink_image = Image.open(blink).convert("RGBA")
+    ears_image = Image.open(ears).convert("RGBA")
+
+    body = base_image.copy()
+    body.paste(
+        (0, 0, 0, 0),
+        (0, 0, body.width, round(body.height * 0.56)),
+    )
+    body.save(output_dir / "mewmuze-hero-front-body-hd.png", format="PNG", optimize=True)
+
+    for source, filename in [
+        (base_image, "mewmuze-hero-front-head-hd.png"),
+        (blink_image, "mewmuze-hero-front-head-blink-hd.png"),
+        (ears_image, "mewmuze-hero-front-head-ears-hd.png"),
+    ]:
+        head = source.copy()
+        neck_top = round(head.height * 0.55)
+        neck_bottom = round(head.height * 0.60)
+        neck_left = round(head.width * 0.37)
+        neck_right = round(head.width * 0.63)
+        head.paste(
+            (0, 0, 0, 0),
+            (0, neck_bottom, head.width, head.height),
+        )
+        head.paste((0, 0, 0, 0), (0, neck_top, neck_left, neck_bottom))
+        head.paste((0, 0, 0, 0), (neck_right, neck_top, head.width, neck_bottom))
+        head.save(output_dir / filename, format="PNG", optimize=True)
+        head.close()
+
+    body.close()
+    base_image.close()
+    blink_image.close()
+    ears_image.close()
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -93,9 +133,17 @@ def main() -> None:
     face_parser.add_argument("--source", type=Path, required=True)
     face_parser.add_argument("--output-dir", type=Path, required=True)
 
+    hero_parser = subparsers.add_parser("hero")
+    hero_parser.add_argument("--base", type=Path, required=True)
+    hero_parser.add_argument("--blink", type=Path, required=True)
+    hero_parser.add_argument("--ears", type=Path, required=True)
+    hero_parser.add_argument("--output-dir", type=Path, required=True)
+
     args = parser.parse_args()
     if args.command == "webp":
         assemble_webp(args.frames, args.output, args.durations)
+    elif args.command == "hero":
+        hero_layers(args.base, args.blink, args.ears, args.output_dir)
     else:
         face_crop(args.source, args.output_dir)
 

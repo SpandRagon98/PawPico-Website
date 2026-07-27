@@ -46,10 +46,11 @@ assert.doesNotMatch(storeHtml, /\sdownload(?:=|\s|>)/i);
 
 for (const file of [
   "../out/index.html",
-  "../out/cat/mewmuze-hero-peek-hd.png",
+  "../out/cat/mewmuze-hero-front-body-hd.png",
+  "../out/cat/mewmuze-hero-front-head-hd.png",
   "../out/cat/mewmuze-face-logo-hd.png",
   "../out/cat/features/cursor.webp",
-  "../out/cat/appearance/white-grey-flower.webp",
+  "../out/cat/appearance/white-curious.webp",
   "../out/og-mewmuze.png",
   "../out/videos/desktop-physics.mp4",
   "../out/store/index.html",

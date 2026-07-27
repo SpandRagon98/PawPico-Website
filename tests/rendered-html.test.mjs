@@ -31,7 +31,8 @@ test("renders the exact full-screen MewMuze opening story", async () => {
   assert.match(html, />Explore Now/);
   assert.match(html, />See every feature/);
   assert.match(html, /experience-locked/);
-  assert.match(html, /mewmuze-hero-peek-hd\.png/);
+  assert.match(html, /mewmuze-hero-front-body-hd\.png/);
+  assert.match(html, /mewmuze-hero-front-head-hd\.png/);
   assert.match(html, /mewmuze-face-logo-hd\.png/);
   assert.match(html, /aria-label="Primary navigation"/);
   assert.match(html, /Store[\s\S]*Coming Soon/);
@@ -53,18 +54,23 @@ test("locks scrolling until Explore Now unlocks the experience", async () => {
   assert.match(css, /\.experience-locked \.hero[\s\S]*touch-action: none/);
 });
 
-test("uses a large, clipped left-edge HD peeking cat instead of enlarging the old screenshot", async () => {
+test("uses a large, seated HD white cat with independent head and eye layers", async () => {
   const page = await source("../app/page.tsx");
   const css = await source("../app/globals.css");
 
-  assert.match(page, /HERO_CAT_ASSET = "\/cat\/mewmuze-hero-peek-hd\.png"/);
+  assert.match(page, /HERO_CAT_BODY_ASSET = "\/cat\/mewmuze-hero-front-body-hd\.png"/);
+  assert.match(page, /HERO_CAT_HEAD_ASSET = "\/cat\/mewmuze-hero-front-head-hd\.png"/);
+  assert.match(page, /HERO_CAT_BLINK_ASSET = "\/cat\/mewmuze-hero-front-head-blink-hd\.png"/);
+  assert.match(page, /HERO_CAT_EARS_ASSET = "\/cat\/mewmuze-hero-front-head-ears-hd\.png"/);
   assert.match(page, /width=\{768\}/);
   assert.match(page, /height=\{768\}/);
   assert.doesNotMatch(page, /mewmuze-flower-cat\.png/);
-  assert.match(css, /\.hero-cat-peek \{[\s\S]*width: min\(49vw, 780px\)/);
-  assert.match(css, /\.hero-cat-art \{[\s\S]*clip-path: polygon/);
-  assert.match(css, /\.hero-cat-motion\.is-travelling \.hero-cat-art[\s\S]*clip-path: inset\(0\)/);
-  assert.match(css, /\.cat-figure > img,[\s\S]*image-rendering: auto/);
+  assert.match(css, /\.hero-cat-peek \{[\s\S]*width: min\(57vw, 960px\)/);
+  assert.match(css, /\.hero-cat-motion \{[\s\S]*width: clamp\(700px, 55vw, 900px\)/);
+  assert.match(css, /\.hero-cat-art \{[\s\S]*clip-path: inset\(0\)/);
+  assert.match(css, /\.hero-cat-head-unit \{[\s\S]*will-change: transform/);
+  assert.match(css, /\.hero-cat-layer \{[\s\S]*image-rendering: auto/);
+  assert.match(css, /\.cat-figure > img,[\s\S]*image-rendering: pixelated/);
 });
 
 test("implements one efficient pupil-first and delayed-head cursor loop", async () => {
@@ -78,6 +84,7 @@ test("implements one efficient pupil-first and delayed-head cursor loop", async 
   assert.match(tracking, /visibilitychange/);
   assert.match(tracking, /pupil\.x \+= \(target\.x - pupil\.x\) \* 0\.28/);
   assert.match(tracking, /head\.x \+= \(target\.x - head\.x\) \* 0\.075/);
+  assert.match(tracking, /heroHeadRef\.current\.style\.transform/);
   assert.match(tracking, /forcedLookRef/);
   assert.doesNotMatch(tracking.match(/const track =[\s\S]*?const returnToNeutral/)?.[0] ?? "", /set[A-Z]\w*\(/);
   assert.match(page, /prefers-reduced-motion: reduce/);
@@ -177,7 +184,7 @@ test("uses transparent authentic feature media and retains the verified source f
   assert.doesNotMatch(page, /<video/);
 });
 
-test("cycles verified animated appearance and emotion combinations while visible", async () => {
+test("cycles only the verified white cat through authentic emotions while visible", async () => {
   const response = await render();
   const html = await response.text();
   const page = await source("../app/page.tsx");
@@ -186,26 +193,27 @@ test("cycles verified animated appearance and emotion combinations while visible
   assert.match(html, /They just don&#x27;t keep you company\./);
   assert.match(html, /Then a tiny pair of green eyes appears\./);
   assert.match(html, /LIVE APPEARANCE \/ AUTHENTIC RENDERER/);
-  assert.match(page, /white-grey-flower/);
-  assert.match(page, /orange-happy/);
-  assert.match(page, /calico-wave/);
-  assert.match(page, /tuxedo-placard/);
-  assert.match(page, /tabby-groom/);
-  assert.match(page, /fluffy-stretch/);
-  assert.match(page, /kitten-yawn/);
-  assert.match(page, /siamese-celebrate/);
+  assert.match(page, /white-curious/);
+  assert.match(page, /white-happy/);
+  assert.match(page, /white-wave/);
+  assert.match(page, /white-placard/);
+  assert.match(page, /white-groom/);
+  assert.match(page, /white-stretch/);
+  assert.match(page, /white-yawn/);
+  assert.match(page, /white-celebrate/);
+  assert.doesNotMatch(page, /orange-happy|calico-wave|tuxedo-placard/);
   assert.match(page, /IntersectionObserver/);
   assert.match(page, /if \(reducedMotion \|\| !isVisible\) return/);
 
   for (const [id] of [
-    ["white-grey-flower"],
-    ["orange-happy"],
-    ["calico-wave"],
-    ["tuxedo-placard"],
-    ["tabby-groom"],
-    ["fluffy-stretch"],
-    ["kitten-yawn"],
-    ["siamese-celebrate"],
+    ["white-curious"],
+    ["white-happy"],
+    ["white-wave"],
+    ["white-placard"],
+    ["white-groom"],
+    ["white-stretch"],
+    ["white-yawn"],
+    ["white-celebrate"],
   ]) {
     assert.ok(
       (await stat(new URL(`../public/cat/appearance/${id}.webp`, import.meta.url))).size > 1_000,
@@ -283,9 +291,14 @@ test("uses the face-only MewMuze mark for navigation, metadata, and Store brandi
   assert.equal(logo[25], 6);
 });
 
-test("keeps the original cat unchanged and ships a genuinely higher-native-resolution derivative", async () => {
+test("keeps the original reference and ships layered high-resolution seated derivatives", async () => {
   const oldCat = await readFile(new URL("../public/mewmuze-flower-cat.png", import.meta.url));
-  const hero = await readFile(new URL("../public/cat/mewmuze-hero-peek-hd.png", import.meta.url));
+  const heroBody = await readFile(
+    new URL("../public/cat/mewmuze-hero-front-body-hd.png", import.meta.url),
+  );
+  const heroHead = await readFile(
+    new URL("../public/cat/mewmuze-hero-front-head-hd.png", import.meta.url),
+  );
   const reference = await readFile(
     new URL("../public/cat/mewmuze-hero-reference-hd.png", import.meta.url),
   );
@@ -293,15 +306,23 @@ test("keeps the original cat unchanged and ships a genuinely higher-native-resol
 
   assert.equal(oldCat.readUInt32BE(16), 55);
   assert.equal(oldCat.readUInt32BE(20), 86);
-  assert.equal(hero.readUInt32BE(16), 768);
-  assert.equal(hero.readUInt32BE(20), 768);
+  assert.equal(heroBody.readUInt32BE(16), 768);
+  assert.equal(heroBody.readUInt32BE(20), 768);
+  assert.equal(heroHead.readUInt32BE(16), 768);
+  assert.equal(heroHead.readUInt32BE(20), 768);
   assert.equal(reference.readUInt32BE(16), 768);
   assert.equal(reference.readUInt32BE(20), 768);
-  assert.equal(hero[25], 6);
+  assert.equal(heroBody[25], 6);
+  assert.equal(heroHead[25], 6);
   assert.match(renderer, /spriteLoader\.ts/);
   assert.match(renderer, /animationDefinitions\.ts/);
   assert.match(renderer, /export const ART = \$\{art\}/);
   assert.match(renderer, /PAWPICO_APP_ROOT is required and is used read-only/);
+  assert.match(renderer, /Math\.round\(60 \/ meta\.fps\)/);
+  assert.match(renderer, /durations\.push\(outputIndex % 3 === 2 \? 16 : 17\)/);
+  assert.match(renderer, /furColor: "#eeeae3"/);
+  assert.match(renderer, /pattern: "solid"/);
+  assert.match(renderer, /accessory: "flowerCrown"/);
 });
 
 test("explains privacy without inventing screen, email-body, or microphone access", async () => {
@@ -341,7 +362,8 @@ test("preserves the professional white tactile system and target breakpoints", a
   assert.match(css, /@media \(max-width: 960px\)/);
   assert.match(css, /@media \(max-width: 760px\)/);
   assert.match(css, /@media \(max-width: 430px\)/);
-  assert.match(css, /\.cat-figure > img,[\s\S]*image-rendering: auto/);
+  assert.match(css, /\.cat-figure > img,[\s\S]*image-rendering: pixelated/);
+  assert.match(css, /\.hero-cat-layer \{[\s\S]*image-rendering: auto/);
   assert.doesNotMatch(css, /backdrop-filter|repeating-linear-gradient|linear-gradient|radial-gradient/i);
 });
 

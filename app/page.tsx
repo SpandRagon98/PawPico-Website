@@ -16,9 +16,10 @@ import { featureGroups, featureStories, type FeatureStory } from "../data/featur
 import { sitePath } from "../lib/site-path";
 
 const CAT_ASSET = "/cat/mewmuze-hero-reference-hd.png";
-const HERO_CAT_ASSET = "/cat/mewmuze-hero-peek-hd.png";
-const HERO_CAT_BLINK_ASSET = "/cat/mewmuze-hero-peek-hd-blink.png";
-const HERO_CAT_EARS_ASSET = "/cat/mewmuze-hero-peek-hd-ears.png";
+const HERO_CAT_BODY_ASSET = "/cat/mewmuze-hero-front-body-hd.png";
+const HERO_CAT_HEAD_ASSET = "/cat/mewmuze-hero-front-head-hd.png";
+const HERO_CAT_BLINK_ASSET = "/cat/mewmuze-hero-front-head-blink-hd.png";
+const HERO_CAT_EARS_ASSET = "/cat/mewmuze-hero-front-head-ears-hd.png";
 const FACE_LOGO_ASSET = "/cat/mewmuze-face-logo-hd.png";
 
 function CatFigure({
@@ -43,45 +44,58 @@ function CatFigure({
 }
 
 function HeroCat({
+  headUnitRef,
   leftPupilRef,
   rightPupilRef,
 }: {
+  headUnitRef: RefObject<HTMLSpanElement | null>;
   leftPupilRef: RefObject<HTMLSpanElement | null>;
   rightPupilRef: RefObject<HTMLSpanElement | null>;
 }) {
   return (
     <span className="hero-cat-art" aria-hidden="true">
       <Image
-        className="hero-cat-layer hero-cat-base"
-        src={sitePath(HERO_CAT_ASSET)}
+        className="hero-cat-layer hero-cat-body"
+        src={sitePath(HERO_CAT_BODY_ASSET)}
         alt=""
         width={768}
         height={768}
         unoptimized
         priority
       />
-      <span className="hero-eye-track hero-eye-track-left">
-        <span ref={leftPupilRef} className="hero-pupil" />
+      <span ref={headUnitRef} className="hero-cat-head-unit">
+        <Image
+          className="hero-cat-layer hero-cat-head"
+          src={sitePath(HERO_CAT_HEAD_ASSET)}
+          alt=""
+          width={768}
+          height={768}
+          unoptimized
+          priority
+        />
+        <span className="hero-eye-track hero-eye-track-left">
+          <span ref={leftPupilRef} className="hero-pupil" />
+        </span>
+        <span className="hero-eye-track hero-eye-track-right">
+          <span ref={rightPupilRef} className="hero-pupil" />
+        </span>
+        <Image
+          className="hero-cat-layer hero-cat-expression hero-cat-ears"
+          src={sitePath(HERO_CAT_EARS_ASSET)}
+          alt=""
+          width={768}
+          height={768}
+          unoptimized
+        />
+        <Image
+          className="hero-cat-layer hero-cat-expression hero-cat-blink"
+          src={sitePath(HERO_CAT_BLINK_ASSET)}
+          alt=""
+          width={768}
+          height={768}
+          unoptimized
+        />
       </span>
-      <span className="hero-eye-track hero-eye-track-right">
-        <span ref={rightPupilRef} className="hero-pupil" />
-      </span>
-      <Image
-        className="hero-cat-layer hero-cat-expression hero-cat-ears"
-        src={sitePath(HERO_CAT_EARS_ASSET)}
-        alt=""
-        width={768}
-        height={768}
-        unoptimized
-      />
-      <Image
-        className="hero-cat-layer hero-cat-expression hero-cat-blink"
-        src={sitePath(HERO_CAT_BLINK_ASSET)}
-        alt=""
-        width={768}
-        height={768}
-        unoptimized
-      />
     </span>
   );
 }
@@ -193,22 +207,22 @@ function FeatureFilm({
       className="feature-media-cat"
       src={sitePath(`/cat/features/${feature.id}.webp`)}
       alt={`Authentic MewMuze animation for ${feature.title}`}
-      width={512}
-      height={512}
+      width={256}
+      height={256}
       unoptimized
     />
   );
 }
 
 const appearanceShowcase = [
-  ["white-grey-flower", "White & grey · Flower Band · curious"],
-  ["orange-happy", "Orange · happy"],
-  ["calico-wave", "Calico · wave"],
-  ["tuxedo-placard", "Tuxedo · placard"],
-  ["tabby-groom", "Tabby · groom"],
-  ["fluffy-stretch", "Fluffy · stretch"],
-  ["kitten-yawn", "Kitten · yawn"],
-  ["siamese-celebrate", "Siamese · celebration"],
+  ["white-curious", "White MewMuze · curious"],
+  ["white-happy", "White MewMuze · happy"],
+  ["white-wave", "White MewMuze · wave"],
+  ["white-placard", "White MewMuze · placard"],
+  ["white-groom", "White MewMuze · groom"],
+  ["white-stretch", "White MewMuze · stretch"],
+  ["white-yawn", "White MewMuze · yawn"],
+  ["white-celebrate", "White MewMuze · celebration"],
 ] as const;
 
 function AppearanceShowcase({ reducedMotion }: { reducedMotion: boolean }) {
@@ -271,8 +285,8 @@ function AppearanceShowcase({ reducedMotion }: { reducedMotion: boolean }) {
                 className="showcase-cat-media is-previous"
                 src={sitePath(`/cat/appearance/${previous[0]}.webp`)}
                 alt=""
-                width={512}
-                height={512}
+                width={256}
+                height={256}
                 unoptimized
               />
             ) : null}
@@ -281,8 +295,8 @@ function AppearanceShowcase({ reducedMotion }: { reducedMotion: boolean }) {
               className="showcase-cat-media is-current"
               src={sitePath(`/cat/appearance/${activeId}.webp`)}
               alt=""
-              width={512}
-              height={512}
+              width={256}
+              height={256}
               unoptimized
             />
           </>
@@ -494,6 +508,7 @@ export default function Home() {
   >("idle");
   const heroRef = useRef<HTMLElement>(null);
   const catMotionRef = useRef<HTMLSpanElement>(null);
+  const heroHeadRef = useRef<HTMLSpanElement>(null);
   const leftPupilRef = useRef<HTMLSpanElement>(null);
   const rightPupilRef = useRef<HTMLSpanElement>(null);
   const theatreHeadingRef = useRef<HTMLHeadingElement>(null);
@@ -585,10 +600,10 @@ export default function Home() {
         "transform",
         `translate3d(${pupilX}px, ${pupilY}px, 0)`,
       );
-      catMotionRef.current?.style.setProperty(
-        "--look-transform",
-        `translate3d(${headX}px, ${headY}px, 0) rotate(${head.x * 1.25}deg)`,
-      );
+      if (heroHeadRef.current) {
+        heroHeadRef.current.style.transform =
+          `translate3d(${headX}px, ${headY}px, 0) rotate(${head.x * 1.25}deg)`;
+      }
 
       if (isVisible && document.visibilityState === "visible") {
         frame = window.requestAnimationFrame(render);
@@ -739,7 +754,11 @@ export default function Home() {
               journeyState === "reacting" ? "is-reacting" : ""
             } ${journeyState === "travelling" ? "is-travelling" : ""}`}
           >
-            <HeroCat leftPupilRef={leftPupilRef} rightPupilRef={rightPupilRef} />
+            <HeroCat
+              headUnitRef={heroHeadRef}
+              leftPupilRef={leftPupilRef}
+              rightPupilRef={rightPupilRef}
+            />
           </span>
           <span className="cat-speech">Hi. I live here now.</span>
         </div>
