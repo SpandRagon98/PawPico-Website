@@ -34,10 +34,10 @@ const runtimeRequire = createRequire(join(runtimeModules, "package.json"));
 const { chromium } = runtimeRequire("playwright");
 
 const currentAppearance = {
-  furColor: "#5a5b63",
+  furColor: "#eeeae3",
   eyeColor: "#76df31",
   earColor: "#e06e91",
-  pattern: "tuxedo",
+  pattern: "solid",
   accessory: "flowerCrown",
   species: "classic",
   eyelashes: true,
@@ -70,58 +70,52 @@ const featureSequences = {
 
 const appearanceShowcase = [
   {
-    id: "white-grey-flower",
-    label: "White & grey · Flower Band · curious",
+    id: "white-curious",
+    label: "White MewMuze · curious",
     animation: "lookAround",
     appearance: currentAppearance,
   },
   {
-    id: "orange-happy",
-    label: "Orange · happy",
+    id: "white-happy",
+    label: "White MewMuze · happy",
     animation: "happy",
-    appearance: { ...currentAppearance, furColor: "#b86b22", pattern: "solid", accessory: "none" },
+    appearance: currentAppearance,
   },
   {
-    id: "calico-wave",
-    label: "Calico · wave",
+    id: "white-wave",
+    label: "White MewMuze · wave",
     animation: "wave",
-    appearance: { ...currentAppearance, furColor: "#d8d1c8", pattern: "calico", accessory: "none" },
+    appearance: currentAppearance,
   },
   {
-    id: "tuxedo-placard",
-    label: "Tuxedo · placard",
+    id: "white-placard",
+    label: "White MewMuze · placard",
     animation: "placard",
-    appearance: { ...currentAppearance, furColor: "#303139", pattern: "tuxedo", accessory: "bandana" },
+    appearance: currentAppearance,
   },
   {
-    id: "tabby-groom",
-    label: "Tabby · groom",
+    id: "white-groom",
+    label: "White MewMuze · groom",
     animation: "groom",
-    appearance: { ...currentAppearance, furColor: "#7b7269", pattern: "tabby", accessory: "none" },
+    appearance: currentAppearance,
   },
   {
-    id: "fluffy-stretch",
-    label: "Fluffy · stretch",
+    id: "white-stretch",
+    label: "White MewMuze · stretch",
     animation: "stretch",
-    appearance: { ...currentAppearance, species: "fluffy", accessory: "flowerCrown" },
+    appearance: currentAppearance,
   },
   {
-    id: "kitten-yawn",
-    label: "Kitten · yawn",
+    id: "white-yawn",
+    label: "White MewMuze · yawn",
     animation: "yawn",
-    appearance: { ...currentAppearance, species: "kitten", pattern: "bicolour", accessory: "none" },
+    appearance: currentAppearance,
   },
   {
-    id: "siamese-celebrate",
-    label: "Siamese · celebration",
+    id: "white-celebrate",
+    label: "White MewMuze · celebration",
     animation: "celebrate",
-    appearance: {
-      ...currentAppearance,
-      furColor: "#5b463d",
-      species: "siamese",
-      pattern: "solid",
-      accessory: "none",
-    },
+    appearance: currentAppearance,
   },
 ];
 
@@ -170,14 +164,59 @@ window.MewMuzeWebRender = {
   meta(name) {
     const animation = ANIMATIONS[name];
     if (!animation) throw new Error("Unknown authentic animation: " + name);
-    return { fps: animation.fps, frameCount: animation.frames.length };
+    return {
+      fps: animation.fps,
+      frameCount: animation.frames.length,
+      loop: animation.loop,
+    };
   },
-  render({ name, frameIndex, appearance, tailPhase = 0, overrides = {} }) {
+  render({
+    name,
+    frameIndex,
+    nextFrameIndex = frameIndex,
+    progress = 0,
+    appearance,
+    tailPhase = 0,
+    overrides = {},
+  }) {
     configureAppearance(appearance);
     const animation = ANIMATIONS[name];
     if (!animation) throw new Error("Unknown authentic animation: " + name);
     const source = animation.frames[frameIndex % animation.frames.length];
-    const canvas = renderFrame({ ...source, ...overrides, tailPhase });
+    const next = animation.frames[nextFrameIndex % animation.frames.length];
+    const pose = { ...source };
+    for (const key of [
+      "legPhase",
+      "headBob",
+      "stride",
+      "pupilX",
+      "pupilY",
+      "headTurnX",
+      "headTurnY",
+    ]) {
+      pose[key] = source[key] + (next[key] - source[key]) * progress;
+    }
+    if (progress >= 0.72) {
+      for (const key of [
+        "view",
+        "body",
+        "eyes",
+        "ears",
+        "tail",
+        "gesture",
+        "mouth",
+        "tint",
+        "prop",
+        "notes",
+        "blush",
+        "steam",
+        "hearts",
+        "zzz",
+      ]) {
+        pose[key] = next[key];
+      }
+    }
+    const canvas = renderFrame({ ...pose, ...overrides, tailPhase });
     canvas.id = "asset";
     document.body.replaceChildren(canvas);
     return { width: canvas.width, height: canvas.height };
@@ -235,18 +274,29 @@ async function renderAnimation(page, id, animations, appearance, output) {
       name,
     );
     for (let frameIndex = 0; frameIndex < meta.frameCount; frameIndex += 1) {
-      await renderPng(
-        page,
-        join(frames, `${String(outputIndex).padStart(3, "0")}.png`),
-        {
-          name,
-          frameIndex,
-          appearance,
-          tailPhase: (outputIndex * 5) % 40,
-        },
-      );
-      durations.push(Math.max(70, Math.round(1000 / meta.fps)));
-      outputIndex += 1;
+      const subframes = Math.max(1, Math.round(60 / meta.fps));
+      const nextFrameIndex =
+        frameIndex + 1 < meta.frameCount
+          ? frameIndex + 1
+          : meta.loop
+            ? 0
+            : frameIndex;
+      for (let subframe = 0; subframe < subframes; subframe += 1) {
+        await renderPng(
+          page,
+          join(frames, `${String(outputIndex).padStart(4, "0")}.png`),
+          {
+            name,
+            frameIndex,
+            nextFrameIndex,
+            progress: subframe / subframes,
+            appearance,
+            tailPhase: Math.floor(outputIndex / 4) % 40,
+          },
+        );
+        durations.push(outputIndex % 3 === 2 ? 16 : 17);
+        outputIndex += 1;
+      }
     }
   }
 
@@ -274,24 +324,28 @@ const browser = await chromium.launch(
 try {
   const completeHero = await openRenderer(browser, 768, false);
   const pupilFreeHero = await openRenderer(browser, 768, true);
-  const featureRenderer = await openRenderer(browser, 512, false);
+  const featureRenderer = await openRenderer(browser, 256, false);
 
   try {
     await renderPng(
       completeHero.page,
       join(publicCat, "mewmuze-hero-reference-hd.png"),
       {
-        name: "edgePeek",
+        name: "idle",
         frameIndex: 0,
         appearance: currentAppearance,
         overrides: { tail: "wrap" },
       },
     );
+    const pupilFreeFront = join(tempRoot, "mewmuze-hero-front-pupil-free.png");
+    const pupilFreeBlink = join(tempRoot, "mewmuze-hero-front-blink.png");
+    const pupilFreeEars = join(tempRoot, "mewmuze-hero-front-ears.png");
+
     await renderPng(
       pupilFreeHero.page,
-      join(publicCat, "mewmuze-hero-peek-hd.png"),
+      pupilFreeFront,
       {
-        name: "edgePeek",
+        name: "idle",
         frameIndex: 0,
         appearance: currentAppearance,
         overrides: { tail: "wrap" },
@@ -299,7 +353,7 @@ try {
     );
     await renderPng(
       pupilFreeHero.page,
-      join(publicCat, "mewmuze-hero-peek-hd-blink.png"),
+      pupilFreeBlink,
       {
         name: "edgePeek",
         frameIndex: 2,
@@ -309,7 +363,7 @@ try {
     );
     await renderPng(
       pupilFreeHero.page,
-      join(publicCat, "mewmuze-hero-peek-hd-ears.png"),
+      pupilFreeEars,
       {
         name: "edgePeek",
         frameIndex: 3,
@@ -320,6 +374,19 @@ try {
 
     await run(python, [
       helper,
+      "hero",
+      "--base",
+      pupilFreeFront,
+      "--blink",
+      pupilFreeBlink,
+      "--ears",
+      pupilFreeEars,
+      "--output-dir",
+      publicCat,
+    ]);
+
+    await run(python, [
+      helper,
       "face",
       "--source",
       join(publicCat, "mewmuze-hero-reference-hd.png"),
@@ -327,24 +394,26 @@ try {
       publicCat,
     ]);
 
-    for (const [id, animations] of Object.entries(featureSequences)) {
-      await renderAnimation(
-        featureRenderer.page,
-        `feature-${id}`,
-        animations,
-        currentAppearance,
-        join(publicCat, "features", `${id}.webp`),
-      );
-    }
+    if (process.env.RENDER_STATIC_ONLY !== "true") {
+      for (const [id, animations] of Object.entries(featureSequences)) {
+        await renderAnimation(
+          featureRenderer.page,
+          `feature-${id}`,
+          animations,
+          currentAppearance,
+          join(publicCat, "features", `${id}.webp`),
+        );
+      }
 
-    for (const preset of appearanceShowcase) {
-      await renderAnimation(
-        featureRenderer.page,
-        `appearance-${preset.id}`,
-        [preset.animation],
-        preset.appearance,
-        join(publicCat, "appearance", `${preset.id}.webp`),
-      );
+      for (const preset of appearanceShowcase) {
+        await renderAnimation(
+          featureRenderer.page,
+          `appearance-${preset.id}`,
+          [preset.animation],
+          preset.appearance,
+          join(publicCat, "appearance", `${preset.id}.webp`),
+        );
+      }
     }
   } finally {
     await completeHero.context.close();

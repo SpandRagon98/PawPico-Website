@@ -505,7 +505,7 @@ h2 em {
 }
 
 .brand-medallion img {
-  width: 28px;
+  width: 42px;
   height: auto;
   image-rendering: pixelated;
 }
@@ -2400,7 +2400,7 @@ body.mewmuze-scroll-locked {
 .feature-media-cat,
 .showcase-cat-media,
 .showcase-cat-static {
-  image-rendering: auto;
+  image-rendering: pixelated;
 }
 
 .hero {
@@ -2416,18 +2416,17 @@ body.mewmuze-scroll-locked {
 
 .hero-cat-peek {
   inset: 0 auto 0 0;
-  width: min(49vw, 780px);
+  width: min(57vw, 960px);
   height: 100%;
   transform: none;
 }
 
 .hero-cat-motion {
-  --look-transform: translate3d(0, 0, 0);
   top: 50%;
-  left: clamp(-245px, -13vw, -185px);
-  width: clamp(620px, 52vw, 790px);
+  left: clamp(-80px, -4vw, -40px);
+  width: clamp(700px, 55vw, 900px);
   transform: translateY(-50%);
-  transform-origin: 42% 66%;
+  transform-origin: 50% 72%;
 }
 
 .hero-cat-motion::after {
@@ -2439,11 +2438,7 @@ body.mewmuze-scroll-locked {
   display: block;
   width: 100%;
   aspect-ratio: 1;
-  clip-path: polygon(0 0, 100% 0, 100% 55%, 65% 55%, 59% 61%, 0 61%);
-  transform: rotate(7deg) var(--look-transform);
-  transform-origin: 43% 68%;
-  transition: clip-path 420ms ease;
-  will-change: transform;
+  clip-path: inset(0);
 }
 
 .hero-cat-layer {
@@ -2453,10 +2448,28 @@ body.mewmuze-scroll-locked {
   width: 100%;
   height: 100%;
   object-fit: contain;
+  image-rendering: auto;
 }
 
-.hero-cat-base {
+.hero-cat-body {
   z-index: 1;
+}
+
+.hero-cat-head-unit {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: block;
+  transform-origin: 50% 59%;
+  will-change: transform;
+}
+
+.hero-cat-head {
+  z-index: 1;
+}
+
+.touch-look .hero-cat-head-unit {
+  animation: touch-curious 7s ease-in-out infinite;
 }
 
 .hero-eye-track {
@@ -2541,8 +2554,8 @@ body.mewmuze-scroll-locked {
 .hero-copy {
   position: relative;
   z-index: 7;
-  width: min(660px, 52vw);
-  margin-left: clamp(440px, 38vw, 720px);
+  width: min(640px, 46vw);
+  margin-left: clamp(610px, 48vw, 920px);
   padding: clamp(46px, 7vh, 96px) 38px clamp(40px, 6vh, 82px) 0;
 }
 
@@ -2557,8 +2570,8 @@ body.mewmuze-scroll-locked {
 }
 
 .cat-speech {
-  top: 24%;
-  left: clamp(76px, 9vw, 148px);
+  top: 21%;
+  left: clamp(150px, 13vw, 230px);
 }
 
 .experience-locked .feature-theatre .section-heading,
@@ -2653,6 +2666,9 @@ body.mewmuze-scroll-locked {
   z-index: 2;
   width: min(88%, 500px);
   height: auto;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+  will-change: transform, opacity;
 }
 
 .showcase-cat-media.is-current {
@@ -2740,6 +2756,9 @@ body.mewmuze-scroll-locked {
   width: min(96%, 560px);
   height: auto;
   object-fit: contain;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+  will-change: transform, opacity;
 }
 
 .theatre-arrow {
@@ -2977,13 +2996,13 @@ body.mewmuze-scroll-locked {
 
 @media (max-width: 1180px) {
   .hero-cat-motion {
-    left: -170px;
-    width: clamp(590px, 57vw, 720px);
+    left: -45px;
+    width: clamp(650px, 61vw, 740px);
   }
 
   .hero-copy {
-    width: min(610px, 56vw);
-    margin-left: 40vw;
+    width: min(570px, 47vw);
+    margin-left: 52vw;
   }
 
   .theatre-console {
@@ -3002,19 +3021,19 @@ body.mewmuze-scroll-locked {
   }
 
   .hero-cat-peek {
-    width: 52vw;
-    height: calc(clamp(470px, 67vw, 620px) + 20px);
+    width: 66vw;
+    height: calc(clamp(480px, 65vw, 560px) + 20px);
   }
 
   .hero-cat-motion {
-    top: 48%;
-    left: clamp(-130px, -16vw, -90px);
-    width: clamp(470px, 67vw, 620px);
+    top: 50%;
+    left: -40px;
+    width: clamp(480px, 65vw, 560px);
   }
 
   .hero-copy {
     width: min(88%, 720px);
-    margin: 42vh auto 0;
+    margin: 48vh auto 0;
     padding: 22px 0 34px;
   }
 
@@ -3030,8 +3049,8 @@ body.mewmuze-scroll-locked {
   }
 
   .cat-speech {
-    top: 20%;
-    left: 78px;
+    top: 16%;
+    left: 330px;
   }
 
   .monotony,
@@ -3070,20 +3089,24 @@ body.mewmuze-scroll-locked {
 }
 
 @media (max-width: 760px) {
+  .cat-speech {
+    display: none;
+  }
+
   .hero-cat-peek {
-    width: 67vw;
-    height: calc(clamp(430px, 92vw, 570px) + 20px);
+    width: 72vw;
+    height: 480px;
   }
 
   .hero-cat-motion {
-    top: 48%;
-    left: clamp(-120px, -24vw, -78px);
-    width: clamp(430px, 92vw, 570px);
+    top: 50%;
+    left: -20px;
+    width: clamp(390px, 68vw, 460px);
   }
 
   .hero-copy {
     width: calc(100% - 36px);
-    margin-top: 37vh;
+    margin-top: 450px;
     padding-top: 18px;
   }
 
@@ -3147,17 +3170,17 @@ body.mewmuze-scroll-locked {
 
 @media (max-width: 430px) {
   .hero-cat-peek {
-    width: 74vw;
-    height: 475px;
+    width: 86vw;
+    height: 380px;
   }
 
   .hero-cat-motion {
-    left: -95px;
-    width: 455px;
+    left: -8px;
+    width: 360px;
   }
 
   .hero-copy {
-    margin-top: 34vh;
+    margin-top: 42vh;
     padding-bottom: 20px;
   }
 
@@ -3191,8 +3214,8 @@ body.mewmuze-scroll-locked {
   }
 
   .cat-speech {
-    top: 18%;
-    left: 60px;
+    top: 14%;
+    left: 74px;
   }
 
   .appearance-showcase {
@@ -3205,7 +3228,7 @@ body.mewmuze-scroll-locked {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .hero-cat-art,
+  .hero-cat-head-unit,
   .hero-pupil {
     transform: none !important;
   }
