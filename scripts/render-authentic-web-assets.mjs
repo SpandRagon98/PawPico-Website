@@ -61,7 +61,7 @@ const featureSequences = {
   context: ["writeNotes", "typeKeys", "readBook"],
   music: ["danceBop"],
   microphone: ["sing", "bow"],
-  appearance: ["lookAround", "happy"],
+  appearance: ["blink", "happy"],
   personality: ["groom", "happy", "sad"],
   peek: ["edgePeek"],
   agent: ["think", "celebrate"],
@@ -70,53 +70,111 @@ const featureSequences = {
 
 const appearanceShowcase = [
   {
-    id: "white-curious",
-    label: "White MewMuze · curious",
-    animation: "lookAround",
+    id: "white-grey-flower",
+    label: "White and grey · calm",
+    animation: "blink",
     appearance: currentAppearance,
   },
   {
-    id: "white-happy",
-    label: "White MewMuze · happy",
+    id: "orange-happy",
+    label: "Orange · happy",
     animation: "happy",
-    appearance: currentAppearance,
+    appearance: {
+      ...currentAppearance,
+      furColor: "#d98a39",
+      earColor: "#ee9cb2",
+      pattern: "tabby",
+      accessory: "bandana",
+      eyelashes: false,
+    },
   },
   {
-    id: "white-wave",
-    label: "White MewMuze · wave",
+    id: "calico-wave",
+    label: "Calico · wave",
     animation: "wave",
-    appearance: currentAppearance,
+    appearance: {
+      ...currentAppearance,
+      furColor: "#f0e7d8",
+      eyeColor: "#6fc64a",
+      pattern: "calico",
+    },
   },
   {
-    id: "white-placard",
-    label: "White MewMuze · placard",
+    id: "tuxedo-placard",
+    label: "Black tuxedo · placard",
     animation: "placard",
-    appearance: currentAppearance,
+    appearance: {
+      ...currentAppearance,
+      furColor: "#34343b",
+      eyeColor: "#9fe85a",
+      pattern: "tuxedo",
+      accessory: "glasses",
+      eyelashes: false,
+    },
   },
   {
-    id: "white-groom",
-    label: "White MewMuze · groom",
+    id: "tabby-groom",
+    label: "Grey tabby · groom",
     animation: "groom",
-    appearance: currentAppearance,
+    appearance: {
+      ...currentAppearance,
+      furColor: "#9d9d9a",
+      eyeColor: "#8edb49",
+      pattern: "tabby",
+      accessory: "none",
+      eyelashes: false,
+    },
   },
   {
-    id: "white-stretch",
-    label: "White MewMuze · stretch",
+    id: "fluffy-stretch",
+    label: "White fluffy · stretch",
     animation: "stretch",
-    appearance: currentAppearance,
+    appearance: {
+      ...currentAppearance,
+      species: "fluffy",
+      pattern: "socks",
+      accessory: "headphones",
+    },
   },
   {
-    id: "white-yawn",
-    label: "White MewMuze · yawn",
+    id: "kitten-yawn",
+    label: "Bicolour kitten · yawn",
     animation: "yawn",
-    appearance: currentAppearance,
+    appearance: {
+      ...currentAppearance,
+      species: "kitten",
+      furColor: "#c9a57e",
+      eyeColor: "#68cce3",
+      pattern: "bicolour",
+      accessory: "bandana",
+      eyelashes: false,
+    },
   },
   {
-    id: "white-celebrate",
-    label: "White MewMuze · celebration",
+    id: "siamese-celebrate",
+    label: "Siamese · celebration",
     animation: "celebrate",
-    appearance: currentAppearance,
+    appearance: {
+      ...currentAppearance,
+      species: "siamese",
+      furColor: "#ddc9a7",
+      eyeColor: "#6bc7eb",
+      pattern: "solid",
+      accessory: "sunglasses",
+      eyelashes: false,
+    },
   },
+];
+
+const studioBodies = ["classic", "chonk", "fluffy", "siamese", "kitten"];
+const studioPatterns = [
+  "solid",
+  "tuxedo",
+  "tabby",
+  "socks",
+  "spotted",
+  "calico",
+  "bicolour",
 ];
 
 function run(command, args) {
@@ -323,7 +381,7 @@ const browser = await chromium.launch(
 
 try {
   const completeHero = await openRenderer(browser, 768, false);
-  const pupilFreeHero = await openRenderer(browser, 768, true);
+  const pupilFreeHero = await openRenderer(browser, 128, true);
   const featureRenderer = await openRenderer(browser, 256, false);
 
   try {
@@ -395,14 +453,16 @@ try {
     ]);
 
     if (process.env.RENDER_STATIC_ONLY !== "true") {
-      for (const [id, animations] of Object.entries(featureSequences)) {
-        await renderAnimation(
-          featureRenderer.page,
-          `feature-${id}`,
-          animations,
-          currentAppearance,
-          join(publicCat, "features", `${id}.webp`),
-        );
+      if (process.env.RENDER_FEATURES !== "false") {
+        for (const [id, animations] of Object.entries(featureSequences)) {
+          await renderAnimation(
+            featureRenderer.page,
+            `feature-${id}`,
+            animations,
+            currentAppearance,
+            join(publicCat, "features", `${id}.webp`),
+          );
+        }
       }
 
       for (const preset of appearanceShowcase) {
@@ -413,6 +473,22 @@ try {
           preset.appearance,
           join(publicCat, "appearance", `${preset.id}.webp`),
         );
+      }
+
+      for (const body of studioBodies) {
+        for (const pattern of studioPatterns) {
+          await renderAnimation(
+            featureRenderer.page,
+            `studio-${body}-${pattern}`,
+            ["idle", "blink", "happy"],
+            {
+              ...currentAppearance,
+              species: body,
+              pattern,
+            },
+            join(publicCat, "studio", `${body}-${pattern}.webp`),
+          );
+        }
       }
     }
   } finally {

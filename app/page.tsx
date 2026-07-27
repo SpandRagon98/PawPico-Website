@@ -16,10 +16,10 @@ import { featureGroups, featureStories, type FeatureStory } from "../data/featur
 import { sitePath } from "../lib/site-path";
 
 const CAT_ASSET = "/cat/mewmuze-hero-reference-hd.png";
-const HERO_CAT_BODY_ASSET = "/cat/mewmuze-hero-front-body-hd.png";
-const HERO_CAT_HEAD_ASSET = "/cat/mewmuze-hero-front-head-hd.png";
-const HERO_CAT_BLINK_ASSET = "/cat/mewmuze-hero-front-head-blink-hd.png";
-const HERO_CAT_EARS_ASSET = "/cat/mewmuze-hero-front-head-ears-hd.png";
+const HERO_CAT_BODY_ASSET = "/cat/mewmuze-hero-front-body-app.png";
+const HERO_CAT_HEAD_ASSET = "/cat/mewmuze-hero-front-head-app.png";
+const HERO_CAT_BLINK_ASSET = "/cat/mewmuze-hero-front-head-blink-app.png";
+const HERO_CAT_EARS_ASSET = "/cat/mewmuze-hero-front-head-ears-app.png";
 const FACE_LOGO_ASSET = "/cat/mewmuze-face-logo-hd.png";
 
 function CatFigure({
@@ -58,8 +58,8 @@ function HeroCat({
         className="hero-cat-layer hero-cat-body"
         src={sitePath(HERO_CAT_BODY_ASSET)}
         alt=""
-        width={768}
-        height={768}
+        width={128}
+        height={128}
         unoptimized
         priority
       />
@@ -68,8 +68,8 @@ function HeroCat({
           className="hero-cat-layer hero-cat-head"
           src={sitePath(HERO_CAT_HEAD_ASSET)}
           alt=""
-          width={768}
-          height={768}
+          width={128}
+          height={128}
           unoptimized
           priority
         />
@@ -83,16 +83,16 @@ function HeroCat({
           className="hero-cat-layer hero-cat-expression hero-cat-ears"
           src={sitePath(HERO_CAT_EARS_ASSET)}
           alt=""
-          width={768}
-          height={768}
+          width={128}
+          height={128}
           unoptimized
         />
         <Image
           className="hero-cat-layer hero-cat-expression hero-cat-blink"
           src={sitePath(HERO_CAT_BLINK_ASSET)}
           alt=""
-          width={768}
-          height={768}
+          width={128}
+          height={128}
           unoptimized
         />
       </span>
@@ -215,19 +215,18 @@ function FeatureFilm({
 }
 
 const appearanceShowcase = [
-  ["white-curious", "White MewMuze · curious"],
-  ["white-happy", "White MewMuze · happy"],
-  ["white-wave", "White MewMuze · wave"],
-  ["white-placard", "White MewMuze · placard"],
-  ["white-groom", "White MewMuze · groom"],
-  ["white-stretch", "White MewMuze · stretch"],
-  ["white-yawn", "White MewMuze · yawn"],
-  ["white-celebrate", "White MewMuze · celebration"],
+  ["white-grey-flower", "White & grey · calm"],
+  ["orange-happy", "Orange · happy"],
+  ["calico-wave", "Calico · wave"],
+  ["tuxedo-placard", "Black tuxedo · placard"],
+  ["tabby-groom", "Grey tabby · groom"],
+  ["fluffy-stretch", "White fluffy · stretch"],
+  ["kitten-yawn", "Bicolour kitten · yawn"],
+  ["siamese-celebrate", "Siamese · celebration"],
 ] as const;
 
 function AppearanceShowcase({ reducedMotion }: { reducedMotion: boolean }) {
   const [activeIndex, setActiveIndex] = useState(0);
-  const [previousIndex, setPreviousIndex] = useState<number | null>(null);
   const [isVisible, setIsVisible] = useState(false);
   const stageRef = useRef<HTMLDivElement>(null);
 
@@ -245,16 +244,12 @@ function AppearanceShowcase({ reducedMotion }: { reducedMotion: boolean }) {
   useEffect(() => {
     if (reducedMotion || !isVisible) return;
     const interval = window.setInterval(() => {
-      setActiveIndex((current) => {
-        setPreviousIndex(current);
-        return (current + 1) % appearanceShowcase.length;
-      });
-    }, 3400);
+      setActiveIndex((current) => (current + 1) % appearanceShowcase.length);
+    }, 2800);
     return () => window.clearInterval(interval);
   }, [isVisible, reducedMotion]);
 
   const [activeId, activeLabel] = appearanceShowcase[activeIndex];
-  const previous = previousIndex === null ? null : appearanceShowcase[previousIndex];
 
   return (
     <div
@@ -278,28 +273,15 @@ function AppearanceShowcase({ reducedMotion }: { reducedMotion: boolean }) {
             unoptimized
           />
         ) : (
-          <>
-            {previous ? (
-              <Image
-                key={`previous-${previous[0]}`}
-                className="showcase-cat-media is-previous"
-                src={sitePath(`/cat/appearance/${previous[0]}.webp`)}
-                alt=""
-                width={256}
-                height={256}
-                unoptimized
-              />
-            ) : null}
-            <Image
-              key={activeId}
-              className="showcase-cat-media is-current"
-              src={sitePath(`/cat/appearance/${activeId}.webp`)}
-              alt=""
-              width={256}
-              height={256}
-              unoptimized
-            />
-          </>
+          <Image
+            key={activeId}
+            className="showcase-cat-media is-current"
+            src={sitePath(`/cat/appearance/${activeId}.webp`)}
+            alt=""
+            width={256}
+            height={256}
+            unoptimized
+          />
         )}
       </div>
       <span className="showcase-ticket">
@@ -316,13 +298,7 @@ function AppearanceShowcase({ reducedMotion }: { reducedMotion: boolean }) {
   );
 }
 
-function FeatureTheatre({
-  reducedMotion,
-  headingRef,
-}: {
-  reducedMotion: boolean;
-  headingRef: RefObject<HTMLHeadingElement | null>;
-}) {
+function FeatureTheatre({ reducedMotion }: { reducedMotion: boolean }) {
   const [activeIndex, setActiveIndex] = useState(0);
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const feature = featureStories[activeIndex];
@@ -358,6 +334,7 @@ function FeatureTheatre({
     <section
       className="feature-theatre section-shell"
       id="features"
+      data-reveal
       aria-labelledby="feature-theatre-title"
       onKeyDown={handleKeyboard}
       onPointerDown={(event) => {
@@ -369,7 +346,7 @@ function FeatureTheatre({
       <div className="section-heading theatre-heading">
         <div>
           <Eyebrow>THE FEATURE THEATRE</Eyebrow>
-          <h2 id="feature-theatre-title" ref={headingRef} tabIndex={-1}>
+          <h2 id="feature-theatre-title">
             One small companion.
             <br />
             <em>A surprisingly useful day.</em>
@@ -391,16 +368,6 @@ function FeatureTheatre({
           <span />
           <span />
         </div>
-
-        <button
-          className="theatre-arrow theatre-arrow-left"
-          type="button"
-          aria-label="Previous feature"
-          disabled={activeIndex === 0}
-          onClick={() => show(activeIndex - 1)}
-        >
-          <span aria-hidden="true">←</span>
-        </button>
 
         <div className="theatre-stage">
           <div className="theatre-media">
@@ -429,15 +396,35 @@ function FeatureTheatre({
           </article>
         </div>
 
-        <button
-          className="theatre-arrow theatre-arrow-right"
-          type="button"
-          aria-label="Next feature"
-          disabled={activeIndex === featureStories.length - 1}
-          onClick={() => show(activeIndex + 1)}
-        >
-          <span aria-hidden="true">→</span>
-        </button>
+        <div className="theatre-controls">
+          <button
+            className="theatre-arrow theatre-arrow-left"
+            type="button"
+            aria-label="Previous feature"
+            disabled={activeIndex === 0}
+            onClick={() => show(activeIndex - 1)}
+          >
+            <span aria-hidden="true">←</span>
+            <small>Previous</small>
+          </button>
+          <div className="theatre-counter" aria-hidden="true">
+            <small>
+              FEATURE {String(activeIndex + 1).padStart(2, "0")} /{" "}
+              {featureStories.length}
+            </small>
+            <strong>{feature.title}</strong>
+          </div>
+          <button
+            className="theatre-arrow theatre-arrow-right"
+            type="button"
+            aria-label="Next feature"
+            disabled={activeIndex === featureStories.length - 1}
+            onClick={() => show(activeIndex + 1)}
+          >
+            <small>Next</small>
+            <span aria-hidden="true">→</span>
+          </button>
+        </div>
 
         <div className="theatre-progress" aria-label="Choose a feature">
           {featureStories.map((item, index) => (
@@ -449,7 +436,7 @@ function FeatureTheatre({
               aria-current={index === activeIndex ? "true" : undefined}
               onClick={() => show(index)}
             >
-              <span />
+              <span>{item.number}</span>
               <small>{item.shortTitle}</small>
             </button>
           ))}
@@ -459,6 +446,191 @@ function FeatureTheatre({
         </p>
       </div>
     </section>
+  );
+}
+
+const bodyOptions = [
+  ["Classic", "classic"],
+  ["Chonk", "chonk"],
+  ["Fluffy", "fluffy"],
+  ["Siamese", "siamese"],
+  ["Kitten", "kitten"],
+] as const;
+
+const patternOptions = [
+  ["Solid", "solid"],
+  ["Tuxedo", "tuxedo"],
+  ["Tabby", "tabby"],
+  ["Socks", "socks"],
+  ["Spotted", "spotted"],
+  ["Calico", "calico"],
+  ["Bicolour", "bicolour"],
+] as const;
+
+function FeatureDirectory() {
+  const [openGroup, setOpenGroup] = useState(0);
+
+  return (
+    <div className="directory-groups">
+      {featureGroups.map((group, groupIndex) => {
+        const entries = featureStories.filter((feature) => feature.group === group);
+        const isOpen = openGroup === groupIndex;
+        const panelId = `directory-panel-${groupIndex}`;
+        return (
+          <section
+            key={group}
+            className={`directory-panel ${isOpen ? "is-open" : ""}`}
+          >
+            <h3>
+              <button
+                type="button"
+                aria-expanded={isOpen}
+                aria-controls={panelId}
+                onClick={() => setOpenGroup(isOpen ? -1 : groupIndex)}
+              >
+                <span>{String(groupIndex + 1).padStart(2, "0")}</span>
+                <strong>{group}</strong>
+                <small>{entries.length} features</small>
+                <i aria-hidden="true">+</i>
+              </button>
+            </h3>
+            <div
+              className="directory-reveal"
+              id={panelId}
+              aria-hidden={!isOpen}
+            >
+              <div className="directory-grid">
+                {entries.map((feature) => (
+                  <article key={feature.id}>
+                    <span
+                      className={`directory-dot accent-${feature.accent}`}
+                      aria-hidden="true"
+                    />
+                    <small>{feature.number}</small>
+                    <h4>{feature.title}</h4>
+                    <p>{feature.story}</p>
+                    <ul>
+                      {feature.facts.map((fact) => (
+                        <li key={fact}>{fact}</li>
+                      ))}
+                    </ul>
+                  </article>
+                ))}
+              </div>
+            </div>
+          </section>
+        );
+      })}
+    </div>
+  );
+}
+
+function AppearanceStudio() {
+  const [body, setBody] = useState<(typeof bodyOptions)[number][1]>("classic");
+  const [pattern, setPattern] =
+    useState<(typeof patternOptions)[number][1]>("solid");
+  const bodyLabel = bodyOptions.find((option) => option[1] === body)?.[0] ?? "Classic";
+  const patternLabel =
+    patternOptions.find((option) => option[1] === pattern)?.[0] ?? "Solid";
+  const asset = `/cat/studio/${body}-${pattern}.webp`;
+
+  return (
+    <>
+      <div className="appearance-stage">
+        <div className="studio-window">
+          <div className="studio-titlebar">
+            <span>APPEARANCE STUDIO / LIVE APP RENDERER</span>
+            <i />
+            <i />
+            <i />
+          </div>
+          <div className="studio-preview">
+            <span className="studio-halo" aria-hidden="true" />
+            <Image
+              key={asset}
+              className="studio-cat-media"
+              src={sitePath(asset)}
+              alt={`Animated ${bodyLabel} MewMuze cat with the ${patternLabel} coat pattern`}
+              width={256}
+              height={256}
+              unoptimized
+            />
+            <span className="studio-live-badge" aria-hidden="true">
+              <i />
+              LIVE EMOTION
+            </span>
+            <span className="preset-ticket">
+              <strong>FLOWER BAND</strong>
+              <small>
+                {bodyLabel} · {patternLabel} · animated
+              </small>
+            </span>
+          </div>
+          <p aria-live="polite">
+            Showing the authentic {bodyLabel} body with the {patternLabel} coat
+            pattern and a looping app-rendered emotion.
+          </p>
+        </div>
+      </div>
+      <div className="appearance-copy">
+        <Eyebrow>APPEARANCE STUDIO</Eyebrow>
+        <h2>
+          Same personality.
+          <br />
+          <em>A cat that looks like yours.</em>
+        </h2>
+        <p>
+          Choose a body and coat pattern to see the real MewMuze renderer update
+          the animated cat immediately.
+        </p>
+        <div className="choice-block">
+          <span>Body</span>
+          <div>
+            {bodyOptions.map(([label, value]) => (
+              <button
+                key={value}
+                type="button"
+                className={body === value ? "is-active" : ""}
+                aria-pressed={body === value}
+                onClick={() => setBody(value)}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
+        <div className="choice-block">
+          <span>Pattern</span>
+          <div>
+            {patternOptions.map(([label, value]) => (
+              <button
+                key={value}
+                type="button"
+                className={pattern === value ? "is-active" : ""}
+                aria-pressed={pattern === value}
+                onClick={() => setPattern(value)}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
+        <div className="appearance-specs">
+          <span>
+            <small>Colors</small>
+            White base · green eyes · pink ears
+          </span>
+          <span>
+            <small>Motion</small>
+            Blink · curious look · happy response
+          </span>
+          <span>
+            <small>Accessory</small>
+            Flower Band
+          </span>
+        </div>
+      </div>
+    </>
   );
 }
 
@@ -495,26 +667,17 @@ const dayMoments = [
   },
 ];
 
-const bodies = ["Classic", "Chonk", "Fluffy", "Siamese", "Kitten"];
-const patterns = ["Solid", "Tuxedo", "Tabby", "Socks", "Spotted", "Calico", "Bicolour"];
 const futureConcepts = ["Mecha Hero", "Shield Guardian", "Web Scout", "Moon Mage"];
 
 export default function Home() {
   const [reducedMotion, setReducedMotion] = useState(false);
   const [finePointer, setFinePointer] = useState(true);
   const [experienceUnlocked, setExperienceUnlocked] = useState(false);
-  const [journeyState, setJourneyState] = useState<
-    "idle" | "reacting" | "travelling" | "ready"
-  >("idle");
   const heroRef = useRef<HTMLElement>(null);
   const catMotionRef = useRef<HTMLSpanElement>(null);
   const heroHeadRef = useRef<HTMLSpanElement>(null);
   const leftPupilRef = useRef<HTMLSpanElement>(null);
   const rightPupilRef = useRef<HTMLSpanElement>(null);
-  const theatreHeadingRef = useRef<HTMLHeadingElement>(null);
-  const forcedLookRef = useRef(false);
-  const transitionTimersRef = useRef<number[]>([]);
-  const transitionScrollRafRef = useRef<number | null>(null);
 
   useEffect(() => {
     const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -545,15 +708,28 @@ export default function Home() {
     };
   }, [experienceUnlocked]);
 
-  useEffect(
-    () => () => {
-      transitionTimersRef.current.forEach((timer) => window.clearTimeout(timer));
-      if (transitionScrollRafRef.current !== null) {
-        window.cancelAnimationFrame(transitionScrollRafRef.current);
-      }
-    },
-    [],
-  );
+  useEffect(() => {
+    const sections = Array.from(
+      document.querySelectorAll<HTMLElement>("[data-reveal]"),
+    );
+    document.documentElement.classList.add("mewmuze-reveal-ready");
+    if (reducedMotion) {
+      sections.forEach((section) => section.classList.add("is-revealed"));
+      return;
+    }
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          (entry.target as HTMLElement).classList.add("is-revealed");
+          observer.unobserve(entry.target);
+        });
+      },
+      { threshold: 0.12, rootMargin: "0px 0px -8% 0px" },
+    );
+    sections.forEach((section) => observer.observe(section));
+    return () => observer.disconnect();
+  }, [reducedMotion]);
 
   useEffect(() => {
     if (reducedMotion || !finePointer) return;
@@ -565,32 +741,14 @@ export default function Home() {
     const head = { x: 0, y: 0 };
 
     const render = () => {
-      if (forcedLookRef.current) {
-        const button = document.querySelector<HTMLElement>(".hero-explore");
-        const cat = catMotionRef.current?.getBoundingClientRect();
-        const buttonRect = button?.getBoundingClientRect();
-        if (cat && buttonRect) {
-          const centreX = cat.left + cat.width * 0.49;
-          const centreY = cat.top + cat.height * 0.32;
-          target.x = Math.max(
-            -1,
-            Math.min(1, (buttonRect.left + buttonRect.width / 2 - centreX) / 520),
-          );
-          target.y = Math.max(
-            -1,
-            Math.min(1, (buttonRect.top + buttonRect.height / 2 - centreY) / 380),
-          );
-        }
-      }
-
-      pupil.x += (target.x - pupil.x) * 0.28;
-      pupil.y += (target.y - pupil.y) * 0.28;
-      head.x += (target.x - head.x) * 0.075;
-      head.y += (target.y - head.y) * 0.075;
-      const pupilX = pupil.x * 13;
-      const pupilY = pupil.y * 9;
-      const headX = head.x * 8;
-      const headY = head.y * 4.5;
+      pupil.x += (target.x - pupil.x) * 0.22;
+      pupil.y += (target.y - pupil.y) * 0.22;
+      head.x += (target.x - head.x) * 0.065;
+      head.y += (target.y - head.y) * 0.065;
+      const pupilX = pupil.x * 8;
+      const pupilY = pupil.y * 5.5;
+      const headX = head.x * 4.5;
+      const headY = head.y * 2.4;
 
       leftPupilRef.current?.style.setProperty(
         "transform",
@@ -602,7 +760,7 @@ export default function Home() {
       );
       if (heroHeadRef.current) {
         heroHeadRef.current.style.transform =
-          `translate3d(${headX}px, ${headY}px, 0) rotate(${head.x * 1.25}deg)`;
+          `translate3d(${headX}px, ${headY}px, 0) rotate(${head.x * 0.55}deg)`;
       }
 
       if (isVisible && document.visibilityState === "visible") {
@@ -620,7 +778,6 @@ export default function Home() {
     };
 
     const returnToNeutral = () => {
-      if (forcedLookRef.current) return;
       target.x = 0;
       target.y = 0;
     };
@@ -658,83 +815,33 @@ export default function Home() {
     };
   }, [finePointer, reducedMotion]);
 
-  const explore = () => {
-    if (journeyState !== "idle") return;
-    transitionTimersRef.current.forEach((timer) => window.clearTimeout(timer));
-    transitionTimersRef.current = [];
-
-    const focusTheatre = () => {
-      window.requestAnimationFrame(() => {
-        theatreHeadingRef.current?.focus({ preventScroll: true });
+  const unlockAndScroll = (targetId: "#story" | "#features") => {
+    document.documentElement.classList.remove("mewmuze-scroll-locked");
+    document.body.classList.remove("mewmuze-scroll-locked");
+    setExperienceUnlocked(true);
+    window.setTimeout(() => {
+      const target = document.querySelector<HTMLElement>(targetId);
+      if (!target) return;
+      const targetTop = target.getBoundingClientRect().top + window.scrollY - 80;
+      window.scrollTo({
+        top: Math.max(0, targetTop),
+        behavior: reducedMotion ? "auto" : "smooth",
       });
-    };
-
-    const finish = (smooth: boolean) => {
-      const featureSection = document.querySelector<HTMLElement>("#features");
-      if (!featureSection) return;
-
-      const targetY = Math.max(
-        0,
-        featureSection.getBoundingClientRect().top + window.scrollY - 124,
-      );
-      if (!smooth) {
-        window.scrollTo({ top: targetY, behavior: "instant" });
-        focusTheatre();
-        return;
-      }
-
-      const startY = window.scrollY;
-      const startedAt = window.performance.now();
-      const duration = 640;
-      const scroll = (now: number) => {
-        const progress = Math.min(1, (now - startedAt) / duration);
-        const eased = 1 - Math.pow(1 - progress, 3);
-        window.scrollTo({
-          top: startY + (targetY - startY) * eased,
-          behavior: "instant",
-        });
-        if (progress < 1) {
-          transitionScrollRafRef.current = window.requestAnimationFrame(scroll);
-        } else {
-          transitionScrollRafRef.current = null;
-          focusTheatre();
-        }
-      };
-      transitionScrollRafRef.current = window.requestAnimationFrame(scroll);
-    };
-
-    if (reducedMotion) {
-      setExperienceUnlocked(true);
-      setJourneyState("ready");
-      window.requestAnimationFrame(() => finish(false));
-      return;
-    }
-
-    forcedLookRef.current = true;
-    setJourneyState("reacting");
-    transitionTimersRef.current = [
-      window.setTimeout(() => setJourneyState("travelling"), 230),
-      window.setTimeout(() => setExperienceUnlocked(true), 620),
-      window.setTimeout(() => finish(true), 720),
-      window.setTimeout(() => {
-        forcedLookRef.current = false;
-        setJourneyState("ready");
-      }, 1580),
-    ];
+    }, 80);
   };
 
   return (
     <main
       id="top"
-      className={`experience-${experienceUnlocked ? "unlocked" : "locked"} journey-${journeyState}`}
+      className={`experience-${experienceUnlocked ? "unlocked" : "locked"}`}
     >
       <a
         className="skip-link"
-        href="#features"
+        href="#story"
         onClick={(event) => {
           if (!experienceUnlocked) {
             event.preventDefault();
-            explore();
+            unlockAndScroll("#story");
           }
         }}
       >
@@ -750,9 +857,7 @@ export default function Home() {
         <div className="hero-cat-peek">
           <span
             ref={catMotionRef}
-            className={`hero-cat-motion ${
-              journeyState === "reacting" ? "is-reacting" : ""
-            } ${journeyState === "travelling" ? "is-travelling" : ""}`}
+            className="hero-cat-motion"
           >
             <HeroCat
               headUnitRef={heroHeadRef}
@@ -772,12 +877,12 @@ export default function Home() {
           </p>
           <div className="hero-actions">
             <SkeuoButton
-              onClick={explore}
-              className={`hero-explore ${journeyState !== "idle" ? "is-pressed" : ""}`}
+              onClick={() => unlockAndScroll("#story")}
+              className={`hero-explore ${experienceUnlocked ? "is-pressed" : ""}`}
             >
               Explore Now <span aria-hidden="true">↓</span>
             </SkeuoButton>
-            <SkeuoButton onClick={explore} variant="quiet">
+            <SkeuoButton onClick={() => unlockAndScroll("#features")} variant="quiet">
               See every feature
             </SkeuoButton>
           </div>
@@ -794,11 +899,11 @@ export default function Home() {
         </div>
       </section>
 
-      <header className="site-navigation">
+      <header className="site-navigation" data-reveal>
         <SiteNavigation />
       </header>
 
-      <section className="monotony section-shell section-pad" id="story">
+      <section className="monotony section-shell section-pad" id="story" data-reveal>
         <div className="monotony-copy">
           <Eyebrow>THE ORDINARY DESKTOP</Eyebrow>
           <h2>
@@ -815,9 +920,9 @@ export default function Home() {
         <AppearanceShowcase reducedMotion={reducedMotion} />
       </section>
 
-      <FeatureTheatre reducedMotion={reducedMotion} headingRef={theatreHeadingRef} />
+      <FeatureTheatre reducedMotion={reducedMotion} />
 
-      <section className="day-story section-pad" aria-labelledby="day-title">
+      <section className="day-story section-pad" aria-labelledby="day-title" data-reveal>
         <div className="section-shell">
           <div className="section-heading">
             <div>
@@ -845,7 +950,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="feature-directory section-shell section-pad" id="directory">
+      <section className="feature-directory section-shell section-pad" id="directory" data-reveal>
         <div className="section-heading">
           <div>
             <Eyebrow>THE COMPLETE FEATURE DIRECTORY</Eyebrow>
@@ -860,101 +965,16 @@ export default function Home() {
             fine print.
           </p>
         </div>
-        <div className="directory-groups">
-          {featureGroups.map((group, groupIndex) => {
-            const entries = featureStories.filter((feature) => feature.group === group);
-            return (
-              <details key={group} open={groupIndex === 0}>
-                <summary>
-                  <span>{String(groupIndex + 1).padStart(2, "0")}</span>
-                  <strong>{group}</strong>
-                  <small>{entries.length} features</small>
-                  <i aria-hidden="true">+</i>
-                </summary>
-                <div className="directory-grid">
-                  {entries.map((feature) => (
-                    <article key={feature.id}>
-                      <span className={`directory-dot accent-${feature.accent}`} aria-hidden="true" />
-                      <small>{feature.number}</small>
-                      <h3>{feature.title}</h3>
-                      <p>{feature.story}</p>
-                      <ul>
-                        {feature.facts.map((fact) => (
-                          <li key={fact}>{fact}</li>
-                        ))}
-                      </ul>
-                    </article>
-                  ))}
-                </div>
-              </details>
-            );
-          })}
-        </div>
+        <FeatureDirectory />
       </section>
 
-      <section className="appearance section-pad" id="appearance">
+      <section className="appearance section-pad" id="appearance" data-reveal>
         <div className="section-shell appearance-shell">
-          <div className="appearance-stage">
-            <div className="studio-window">
-              <div className="studio-titlebar">
-                <span>APPEARANCE STUDIO / VERIFIED PRESET</span>
-                <i />
-                <i />
-                <i />
-              </div>
-              <div className="studio-preview">
-                <span className="studio-halo" aria-hidden="true" />
-                <CatFigure className="studio-cat" />
-                <span className="preset-ticket">
-                  <strong>FLOWER BAND</strong>
-                  <small>Classic · Tuxedo · Medium</small>
-                </span>
-              </div>
-              <p>
-                The preview uses the supplied current MewMuze preset. Exact body and coat
-                rendering remains inside the app.
-              </p>
-            </div>
-          </div>
-          <div className="appearance-copy">
-            <Eyebrow>APPEARANCE STUDIO</Eyebrow>
-            <h2>
-              Same personality.
-              <br />
-              <em>A cat that looks like yours.</em>
-            </h2>
-            <p>
-              Body plans change real proportions before color and coat are applied. The
-              website shows the verified choices without pretending to replace the app&apos;s
-              renderer.
-            </p>
-            <div className="choice-block">
-              <span>Body</span>
-              <div>{bodies.map((body) => <b key={body}>{body}</b>)}</div>
-            </div>
-            <div className="choice-block">
-              <span>Pattern</span>
-              <div>{patterns.map((pattern) => <b key={pattern}>{pattern}</b>)}</div>
-            </div>
-            <div className="appearance-specs">
-              <span>
-                <small>Colors</small>
-                Fur · eyes · inner ears
-              </span>
-              <span>
-                <small>Size</small>
-                Small · medium · large
-              </span>
-              <span>
-                <small>Default accessory</small>
-                None · Flower Band
-              </span>
-            </div>
-          </div>
+          <AppearanceStudio />
         </div>
       </section>
 
-      <section className="store-teaser section-shell section-pad" id="store">
+      <section className="store-teaser section-shell section-pad" id="store" data-reveal>
         <div className="store-teaser-card">
           <div>
             <Eyebrow>THE MEWMUZE WARDROBE</Eyebrow>
@@ -983,7 +1003,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="privacy section-pad" id="privacy">
+      <section className="privacy section-pad" id="privacy" data-reveal>
         <div className="section-shell privacy-shell">
           <div className="privacy-copy">
             <Eyebrow>LOCAL-FIRST, CLEARLY EXPLAINED</Eyebrow>
@@ -1018,7 +1038,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="pricing section-pad" id="pricing" aria-labelledby="pricing-title">
+      <section className="pricing section-pad" id="pricing" aria-labelledby="pricing-title" data-reveal>
         <div className="section-shell pricing-shell">
           <div className="pricing-card">
             <div className="pricing-brand">
@@ -1069,7 +1089,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="final-cta section-shell section-pad" id="download">
+      <section className="final-cta section-shell section-pad" id="download" data-reveal>
         <div className="cta-cat">
           <CatFigure />
           <span>ready when you are.</span>

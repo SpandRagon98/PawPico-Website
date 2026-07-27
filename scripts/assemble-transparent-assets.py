@@ -93,12 +93,12 @@ def hero_layers(base: Path, blink: Path, ears: Path, output_dir: Path) -> None:
         (0, 0, 0, 0),
         (0, 0, body.width, round(body.height * 0.56)),
     )
-    body.save(output_dir / "mewmuze-hero-front-body-hd.png", format="PNG", optimize=True)
+    body.save(output_dir / "mewmuze-hero-front-body-app.png", format="PNG", optimize=True)
 
     for source, filename in [
-        (base_image, "mewmuze-hero-front-head-hd.png"),
-        (blink_image, "mewmuze-hero-front-head-blink-hd.png"),
-        (ears_image, "mewmuze-hero-front-head-ears-hd.png"),
+        (base_image, "mewmuze-hero-front-head-app.png"),
+        (blink_image, "mewmuze-hero-front-head-blink-app.png"),
+        (ears_image, "mewmuze-hero-front-head-ears-app.png"),
     ]:
         head = source.copy()
         neck_top = round(head.height * 0.55)
