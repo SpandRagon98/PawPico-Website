@@ -11,8 +11,7 @@ const detailHtml = await readFile(
 
 for (const expected of [
   `${basePath}/_next/`,
-  `${basePath}/videos/`,
-  `${basePath}/mewmuze-flower-cat.png`,
+  `${basePath}/cat/`,
   `${basePath}/og-mewmuze.png`,
 ]) {
   assert.ok(html.includes(expected), `Static export is missing ${expected}`);
@@ -20,7 +19,7 @@ for (const expected of [
 
 assert.doesNotMatch(
   html,
-  /(?:src|href|poster)="\/(?:_next|videos|mewmuze-|pawpico-)/,
+  /(?:src|href|poster)="\/(?:_next|cat|videos|mewmuze-|pawpico-)/,
 );
 assert.ok(
   storeHtml.includes("The wardrobe is still being stitched."),
@@ -37,7 +36,7 @@ assert.ok(
 );
 assert.doesNotMatch(
   storeHtml,
-  /(?:src|href)="\/(?:_next|store|mewmuze-|pawpico-)/,
+  /(?:src|href)="\/(?:_next|cat|store|mewmuze-|pawpico-)/,
 );
 assert.doesNotMatch(
   storeHtml,
@@ -47,7 +46,10 @@ assert.doesNotMatch(storeHtml, /\sdownload(?:=|\s|>)/i);
 
 for (const file of [
   "../out/index.html",
-  "../out/mewmuze-flower-cat.png",
+  "../out/cat/mewmuze-hero-peek-hd.png",
+  "../out/cat/mewmuze-face-logo-hd.png",
+  "../out/cat/features/cursor.webp",
+  "../out/cat/appearance/white-grey-flower.webp",
   "../out/og-mewmuze.png",
   "../out/videos/desktop-physics.mp4",
   "../out/store/index.html",

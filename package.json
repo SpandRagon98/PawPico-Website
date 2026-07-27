@@ -8,7 +8,7 @@
   "scripts": {
     "dev": "node scripts/run-vinext.mjs dev",
     "build": "node scripts/run-vinext.mjs build",
-    "build:pages": "next build && node scripts/verify-pages-export.mjs",
+    "build:pages": "node scripts/build-pages.mjs",
     "start": "node scripts/run-vinext.mjs start",
     "test": "npm run build && node --test tests/rendered-html.test.mjs",
     "lint": "eslint . --ignore-pattern dist --ignore-pattern .next",

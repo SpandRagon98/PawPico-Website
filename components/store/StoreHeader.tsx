@@ -7,10 +7,10 @@ export function StoreHeader() {
       <a className="store-brand" href={sitePath("/")} aria-label="MewMuze home">
         <span>
           <Image
-            src={sitePath("/mewmuze-flower-cat.png")}
+            src={sitePath("/cat/mewmuze-face-logo-hd.png")}
             alt=""
-            width={55}
-            height={86}
+            width={512}
+            height={512}
             unoptimized
           />
         </span>

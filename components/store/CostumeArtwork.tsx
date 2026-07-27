@@ -28,11 +28,11 @@ export function CostumeArtwork({
       </span>
       <Image
         className="concept-cat"
-        src={sitePath("/mewmuze-flower-cat.png")}
+        src={sitePath("/cat/mewmuze-hero-reference-hd.png")}
         alt=""
         aria-hidden="true"
-        width={55}
-        height={86}
+        width={768}
+        height={768}
         unoptimized
         priority={size === "hero"}
       />
