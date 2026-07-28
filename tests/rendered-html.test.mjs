@@ -602,3 +602,17 @@ test("gives phones their own layout instead of a squeezed desktop", async () => 
   assert.match(css, /\.notice-float\s*\{[^}]*position:\s*static/s);
   assert.match(css, /@media \(max-width: 430px\)/);
 });
+
+test("fits the whole locked hero on a phone screen", async () => {
+  const css = await source("../app/globals.css");
+  // The hero is height-locked and scrolling stays locked until Explore Now, so
+  // the cat must reserve real space and the copy must drop its desktop margin -
+  // otherwise the closing line sits below the fold and cannot be reached.
+  assert.match(css, /\.hero-cat-peek\s*\{[^}]*height:\s*min\(250px, 29vh\)/s);
+  assert.match(css, /\.hero-cat-motion\s*\{[^}]*height:\s*min\(250px, 29vh\)/s);
+  assert.match(css, /\.hero-copy\s*\{[^}]*margin-top:\s*0/s);
+  // short phones shrink the cat further so the call to action stays visible
+  assert.match(css, /@media \(max-width: 760px\) and \(max-height: 700px\)/);
+  // touch targets clear the 44px minimum
+  assert.match(css, /\.choice-block > div > button\s*\{[^}]*min-height:\s*46px/s);
+});
