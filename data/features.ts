@@ -6,6 +6,13 @@ export type FeatureGroup =
   | "Looks like mine"
   | "Respects my privacy";
 
+/** A dummy in-app notice, shown on the site exactly as the app would show it. */
+export type FeatureNotice = {
+  app: string;
+  title: string;
+  body: string;
+};
+
 export type FeatureStory = {
   id: string;
   number: string;
@@ -19,9 +26,12 @@ export type FeatureStory = {
   video: string;
   accent: "mint" | "pink" | "lavender" | "blue" | "peach" | "yellow";
   facts: string[];
+  /** Plain-English payoff: what this actually changes for the person using it. */
+  helps: string;
+  notice?: FeatureNotice;
 };
 
-export const featureStories: FeatureStory[] = [
+const stories: Omit<FeatureStory, "helps" | "notice">[] = [
   {
     id: "cursor",
     number: "01",
@@ -343,6 +353,98 @@ export const featureStories: FeatureStory[] = [
     facts: ["Adaptive rendering", "Dynamic click-through", "Windows 10 and 11"],
   },
 ];
+
+const helps: Record<string, string> = {
+  cursor:
+    "The screen stops feeling like furniture. Something in there registers that you are present — you move the mouse, it looks up, and the room is a little less empty than it was a second ago.",
+  petting:
+    "Thirty seconds of stroking a warm little animal is a genuinely better reset after a hard message than another lap around social media. It costs nothing and it is always within reach.",
+  sleep:
+    "The cat winds down when you do, so your desktop stops shouting at the end of the day. Watching something curl up and go quiet is a surprisingly strong signal that you are allowed to stop too.",
+  work:
+    "You stop handing private documents to a free converter website. The two file jobs you actually do — images into a PDF, a PDF back into images — happen on your own machine in seconds.",
+  clipboard:
+    "The thing you copied is still there when you need it two steps later, so you stop re-finding the same link, code or address for the third time in ten minutes.",
+  focus:
+    "A focus timer you do not resent. The cat sits down and works alongside you instead of a progress bar shaming you from a browser tab, which turns out to be a far better reason to keep going.",
+  pomodoro:
+    "Structure without rigidity. The cycle keeps its shape whether you are deep in it or stepping away, so a broken session never becomes a reason to abandon the whole afternoon.",
+  breaks:
+    "You actually stand up. A break you watch a cat take with you is much harder to dismiss than a notification you have already learned to click away without reading.",
+  reminders:
+    "The small things that fall through — the tablet, the callback, the water — arrive in your own words from something you like looking at, so they land instead of blending into the noise.",
+  gmail:
+    "You close the inbox tab that has been eating your afternoon. When something genuinely new lands, the cat waves and tells you who it is and what it is about. One line, no red badge, no falling back into the inbox.",
+  calendar:
+    "You stop joining calls four minutes late because a browser notification appeared behind a full-screen window. The warning comes from something always on top, with enough lead time to actually get ready.",
+  physics:
+    "This is the part that makes people call a colleague over. Your real windows are the world — the cat walks your taskbar, hops between the apps you have open, and hangs off the edge of what you are typing in.",
+  context:
+    "The cat reads the room without reading your screen. Open an editor and glasses appear; type hard for ten minutes and it starts steaming. You feel accompanied at work, from nothing more sensitive than an app name.",
+  music:
+    "Your music gets a tiny dancing audience. It costs you nothing — MewMuze never learns the artist or the track, only that something is playing.",
+  microphone:
+    "Every call ends with a small bow. The cat knows the mic went live and nothing else — no stream is opened, recorded or transcribed.",
+  appearance:
+    "The cat becomes yours rather than a stock mascot. People rebuild a cat they have lost, match a partner's tabby, or invent something that never existed — and it greets them in that form every morning.",
+  personality:
+    "This is why it does not get old in week three. Energy drains and recovers, moods carry over, affection is remembered — so the cat you have in March behaves like one you have lived with, not a looping GIF.",
+  peek:
+    "It never costs you a meeting. When you present or go full screen, the cat steps aside on its own, so you get a companion without a single embarrassing moment.",
+  agent:
+    "Stop babysitting a long build. The cat works while the job runs and celebrates from across the screen when it lands, so you can go make tea and still know the moment it finishes.",
+  lightweight:
+    "It behaves itself. No taskbar clutter, clicks pass through to whatever is underneath, and it goes near-idle when hidden — so company never costs you a battery or a frame rate.",
+};
+
+const notices: Record<string, FeatureNotice> = {
+  gmail: {
+    app: "GMAIL",
+    title: "Priya Raman",
+    body: "Hey! There is a new mail — “Re: the deck for Monday”",
+  },
+  calendar: {
+    app: "CALENDAR",
+    title: "In 10 minutes",
+    body: "Design standup. Want me to nudge you again at five?",
+  },
+  reminders: {
+    app: "REMINDER",
+    title: "52 minutes in",
+    body: "Stand up and stretch. I will wait right here.",
+  },
+  focus: {
+    app: "FOCUS",
+    title: "25:00 complete",
+    body: "Nice run. Take five — I will guard the desk.",
+  },
+  breaks: {
+    app: "BREAK",
+    title: "Break's over",
+    body: "Back when you are ready. No rush.",
+  },
+  agent: {
+    app: "AGENT",
+    title: "Build finished",
+    body: "All tests green. I did the celebrating already.",
+  },
+  clipboard: {
+    app: "CLIPBOARD",
+    title: "Saved for later",
+    body: "That tracking number is still here when you need it.",
+  },
+  work: {
+    app: "QUICK TOOLS",
+    title: "MewMuze",
+    body: "4 images stitched into one PDF. Saved to your Desktop.",
+  },
+};
+
+export const featureStories: FeatureStory[] = stories.map((story) => ({
+  ...story,
+  helps: helps[story.id] ?? story.detail,
+  notice: notices[story.id],
+}));
 
 export const featureGroups: FeatureGroup[] = [
   "Helps me work",
