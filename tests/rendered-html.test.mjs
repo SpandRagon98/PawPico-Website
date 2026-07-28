@@ -637,9 +637,13 @@ test("styles notifications like the app's own bubble", async () => {
 test("keeps every cat element untouched while adding only idle motion", async () => {
   const css = await source("../app/globals.css");
   const page = await source("../app/page.tsx");
-  // liveliness is animation only - no geometry, colour or layer changes
-  assert.match(css, /@keyframes cat-breathe/);
-  assert.match(css, /\.hero-cat-art\s*\{[^}]*animation:\s*cat-breathe/s);
+  // liveliness is animation only - no geometry, colour or layer changes.
+  // Breathing and drift are one keyframe: two animations both driving transform
+  // would fight, and an animation on .hero-cat-motion would override the
+  // transform that frames the cat and drop it half its height down the page.
+  assert.match(css, /@keyframes cat-alive/);
+  assert.match(css, /\.hero-cat-art\s*\{[^}]*animation:\s*cat-alive/s);
+  assert.doesNotMatch(css, /\.hero-cat-motion\s*\{[^}]*animation:\s*cat-drift/s);
   // the original eye/pupil shapes and the full emotion set are still in place
   assert.match(css, /\.hero-eye-track\s*\{[\s\S]*?border-radius:\s*48%/);
   assert.match(css, /\.hero-pupil\s*\{[\s\S]*?border-radius:\s*47%/);
@@ -665,4 +669,33 @@ test("gives the phone layout a real gutter and phone-sized controls", async () =
   // controls are thumb-sized rather than full-bleed slabs
   assert.match(css, /\.hero-actions \.skeuo-button\s*\{[^}]*min-height:\s*48px/s);
   assert.match(css, /\.hero-actions \.skeuo-button-quiet\s*\{[^}]*width:\s*auto/s);
+});
+
+test("uses a pixel typeface for display type and keeps body copy readable", async () => {
+  const layout = await source("../app/layout.tsx");
+  const css = await source("../app/globals.css");
+  assert.match(layout, /Pixelify_Sans/);
+  assert.match(layout, /variable: "--font-pixel"/);
+  assert.match(layout, /pixelify\.variable/);
+  // declared on body, not :root - --font-pixel is set by the body class, so a
+  // :root declaration resolves to nothing and the font silently never applies
+  assert.match(css, /body\s*\{\s*--pixel:\s*var\(--font-pixel\)/);
+  // long-form copy stays on the sans face
+  assert.match(css, /--sans:\s*var\(--font-montserrat\)/);
+});
+
+test("frames the hero cat to head and shoulders at a larger size", async () => {
+  const css = await source("../app/globals.css");
+  assert.match(css, /\.hero-cat-motion\s*\{[^}]*width:\s*clamp\(880px, 66vw, 1180px\)/s);
+  assert.match(css, /\.hero-cat-motion\s*\{[^}]*transform:\s*translateY\(-43%\)/s);
+  // phones re-assert their own smaller framing after the desktop rule
+  assert.match(css, /\.hero-cat-motion\s*\{[^}]*width:\s*min\(250px, 29vh\)/s);
+});
+
+test("stacks the feature panel on phones so nothing covers the cat", async () => {
+  const css = await source("../app/globals.css");
+  // the label and caption were absolutely positioned over the cat at 6.5px
+  assert.match(css, /\.media-label,\s*\.media-caption\s*\{[^}]*position:\s*static/s);
+  assert.match(css, /\.media-label\s*\{[^}]*font-size:\s*9px/s);
+  assert.match(css, /\.theatre-media\s*\{[^}]*grid-template-rows:\s*auto 1fr auto/s);
 });
