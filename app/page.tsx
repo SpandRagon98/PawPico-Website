@@ -28,10 +28,12 @@ const HERO_CAT_BLINK_ASSET = "/cat/mewmuze-hero-front-head-blink-app.png";
 const HERO_CAT_EARS_ASSET = "/cat/mewmuze-hero-front-head-ears-app.png";
 const FACE_LOGO_ASSET = "/cat/mewmuze-face-logo-hd.png";
 
+// Only moods whose sprites have open eyes are used in the hero, so the pupils
+// keep following the cursor in every mood shown. (cheerful.webp is an
+// eyes-closed squint-laugh, so it can't carry a tracking pupil.)
 const heroEmotionAssets = {
   happy: "/cat/hero-emotions/happy.webp",
   sad: "/cat/hero-emotions/sad.webp",
-  cheerful: "/cat/hero-emotions/cheerful.webp",
 } as const;
 
 type HeroEmotion = "neutral" | keyof typeof heroEmotionAssets;
@@ -62,11 +64,6 @@ const emotionRigs: Record<HeroEmotion, EmotionRig> = {
     headEase: 0.15, pupilEase: 0.42, headGain: 1.12, pupilGain: 1.15,
     tiltGain: 1.25, tiltBias: 0, headDrop: -2.4, gazeDrop: -1.2,
     sway: 2.6, swaySpeed: 1.35, puff: 0.014,
-  },
-  cheerful: {
-    headEase: 0.19, pupilEase: 0.5, headGain: 1.24, pupilGain: 1.3,
-    tiltGain: 1.5, tiltBias: -1.1, headDrop: -3.4, gazeDrop: -1.8,
-    sway: 3.4, swaySpeed: 1.95, puff: 0.02,
   },
   sad: {
     headEase: 0.06, pupilEase: 0.2, headGain: 0.72, pupilGain: 0.66,
@@ -122,6 +119,8 @@ function HeroCat({
         unoptimized
         priority
       />
+      {/* The emotion faces live inside the head unit so the head keeps turning
+          with the cursor in every mood, not just the neutral one. */}
       <span ref={headUnitRef} className="hero-cat-head-unit">
         <Image
           className="hero-cat-layer hero-cat-head"
@@ -132,6 +131,20 @@ function HeroCat({
           unoptimized
           priority
         />
+        {Object.entries(heroEmotionAssets).map(([name, asset]) => (
+          <Image
+            key={name}
+            className={`hero-cat-layer hero-cat-emotion hero-cat-emotion-${name}`}
+            src={sitePath(asset)}
+            alt=""
+            width={128}
+            height={128}
+            loading="eager"
+            unoptimized
+          />
+        ))}
+        {/* Opaque pixel eye sockets: they mask each sprite's own painted pupils
+            so the tracking pupils stay correct on top of every mood. */}
         <span className="hero-eye-track hero-eye-track-left">
           <span ref={leftPupilRef} className="hero-pupil" />
         </span>
@@ -155,18 +168,6 @@ function HeroCat({
           unoptimized
         />
       </span>
-      {Object.entries(heroEmotionAssets).map(([name, asset]) => (
-        <Image
-          key={name}
-          className={`hero-cat-layer hero-cat-emotion hero-cat-emotion-${name}`}
-          src={sitePath(asset)}
-          alt=""
-          width={128}
-          height={128}
-          loading="eager"
-          unoptimized
-        />
-      ))}
     </span>
   );
 }
@@ -239,9 +240,6 @@ function SiteNavigation() {
 
   return (
     <div className="nav-dock">
-      <a className="brand-link" href="#top" aria-label="MewMuze home">
-        <SiteBrand />
-      </a>
       <nav className="desktop-nav" aria-label="Primary navigation">
         {links}
       </nav>
@@ -789,6 +787,8 @@ export default function Home() {
   // Read inside the animation loop so a mood change retunes the motion without
   // tearing down and restarting the frame loop.
   const emotionRigRef = useRef<EmotionRig>(emotionRigs.neutral);
+  // CSS pixels per sprite pixel, used to snap the pupils to the pixel grid.
+  const spritePixelRef = useRef(1);
 
   useEffect(() => {
     emotionRigRef.current = emotionRigs[heroEmotion];
@@ -829,11 +829,7 @@ export default function Home() {
       return () => window.clearTimeout(neutralTimer);
     }
 
-    const emotions: Exclude<HeroEmotion, "neutral">[] = [
-      "happy",
-      "cheerful",
-      "sad",
-    ];
+    const emotions: Exclude<HeroEmotion, "neutral">[] = ["happy", "sad"];
     let emotionIndex = 0;
     let neutralTimer = 0;
 
@@ -911,14 +907,15 @@ export default function Home() {
       const headScale =
         1 + Math.min(1, Math.hypot(head.x, head.y)) * 0.012 + rig.puff;
 
-      leftPupilRef.current?.style.setProperty(
-        "transform",
-        `translate3d(${pupilX}px, ${pupilY}px, 0)`,
-      );
-      rightPupilRef.current?.style.setProperty(
-        "transform",
-        `translate3d(${pupilX}px, ${pupilY}px, 0)`,
-      );
+      // The cat is a 128px sprite scaled up, so one sprite pixel is several CSS
+      // pixels. Snapping the pupils to that grid makes them step like pixel art
+      // instead of gliding smoothly across the eye.
+      const step = spritePixelRef.current;
+      const snap = (value: number) => Math.round(value / step) * step;
+      const pupilTransform = `translate3d(${snap(pupilX)}px, ${snap(pupilY)}px, 0)`;
+
+      leftPupilRef.current?.style.setProperty("transform", pupilTransform);
+      rightPupilRef.current?.style.setProperty("transform", pupilTransform);
       if (heroHeadRef.current) {
         heroHeadRef.current.style.transform =
           `translate3d(${headX}px, ${headY}px, 0) rotate(${headTilt}deg) scale(${headScale})`;
@@ -928,6 +925,13 @@ export default function Home() {
         frame = window.requestAnimationFrame(render);
       }
     };
+
+    const measureSpritePixel = () => {
+      const cat = catMotionRef.current?.getBoundingClientRect();
+      if (cat?.width) spritePixelRef.current = Math.max(1, cat.width / 128);
+    };
+    measureSpritePixel();
+    window.addEventListener("resize", measureSpritePixel, { passive: true });
 
     const track = (event: globalThis.PointerEvent) => {
       const cat = catMotionRef.current?.getBoundingClientRect();
@@ -975,6 +979,7 @@ export default function Home() {
 
     return () => {
       observer.disconnect();
+      window.removeEventListener("resize", measureSpritePixel);
       window.removeEventListener("pointermove", track);
       heroElement?.removeEventListener("pointerleave", returnToNeutral);
       document.removeEventListener("visibilitychange", resume);
