@@ -982,7 +982,7 @@ export default function Home() {
     };
   }, [reducedMotion]);
 
-  const unlockAndScroll = (targetId: "#story" | "#features") => {
+  const unlockAndScroll = (targetId: "#story" | "#features" | "#pricing") => {
     document.documentElement.classList.remove("mewmuze-scroll-locked");
     document.body.classList.remove("mewmuze-scroll-locked");
     setExperienceUnlocked(true);
@@ -1050,7 +1050,14 @@ export default function Home() {
           </p>
           <div className="hero-actions">
             <SkeuoButton
+              onClick={() => unlockAndScroll("#pricing")}
+              className="hero-buy"
+            >
+              {`Get MewMuze · $${priceLabel}`}
+            </SkeuoButton>
+            <SkeuoButton
               onClick={() => unlockAndScroll("#story")}
+              variant="secondary"
               className={`hero-explore ${experienceUnlocked ? "is-pressed" : ""}`}
             >
               Explore Now <span aria-hidden="true">↓</span>

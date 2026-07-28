@@ -6108,3 +6108,307 @@ html.mewmuze-reveal-ready [data-reveal] {
     width: min(190px, 24vh);
   }
 }
+
+/* ============================================================================
+   GLASSMORPHISM + SKEUOMORPHISM
+
+   The two languages are split by role rather than mixed on the same surface:
+
+     glass  -> things that FLOAT over other content (nav, overlay chips,
+               tickets, badges, arrows). They blur what is behind them.
+     skeuo  -> things you press or that hold content (buttons, cards, panels).
+               They keep their bevels, contact shadows and solid fills.
+
+   Glass needs something behind it to refract, and the page is white, so a few
+   very soft tinted auras sit behind the key sections to give it substance.
+   ========================================================================== */
+
+body {
+  --glass-tint: rgba(255, 255, 255, 0.62);
+  --glass-tint-strong: rgba(255, 255, 255, 0.76);
+  --glass-edge: rgba(255, 255, 255, 0.85);
+  --glass-line: rgba(150, 158, 166, 0.34);
+  --glass-blur: saturate(1.5) blur(18px);
+  --glass-shadow: 0 10px 30px rgba(31, 35, 39, 0.13);
+}
+
+/* --- 1. AMBIENT COLOUR SO GLASS HAS SOMETHING TO REFRACT ---------------- */
+.hero,
+.feature-theatre,
+.appearance,
+.pricing {
+  position: relative;
+  isolation: isolate;
+  /* clip, not hidden: it stops the auras widening the page without turning the
+     section into a scroll container (which would break sticky children) */
+  overflow-x: clip;
+}
+
+.hero::before,
+.feature-theatre::before,
+.appearance::before,
+.pricing::before {
+  position: absolute;
+  z-index: -1;
+  border-radius: 50%;
+  content: "";
+  filter: blur(46px);
+  pointer-events: none;
+}
+
+.hero::before {
+  top: 6%;
+  right: 4%;
+  width: min(46vw, 620px);
+  height: min(46vw, 620px);
+  background: radial-gradient(
+    circle at 38% 34%,
+    rgba(169, 216, 189, 0.5),
+    rgba(181, 213, 237, 0.34) 46%,
+    rgba(255, 255, 255, 0) 72%
+  );
+}
+
+.feature-theatre::before {
+  top: 12%;
+  left: 0;
+  width: min(38vw, 520px);
+  height: min(38vw, 520px);
+  background: radial-gradient(
+    circle at 50% 50%,
+    rgba(231, 165, 184, 0.34),
+    rgba(187, 183, 232, 0.26) 52%,
+    rgba(255, 255, 255, 0) 74%
+  );
+}
+
+.appearance::before {
+  right: 0;
+  bottom: 8%;
+  width: min(40vw, 560px);
+  height: min(40vw, 560px);
+  background: radial-gradient(
+    circle at 50% 50%,
+    rgba(242, 199, 167, 0.34),
+    rgba(245, 223, 160, 0.24) 50%,
+    rgba(255, 255, 255, 0) 74%
+  );
+}
+
+.pricing::before {
+  top: 10%;
+  left: 2%;
+  width: min(36vw, 480px);
+  height: min(36vw, 480px);
+  background: radial-gradient(
+    circle at 50% 50%,
+    rgba(169, 216, 189, 0.38),
+    rgba(181, 213, 237, 0.24) 52%,
+    rgba(255, 255, 255, 0) 74%
+  );
+}
+
+/* --- 2. THE GLASS RECIPE ------------------------------------------------
+   Translucent fill, a blurred backdrop, a bright top edge for the lit rim,
+   and a soft drop shadow so the pane reads as sitting above the page.
+   ------------------------------------------------------------------------ */
+.nav-dock,
+.cat-speech,
+.hero-status,
+.media-label,
+.media-caption,
+.showcase-ticket,
+.preset-ticket,
+.studio-live-badge,
+.theatre-arrow,
+.coming-pill,
+.theatre-counter {
+  border: 1px solid var(--glass-line);
+  background: var(--glass-tint);
+  box-shadow:
+    inset 0 1px 0 var(--glass-edge),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.4),
+    var(--glass-shadow);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+}
+
+/* The nav floats over the hero and the cat, so it gets the strongest pane. */
+.nav-dock {
+  background: var(--glass-tint-strong);
+  -webkit-backdrop-filter: saturate(1.6) blur(22px);
+  backdrop-filter: saturate(1.6) blur(22px);
+  box-shadow:
+    inset 0 1px 0 var(--glass-edge),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.45),
+    0 2px 0 rgba(199, 203, 208, 0.5),
+    0 14px 34px rgba(31, 35, 39, 0.12);
+  transition: background 260ms ease, box-shadow 260ms ease;
+}
+
+.nav-dock:hover {
+  background: rgba(255, 255, 255, 0.86);
+}
+
+/* Overlay chips sitting directly on the cat art. */
+.media-label,
+.media-caption,
+.showcase-ticket,
+.preset-ticket,
+.studio-live-badge {
+  background: var(--glass-tint-strong);
+}
+
+/* Arrows are glass but still press like a control. */
+.theatre-arrow {
+  transition:
+    transform 220ms cubic-bezier(0.34, 1.56, 0.64, 1),
+    background 220ms ease,
+    box-shadow 220ms ease;
+}
+
+.theatre-arrow:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.86);
+  box-shadow:
+    inset 0 1px 0 var(--glass-edge),
+    0 14px 30px rgba(31, 35, 39, 0.18);
+}
+
+/* --- 3. SKEUOMORPHISM STAYS ON THE TACTILE LAYER ------------------------
+   Buttons and cards keep solid fills and bevels: a control you press should
+   feel like a physical object, not a pane of glass.
+   ------------------------------------------------------------------------ */
+.skeuo-button,
+.skeuo-button-primary,
+.skeuo-button-secondary {
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+/* A hint of glass on the big content panels: the surface stays solid enough
+   to read against, with a lit rim so it sits in the same world as the panes. */
+.theatre-console,
+.studio-window,
+.pricing-card,
+.appearance-showcase,
+.store-teaser-card,
+.cta-cat {
+  border-color: rgba(178, 185, 192, 0.6);
+  box-shadow:
+    inset 0 3px 0 #ffffff,
+    inset 0 -6px 0 #eceff1,
+    inset 0 0 0 1px rgba(255, 255, 255, 0.55),
+    0 4px 0 rgba(199, 203, 208, 0.55),
+    0 26px 56px rgba(30, 34, 38, 0.13);
+}
+
+/* --- 4. FALLBACK ---------------------------------------------------------
+   Without backdrop-filter the panes would be see-through mush, so they fall
+   back to a near-solid fill and keep their bevels.
+   ------------------------------------------------------------------------ */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .nav-dock,
+  .cat-speech,
+  .hero-status,
+  .media-label,
+  .media-caption,
+  .showcase-ticket,
+  .preset-ticket,
+  .studio-live-badge,
+  .theatre-arrow,
+  .coming-pill,
+  .theatre-counter {
+    background: rgba(255, 255, 255, 0.97);
+  }
+}
+
+/* --- 5. PHONES -----------------------------------------------------------
+   Backdrop blur is expensive on mobile GPUs, so the auras shrink and only the
+   nav keeps a real pane; the rest fall back to near-solid fills.
+   ------------------------------------------------------------------------ */
+@media (max-width: 760px) {
+  .hero::before,
+  .feature-theatre::before,
+  .appearance::before,
+  .pricing::before {
+    width: min(70vw, 340px);
+    height: min(70vw, 340px);
+    filter: blur(38px);
+  }
+
+  .nav-dock {
+    -webkit-backdrop-filter: saturate(1.5) blur(16px);
+    backdrop-filter: saturate(1.5) blur(16px);
+  }
+
+  .media-label,
+  .media-caption,
+  .showcase-ticket,
+  .preset-ticket,
+  .studio-live-badge,
+  .theatre-counter,
+  .coming-pill {
+    background: rgba(255, 255, 255, 0.95);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nav-dock,
+  .theatre-arrow {
+    transition: none;
+  }
+}
+
+/* Landing CTA: the buy action leads, Explore Now steps back to a secondary,
+   and the quiet link trails. Three actions, one clear hierarchy. */
+.hero-actions {
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.hero-buy {
+  position: relative;
+}
+
+/* a slow sheen sweep so the primary action draws the eye without shouting */
+.hero-buy::after {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(
+    100deg,
+    rgba(255, 255, 255, 0) 38%,
+    rgba(255, 255, 255, 0.55) 50%,
+    rgba(255, 255, 255, 0) 62%
+  );
+  content: "";
+  pointer-events: none;
+  animation: buy-sheen 5.2s ease-in-out infinite;
+}
+
+@keyframes buy-sheen {
+  0%, 62% { opacity: 0; transform: translateX(-58%); }
+  70% { opacity: 1; }
+  86%, 100% { opacity: 0; transform: translateX(58%); }
+}
+
+@media (max-width: 760px) {
+  .hero-actions {
+    display: grid;
+    gap: 10px;
+  }
+
+  .hero-buy,
+  .hero-explore {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-buy::after {
+    animation: none;
+    opacity: 0;
+  }
+}

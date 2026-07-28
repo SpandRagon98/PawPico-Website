@@ -141,7 +141,7 @@ test("unlocks into the story while leaving the landing cat stationary", async ()
   const page = await source("../app/page.tsx");
   const css = await source("../app/globals.css");
 
-  assert.match(page, /const unlockAndScroll = \(targetId: "#story" \| "#features"\)/);
+  assert.match(page, /const unlockAndScroll = \(targetId: "#story" \| "#features" \| "#pricing"\)/);
   assert.match(page, /unlockAndScroll\("#story"\)/);
   assert.match(page, /window\.scrollTo\(\{/);
   assert.match(page, /target\.getBoundingClientRect\(\)\.top \+ window\.scrollY - 80/);
@@ -446,7 +446,10 @@ test("preserves the professional white tactile system and target breakpoints", a
   assert.match(css, /\.section-heading \{[\s\S]*gap: clamp\(32px, 4vw, 52px\)/);
   assert.match(storeCss, /Store typography follows the same measured rhythm/);
   assert.match(storeCss, /\.store-hero h1,[\s\S]*line-height: 0\.94/);
-  assert.doesNotMatch(css, /backdrop-filter|repeating-linear-gradient|linear-gradient|radial-gradient/i);
+  // Glass is now part of the design language, so backdrop-filter and the soft
+  // radial auras behind it are expected. Repeating gradients stay out - they
+  // were the pattern-y look the tactile system was defined against.
+  assert.doesNotMatch(css, /repeating-linear-gradient/i);
 });
 
 test("renders an original-concepts-only Coming Soon store with no order flow", async () => {
@@ -622,7 +625,10 @@ test("uses a white canvas with the hero's left-hand bar removed", async () => {
   assert.match(css, /body\s*\{\s*background:\s*#ffffff/);
   assert.match(css, /\.hero-edge\s*\{\s*display:\s*none/);
   // the flat tactile system stays: depth comes from bevels, never gradients
-  assert.doesNotMatch(css, /backdrop-filter|repeating-linear-gradient|linear-gradient|radial-gradient/i);
+  // Glass is now part of the design language, so backdrop-filter and the soft
+  // radial auras behind it are expected. Repeating gradients stay out - they
+  // were the pattern-y look the tactile system was defined against.
+  assert.doesNotMatch(css, /repeating-linear-gradient/i);
 });
 
 test("styles notifications like the app's own bubble", async () => {
@@ -687,4 +693,34 @@ test("stacks the feature panel on phones so nothing covers the cat", async () =>
   assert.match(css, /\.media-label,\s*\.media-caption\s*\{[^}]*position:\s*static/s);
   assert.match(css, /\.media-label\s*\{[^}]*font-size:\s*9px/s);
   assert.match(css, /\.theatre-media\s*\{[^}]*grid-template-rows:\s*auto 1fr auto/s);
+});
+
+test("puts a buy call to action on the landing page", async () => {
+  const response = await render();
+  const html = await response.text();
+  const page = await source("../app/page.tsx");
+  const css = await source("../app/globals.css");
+
+  assert.match(html, /Get MewMuze/);
+  assert.match(html, /class="skeuo-button skeuo-button-primary hero-buy"/);
+  // it unlocks the locked hero and takes you to pricing
+  assert.match(page, /unlockAndScroll\("#pricing"\)/);
+  // the buy action leads, Explore Now steps back to secondary
+  assert.match(page, /variant="secondary"\s+className=\{`hero-explore/);
+  assert.match(css, /@keyframes buy-sheen/);
+});
+
+test("layers glassmorphism over the tactile system without breaking it", async () => {
+  const css = await source("../app/globals.css");
+  // floating panes get real glass
+  assert.match(css, /backdrop-filter: saturate\(1\.6\) blur\(22px\)/);
+  assert.match(css, /--glass-blur: saturate\(1\.5\) blur\(18px\)/);
+  // controls you press stay solid and bevelled
+  assert.match(css, /\.skeuo-button,[\s\S]*?backdrop-filter: none/);
+  // glass needs something behind it on a white page
+  assert.match(css, /\.hero::before/);
+  // and the auras must not widen the page
+  assert.match(css, /overflow-x: clip/);
+  // a fallback for browsers without backdrop-filter
+  assert.match(css, /@supports not \(\(backdrop-filter/);
 });
