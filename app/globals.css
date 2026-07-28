@@ -5156,3 +5156,453 @@ h2 {
     font-size: 12px;
   }
 }
+
+/* ============================================================================
+   Refinement pass: white canvas, app-accurate notices, deeper skeuomorphism,
+   a livelier cat, a corrected closing panel, and richer motion throughout.
+
+   House rule kept intact: no gradients and no backdrop filters anywhere. Every
+   surface below is a solid colour shaped by layered bevels and shadows.
+   ========================================================================== */
+
+/* --- 1. WHITE CANVAS, AND THE LEFT-HAND BAR REMOVED --------------------- */
+body {
+  background: #ffffff;
+}
+
+/* The hero carried an 18px inset "shelf" strip down its left edge. */
+.hero-edge {
+  display: none;
+}
+
+.hero,
+.monotony,
+.feature-directory,
+.final-cta,
+.site-footer {
+  background: #ffffff;
+}
+
+/* --- 2. NOTIFICATIONS, MATCHED TO THE APP -------------------------------
+   The in-app notice is a compact white bubble with a thin dark outline and a
+   small tail. Rebuilt here to read the same way rather than as a web card.
+   ------------------------------------------------------------------------ */
+.app-notice {
+  position: relative;
+  display: grid;
+  gap: 3px;
+  width: max-content;
+  max-width: min(300px, 100%);
+  padding: 9px 13px 10px;
+  border: 1.5px solid #2b2f33;
+  border-left-width: 1.5px;
+  border-radius: 9px;
+  background: #ffffff;
+  box-shadow:
+    inset 0 1px 0 #ffffff,
+    0 3px 0 rgba(43, 47, 51, 0.13),
+    0 10px 20px rgba(31, 35, 39, 0.15);
+  text-align: left;
+}
+
+/* the little tail that points down at the cat, as the app draws it */
+.app-notice::after {
+  position: absolute;
+  bottom: -7px;
+  left: 26px;
+  width: 10px;
+  height: 10px;
+  border-right: 1.5px solid #2b2f33;
+  border-bottom: 1.5px solid #2b2f33;
+  background: #ffffff;
+  content: "";
+  transform: rotate(45deg);
+}
+
+.app-notice-app {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #6a7076;
+  font: 700 9px/1 var(--mono);
+  letter-spacing: 0.14em;
+}
+
+.app-notice-app > i {
+  width: 6px;
+  height: 6px;
+  border: 1px solid #2b2f33;
+  border-radius: 50%;
+  background: var(--green);
+  box-shadow: none;
+}
+
+.app-notice strong {
+  color: #1b1e21;
+  font: 700 13px/1.25 var(--mono);
+  letter-spacing: -0.01em;
+}
+
+.app-notice small {
+  color: #40464c;
+  font: 500 12.5px/1.45 var(--mono);
+}
+
+.notice-float {
+  position: absolute;
+  z-index: 5;
+  top: 40px;
+  left: 50%;
+  animation: notice-pop 7s cubic-bezier(0.34, 1.56, 0.64, 1) infinite;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, -10px);
+}
+
+@keyframes notice-pop {
+  0% { opacity: 0; transform: translate(-50%, -12px) scale(0.9); }
+  5% { opacity: 1; transform: translate(-50%, 2px) scale(1.03); }
+  9% { transform: translate(-50%, 0) scale(1); }
+  45% { opacity: 1; transform: translate(-50%, 0) scale(1); }
+  53% { opacity: 0; transform: translate(-50%, -8px) scale(0.97); }
+  100% { opacity: 0; transform: translate(-50%, -12px) scale(0.9); }
+}
+
+.notice-inline {
+  position: relative;
+  width: 100%;
+  max-width: none;
+  margin: 6px 0 2px;
+}
+
+.notice-inline::after {
+  display: none;
+}
+
+/* --- 3. A LIVELIER CAT (motion only — every element is untouched) --------
+   The sprites, eyes, pupils and sizes are exactly as they were. This only
+   adds breathing and a slow idle drift on top.
+   ------------------------------------------------------------------------ */
+.hero-cat-art {
+  animation: cat-breathe 4.6s ease-in-out infinite;
+  transform-origin: 50% 88%;
+}
+
+@keyframes cat-breathe {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(0, -0.7%, 0) scale(1.012); }
+}
+
+.hero-cat-motion {
+  animation: cat-drift 9s ease-in-out infinite;
+}
+
+@keyframes cat-drift {
+  0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg); }
+  33% { transform: translate3d(-0.5%, -0.8%, 0) rotate(-0.35deg); }
+  66% { transform: translate3d(0.5%, -0.4%, 0) rotate(0.35deg); }
+}
+
+/* the cat perks up when you reach for it */
+.hero-cat-peek:hover .hero-cat-art {
+  animation-duration: 2.4s;
+}
+
+/* --- 4. THE CLOSING PANEL, CORRECTED ------------------------------------
+   The cat sat small in a tall recessed box with its caption jammed into the
+   corner. It is now a centred stack: cat, then caption beneath it.
+   ------------------------------------------------------------------------ */
+.cta-cat {
+  min-height: 0;
+  padding: clamp(30px, 4vw, 48px) clamp(24px, 3vw, 36px);
+  align-content: center;
+  justify-items: center;
+  gap: 20px;
+  border-radius: 26px;
+  box-shadow:
+    inset 0 3px 8px rgba(31, 35, 39, 0.11),
+    inset 0 -2px 0 #ffffff,
+    0 3px 0 #c7cbd0,
+    0 18px 38px rgba(31, 35, 39, 0.1);
+}
+
+.cta-cat .cat-figure {
+  width: clamp(190px, 17vw, 240px);
+  animation: cat-breathe 4.6s ease-in-out infinite;
+  transform-origin: 50% 90%;
+}
+
+.cta-cat > span {
+  position: static;
+  right: auto;
+  bottom: auto;
+  font-size: 11px;
+  line-height: 1.2;
+}
+
+/* --- 5. DEEPER SKEUOMORPHISM -------------------------------------------
+   Solid colours only; the depth comes from stacked bevels and contact shadows.
+   ------------------------------------------------------------------------ */
+.skeuo-button {
+  border-radius: 14px;
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.98),
+    inset 0 -2px 0 rgba(117, 124, 130, 0.18),
+    0 2px 0 #c9cdd2,
+    0 6px 14px rgba(31, 35, 39, 0.11);
+  transition:
+    transform 220ms cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 220ms cubic-bezier(0.22, 1, 0.36, 1),
+    background-color 180ms ease;
+}
+
+.skeuo-button:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.98),
+    inset 0 -2px 0 rgba(117, 124, 130, 0.18),
+    0 4px 0 #c9cdd2,
+    0 12px 24px rgba(31, 35, 39, 0.15);
+}
+
+.skeuo-button:active {
+  transform: translateY(2px);
+  box-shadow:
+    inset 0 3px 7px rgba(31, 35, 39, 0.24),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.55);
+}
+
+.skeuo-button-primary {
+  border-color: #6ba482;
+  color: #10301d;
+  background: #9ed3b3;
+  box-shadow:
+    inset 0 2px 0 #d8f0e2,
+    inset 0 -3px 0 rgba(45, 90, 60, 0.26),
+    0 3px 0 #62997a,
+    0 10px 22px rgba(55, 99, 68, 0.22);
+}
+
+.skeuo-button-primary:hover {
+  background: #aedcc0;
+  box-shadow:
+    inset 0 2px 0 #d8f0e2,
+    inset 0 -3px 0 rgba(45, 90, 60, 0.26),
+    0 5px 0 #62997a,
+    0 16px 30px rgba(55, 99, 68, 0.28);
+}
+
+.skeuo-button-primary:active {
+  box-shadow:
+    inset 0 3px 8px rgba(35, 74, 48, 0.34),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.4);
+}
+
+/* Panels gain a crisper edge and a real contact shadow. */
+.theatre-console,
+.studio-window,
+.pricing-card,
+.appearance-showcase,
+.store-teaser-card {
+  box-shadow:
+    inset 0 3px 0 #ffffff,
+    inset 0 -6px 0 #e6e9eb,
+    0 4px 0 #c7cbd0,
+    0 26px 56px rgba(30, 34, 38, 0.13);
+}
+
+.directory-grid article,
+.privacy-grid article,
+.pricing-promises li,
+.download-promises li {
+  transition:
+    transform 260ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 260ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.directory-grid article:hover,
+.privacy-grid article:hover {
+  transform: translateY(-3px);
+  box-shadow:
+    inset 0 2px 0 #ffffff,
+    0 3px 0 #d3d7db,
+    0 16px 30px rgba(30, 34, 38, 0.12);
+}
+
+/* --- 6. MOTION: reveals, staggers and springy interactions -------------- */
+html.mewmuze-reveal-ready [data-reveal] {
+  transition:
+    opacity 700ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 700ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* children cascade in behind their section */
+[data-reveal] .directory-panel,
+[data-reveal] .privacy-grid article,
+[data-reveal] .day-timeline li,
+[data-reveal] .pricing-promises li {
+  transition:
+    opacity 620ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 620ms cubic-bezier(0.22, 1, 0.36, 1);
+  opacity: 0;
+  transform: translate3d(0, 18px, 0);
+}
+
+[data-reveal].is-revealed .directory-panel,
+[data-reveal].is-revealed .privacy-grid article,
+[data-reveal].is-revealed .day-timeline li,
+[data-reveal].is-revealed .pricing-promises li {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+
+[data-reveal].is-revealed .privacy-grid article:nth-child(2),
+[data-reveal].is-revealed .day-timeline li:nth-child(2),
+[data-reveal].is-revealed .pricing-promises li:nth-child(2) { transition-delay: 70ms; }
+[data-reveal].is-revealed .privacy-grid article:nth-child(3),
+[data-reveal].is-revealed .day-timeline li:nth-child(3),
+[data-reveal].is-revealed .pricing-promises li:nth-child(3) { transition-delay: 140ms; }
+[data-reveal].is-revealed .privacy-grid article:nth-child(4),
+[data-reveal].is-revealed .day-timeline li:nth-child(4) { transition-delay: 210ms; }
+[data-reveal].is-revealed .privacy-grid article:nth-child(5),
+[data-reveal].is-revealed .day-timeline li:nth-child(5) { transition-delay: 280ms; }
+[data-reveal].is-revealed .privacy-grid article:nth-child(6) { transition-delay: 350ms; }
+
+/* feature copy and film swap with a spring instead of a hard cut */
+.theatre-copy {
+  animation: feature-swap 460ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+@keyframes feature-swap {
+  from { opacity: 0; transform: translate3d(14px, 0, 0); }
+  to { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+
+.feature-media-cat {
+  animation: film-swap 520ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+@keyframes film-swap {
+  from { opacity: 0; transform: scale(0.94); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.theatre-progress button,
+.choice-block > div > button,
+.theatre-arrow {
+  transition:
+    transform 220ms cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 220ms ease,
+    background-color 180ms ease,
+    color 180ms ease;
+}
+
+.theatre-progress button:hover,
+.choice-block > div > button:hover,
+.theatre-arrow:hover:not(:disabled) {
+  transform: translateY(-2px);
+}
+
+.theatre-arrow:active:not(:disabled),
+.theatre-progress button:active,
+.choice-block > div > button:active {
+  transform: translateY(2px);
+}
+
+.desktop-nav > a {
+  transition: color 200ms ease;
+}
+
+/* everything that animates stays on the compositor */
+.hero-cat-art,
+.hero-cat-motion,
+.hero-cat-head-unit,
+.hero-pupil,
+.notice-float,
+.theatre-copy,
+.feature-media-cat,
+.cta-cat .cat-figure {
+  backface-visibility: hidden;
+  will-change: transform;
+}
+
+/* --- 7. SPACE AND RHYTHM ------------------------------------------------ */
+.section-pad {
+  padding-block: clamp(84px, 9vw, 132px);
+}
+
+.final-cta {
+  gap: clamp(40px, 5vw, 84px);
+  grid-template-columns: minmax(240px, 0.5fr) minmax(0, 1.5fr);
+}
+
+/* --- 8. PHONE ----------------------------------------------------------- */
+@media (max-width: 760px) {
+  .section-pad {
+    padding-block: 64px;
+  }
+
+  .app-notice {
+    max-width: 100%;
+    padding: 8px 11px 9px;
+  }
+
+  .app-notice strong {
+    font-size: 12.5px;
+  }
+
+  .app-notice small {
+    font-size: 12px;
+  }
+
+  .notice-float {
+    top: 28px;
+  }
+
+  .cta-cat {
+    padding: 26px 20px 24px;
+    gap: 16px;
+  }
+
+  .cta-cat .cat-figure {
+    width: min(200px, 54vw);
+  }
+
+  .final-cta {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+
+  /* reveals travel less on a small screen so nothing feels sluggish */
+  [data-reveal] .directory-panel,
+  [data-reveal] .privacy-grid article,
+  [data-reveal] .day-timeline li,
+  [data-reveal] .pricing-promises li {
+    transform: translate3d(0, 12px, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-cat-art,
+  .hero-cat-motion,
+  .cta-cat .cat-figure,
+  .theatre-copy,
+  .feature-media-cat,
+  .notice-float {
+    animation: none;
+  }
+
+  .notice-float {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+
+  [data-reveal] .directory-panel,
+  [data-reveal] .privacy-grid article,
+  [data-reveal] .day-timeline li,
+  [data-reveal] .pricing-promises li {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}

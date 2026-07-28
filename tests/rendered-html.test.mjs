@@ -616,3 +616,40 @@ test("fits the whole locked hero on a phone screen", async () => {
   // touch targets clear the 44px minimum
   assert.match(css, /\.choice-block > div > button\s*\{[^}]*min-height:\s*46px/s);
 });
+
+test("uses a white canvas with the hero's left-hand bar removed", async () => {
+  const css = await source("../app/globals.css");
+  assert.match(css, /body\s*\{\s*background:\s*#ffffff/);
+  assert.match(css, /\.hero-edge\s*\{\s*display:\s*none/);
+  // the flat tactile system stays: depth comes from bevels, never gradients
+  assert.doesNotMatch(css, /backdrop-filter|repeating-linear-gradient|linear-gradient|radial-gradient/i);
+});
+
+test("styles notifications like the app's own bubble", async () => {
+  const css = await source("../app/globals.css");
+  // white bubble, thin dark outline, mono type and a tail pointing at the cat
+  assert.match(css, /\.app-notice\s*\{[^}]*border:\s*1\.5px solid #2b2f33/s);
+  assert.match(css, /\.app-notice\s*\{[^}]*background:\s*#ffffff/s);
+  assert.match(css, /\.app-notice::after\s*\{[^}]*transform:\s*rotate\(45deg\)/s);
+  assert.match(css, /\.app-notice strong\s*\{[^}]*var\(--mono\)/s);
+});
+
+test("keeps every cat element untouched while adding only idle motion", async () => {
+  const css = await source("../app/globals.css");
+  const page = await source("../app/page.tsx");
+  // liveliness is animation only - no geometry, colour or layer changes
+  assert.match(css, /@keyframes cat-breathe/);
+  assert.match(css, /\.hero-cat-art\s*\{[^}]*animation:\s*cat-breathe/s);
+  // the original eye/pupil shapes and the full emotion set are still in place
+  assert.match(css, /\.hero-eye-track\s*\{[\s\S]*?border-radius:\s*48%/);
+  assert.match(css, /\.hero-pupil\s*\{[\s\S]*?border-radius:\s*47%/);
+  assert.match(page, /cheerful: "\/cat\/hero-emotions\/cheerful\.webp"/);
+  assert.match(page, /className="brand-link"/);
+});
+
+test("centres the closing panel's cat instead of pinning it to a corner", async () => {
+  const css = await source("../app/globals.css");
+  assert.match(css, /\.cta-cat\s*\{[^}]*justify-items:\s*center/s);
+  assert.match(css, /\.cta-cat > span\s*\{[^}]*position:\s*static/s);
+  assert.match(css, /\.cta-cat \.cat-figure\s*\{[^}]*width:\s*clamp\(190px, 17vw, 240px\)/s);
+});
