@@ -671,23 +671,12 @@ test("gives the phone layout a real gutter and phone-sized controls", async () =
   assert.match(css, /\.hero-actions \.skeuo-button-quiet\s*\{[^}]*width:\s*auto/s);
 });
 
-test("uses a pixel typeface for display type and keeps body copy readable", async () => {
-  const layout = await source("../app/layout.tsx");
-  const css = await source("../app/globals.css");
-  assert.match(layout, /Pixelify_Sans/);
-  assert.match(layout, /variable: "--font-pixel"/);
-  assert.match(layout, /pixelify\.variable/);
-  // declared on body, not :root - --font-pixel is set by the body class, so a
-  // :root declaration resolves to nothing and the font silently never applies
-  assert.match(css, /body\s*\{\s*--pixel:\s*var\(--font-pixel\)/);
-  // long-form copy stays on the sans face
-  assert.match(css, /--sans:\s*var\(--font-montserrat\)/);
-});
-
 test("frames the hero cat to head and shoulders at a larger size", async () => {
   const css = await source("../app/globals.css");
-  assert.match(css, /\.hero-cat-motion\s*\{[^}]*width:\s*clamp\(880px, 66vw, 1180px\)/s);
-  assert.match(css, /\.hero-cat-motion\s*\{[^}]*transform:\s*translateY\(-43%\)/s);
+  // anchored to the bottom and pushed down by a share of its own height, so
+  // the head clears the crop and the shoulders meet the bottom edge
+  assert.match(css, /\.hero-cat-motion\s*\{[^}]*bottom:\s*0/s);
+  assert.match(css, /\.hero-cat-motion\s*\{[^}]*transform:\s*translateY\(27%\)/s);
   // phones re-assert their own smaller framing after the desktop rule
   assert.match(css, /\.hero-cat-motion\s*\{[^}]*width:\s*min\(250px, 29vh\)/s);
 });

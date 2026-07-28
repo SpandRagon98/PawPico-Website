@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Geist_Mono, Montserrat, Pixelify_Sans } from "next/font/google";
+import { Geist_Mono, Montserrat } from "next/font/google";
 import "./globals.css";
 
 const montserrat = Montserrat({
@@ -8,14 +8,6 @@ const montserrat = Montserrat({
   weight: ["400", "500", "600", "700", "800"],
 });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
-// Pixel typeface to match the cat's art. Used for headings and interface
-// labels; long-form copy stays on Montserrat so it remains comfortable to read.
-const pixelify = Pixelify_Sans({
-  variable: "--font-pixel",
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-});
-
 const siteUrl =
   process.env.NEXT_PUBLIC_SITE_URL ?? "https://spandragon98.github.io/PawPico-Website";
 const catIcon = `${siteUrl}/cat/mewmuze-face-logo-192.png`;
@@ -68,7 +60,7 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
-      <body className={`${montserrat.variable} ${geistMono.variable} ${pixelify.variable}`}>
+      <body className={`${montserrat.variable} ${geistMono.variable}`}>
         {children}
       </body>
     </html>

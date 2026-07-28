@@ -5739,107 +5739,6 @@ html.mewmuze-reveal-ready [data-reveal] {
    all keep their existing rules. Only the frame around the cat changes.
    ========================================================================== */
 
-/* Declared on body, not :root — --font-pixel is set by the body class, so a
-   :root declaration would resolve to nothing. */
-body {
-  --pixel: var(--font-pixel), "Courier New", ui-monospace, monospace;
-}
-
-/* --- 1. PIXEL TYPE -------------------------------------------------------
-   Headings and interface labels take the pixel face. Body copy stays on
-   Montserrat, because a pixel font at paragraph size is tiring to read.
-   ------------------------------------------------------------------------ */
-h1,
-h2,
-h3,
-h4,
-.hero h1,
-.eyebrow,
-.skeuo-button,
-.nav-cta,
-.desktop-nav > a,
-.mobile-nav > summary,
-.app-notice strong,
-.app-notice-app,
-.media-label,
-.media-caption,
-.feature-index,
-.feature-index > small,
-.theatre-counter,
-.theatre-counter strong,
-.theatre-progress button,
-.directory-panel > h3 > button strong,
-.directory-panel > h3 > button small,
-.directory-grid article > small,
-.directory-grid h4,
-.choice-block > span,
-.choice-block > div > button,
-.chip,
-.coming-pill,
-.showcase-ticket strong,
-.showcase-ticket small,
-.preset-ticket strong,
-.preset-ticket small,
-.studio-live-badge,
-.pricing-price strong,
-.pricing-brand strong,
-.pricing-brand small,
-.pricing-price small,
-.cta-cat > span,
-.day-timeline time,
-.site-brand strong,
-.site-brand small,
-.feature-helps > small,
-.directory-helps > small,
-.privacy-grid h3,
-.tip-copy strong,
-.pricing-promises strong,
-.download-promises b,
-.story-time,
-.concept-stack strong,
-.concept-stack small {
-  font-family: var(--pixel);
-}
-
-/* Pixel faces sit small, so they need a touch more size and looser tracking. */
-h1,
-h2 {
-  letter-spacing: -0.02em;
-}
-
-.hero h1 {
-  letter-spacing: -0.015em;
-  line-height: 1.02;
-}
-
-.eyebrow {
-  font-size: 12.5px;
-  letter-spacing: 0.12em;
-}
-
-.skeuo-button {
-  font-size: 13px;
-  letter-spacing: 0.02em;
-}
-
-.desktop-nav > a {
-  font-size: 14px;
-  letter-spacing: 0.01em;
-}
-
-.site-brand strong {
-  font-size: 22px;
-  letter-spacing: 0.01em;
-}
-
-.directory-grid h4 {
-  font-size: 22px;
-}
-
-.pricing-price strong {
-  letter-spacing: 0.01em;
-}
-
 /* --- 2. A BIGGER HEAD-AND-SHOULDERS CAT ---------------------------------
    Scaled up and nudged down inside its existing frame, so the crop lands
    below the shoulders instead of showing the whole seated body small.
@@ -6156,5 +6055,56 @@ h2 {
     max-height: 62vw;
     margin: 0 auto;
     object-fit: contain;
+  }
+}
+
+/* ============================================================================
+   Landing hero only: the cat peeks up from the bottom edge.
+
+   Anchored to the bottom and pushed down by a share of its own height, so the
+   head clears the top of the crop and the shoulders meet the bottom edge. The
+   percentage is on translateY, which resolves against the element's own size,
+   so the framing holds as the cat scales with the viewport.
+   ========================================================================== */
+.hero-cat-peek {
+  align-items: end;
+  width: min(62vw, 1040px);
+}
+
+.hero-cat-motion {
+  top: auto;
+  bottom: 0;
+  left: clamp(-40px, -2vw, 0px);
+  width: clamp(700px, 60vw, 980px);
+  transform: translateY(27%);
+}
+
+/* Phones keep the stacked hero: the cat sits above the copy at a size that
+   fits the locked first screen, rather than peeking from the bottom. */
+@media (max-width: 760px) {
+  .hero-cat-peek {
+    align-items: center;
+    width: calc(100% + (var(--gutter) * 2));
+    height: min(250px, 29vh);
+  }
+
+  .hero-cat-motion {
+    top: auto;
+    bottom: auto;
+    left: auto;
+    width: min(250px, 29vh);
+    height: min(250px, 29vh);
+    transform: none;
+  }
+}
+
+@media (max-width: 760px) and (max-height: 700px) {
+  .hero-cat-peek,
+  .hero-cat-motion {
+    height: min(190px, 24vh);
+  }
+
+  .hero-cat-motion {
+    width: min(190px, 24vh);
   }
 }
