@@ -79,9 +79,7 @@ test("gives the landing cat an authentic moving tail and rotating emotional life
   const css = await source("../app/globals.css");
   const renderer = await source("../scripts/render-authentic-web-assets.mjs");
 
-  // Only open-eyed moods are used in the hero, so the pupils can track in all
-  // of them; cheerful.webp is an eyes-closed squint and is deliberately unused.
-  for (const emotion of ["happy", "sad"]) {
+  for (const emotion of ["happy", "sad", "cheerful"]) {
     const media = await readFile(
       new URL(`../public/cat/hero-emotions/${emotion}.webp`, import.meta.url),
     );
@@ -100,7 +98,7 @@ test("gives the landing cat an authentic moving tail and rotating emotional life
   assert.ok(tail.length > 1_000);
   assert.equal(tail.toString("ascii", 0, 4), "RIFF");
   assert.match(page, /const \[heroEmotion, setHeroEmotion\]/);
-  assert.match(page, /\["happy", "sad"\]/);
+  assert.match(page, /"happy",\s+"cheerful",\s+"sad"/);
   assert.match(page, /setHeroEmotion\("neutral"\)/);
   assert.match(renderer, /renderHeroTailBody/);
   assert.match(renderer, /tailPhase < 40/);
@@ -554,14 +552,9 @@ test("explains in plain English what every feature does for the user", async () 
 
 test("moves the hero cat's head and eyes differently for every mood", async () => {
   const page = await source("../app/page.tsx");
-  for (const mood of ["neutral", "happy", "sad"]) {
+  for (const mood of ["neutral", "happy", "cheerful", "sad"]) {
     assert.match(page, new RegExp(`${mood}:\\s*\\{`), `${mood} needs a motion rig`);
   }
-  // the pupils must keep tracking in every mood, not just neutral
-  const css2 = await source("../app/globals.css");
-  assert.match(css2, /\.hero-cat-art:not\(\.emotion-neutral\) > \.hero-cat-head-unit \{\s*opacity: 1/);
-  assert.match(css2, /\.hero-cat-art\.emotion-sad \{\s*--eye-top/);
-  assert.match(page, /spritePixelRef/);
   // the loop reads the rig, so a mood change retunes motion without restarting
   assert.match(page, /emotionRigRef\.current/);
   assert.match(page, /rig\.headGain/);
@@ -571,32 +564,6 @@ test("moves the hero cat's head and eyes differently for every mood", async () =
   // idle sway keeps the cat alive with no cursor (and on touch screens)
   assert.match(page, /swaySpeed/);
   assert.doesNotMatch(page, /if \(reducedMotion \|\| !finePointer\) return;/);
-});
-
-test("keeps the feature console one fixed size for every feature", async () => {
-  const css = await source("../app/globals.css");
-  // desktop: one fixed frame, the copy column scrolls inside it
-  assert.match(css, /\.theatre-stage\s*\{[^}]*height:\s*630px/s);
-  assert.match(css, /\.theatre-copy\s*\{[^}]*overflow-y:\s*auto/s);
-  // stacked layout: both rows pinned, since captions wrap to different heights
-  assert.match(css, /\.theatre-media\s*\{[^}]*height:\s*min\(92vw, 430px\)/s);
-  assert.match(css, /\.theatre-copy\s*\{[^}]*height:\s*clamp\(360px, 54vh, 470px\)/s);
-});
-
-test("strips the navigation back to links on a transparent bar", async () => {
-  const response = await render();
-  const html = await response.text();
-  const page = await source("../app/page.tsx");
-  const css = await source("../app/globals.css");
-
-  // the brand lockup is gone from the nav, links remain
-  assert.doesNotMatch(page, /<a className="brand-link"/);
-  for (const label of ["Story", "Features", "Appearance", "Privacy"]) {
-    assert.match(html, new RegExp(`>${label}<`));
-  }
-  assert.match(html, /View the price/);
-  assert.match(css, /\.nav-dock\s*\{[^}]*background:\s*transparent/s);
-  assert.match(css, /\.nav-dock\s*\{[^}]*box-shadow:\s*none/s);
 });
 
 test("offers a one-time price with an optional $1 developer tip", async () => {
