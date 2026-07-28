@@ -653,3 +653,16 @@ test("centres the closing panel's cat instead of pinning it to a corner", async 
   assert.match(css, /\.cta-cat > span\s*\{[^}]*position:\s*static/s);
   assert.match(css, /\.cta-cat \.cat-figure\s*\{[^}]*width:\s*clamp\(190px, 17vw, 240px\)/s);
 });
+
+test("gives the phone layout a real gutter and phone-sized controls", async () => {
+  const css = await source("../app/globals.css");
+  // the hero had no horizontal padding at all, so everything ran edge to edge
+  assert.match(css, /\.hero\s*\{[^}]*padding-left:\s*var\(--gutter\)/s);
+  assert.match(css, /\.section-shell\s*\{[^}]*width:\s*calc\(100% - \(var\(--gutter\) \* 2\)\)/s);
+  assert.match(css, /\.nav-dock\s*\{[^}]*width:\s*calc\(100% - \(var\(--gutter\) \* 2\)\)/s);
+  // the cat stays optically centred on the full width, not the padded box
+  assert.match(css, /\.hero-cat-peek\s*\{[^}]*margin-inline:\s*calc\(var\(--gutter\) \* -1\)/s);
+  // controls are thumb-sized rather than full-bleed slabs
+  assert.match(css, /\.hero-actions \.skeuo-button\s*\{[^}]*min-height:\s*48px/s);
+  assert.match(css, /\.hero-actions \.skeuo-button-quiet\s*\{[^}]*width:\s*auto/s);
+});

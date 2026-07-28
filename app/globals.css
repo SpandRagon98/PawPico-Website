@@ -5606,3 +5606,117 @@ html.mewmuze-reveal-ready [data-reveal] {
     transition: none;
   }
 }
+
+/* ============================================================================
+   Phone spacing.
+
+   The hero had no horizontal padding at all, so the headline, body copy,
+   buttons and the closing line all ran edge to edge. Everything now sits on
+   one shared gutter, and the controls are a size that suits a phone rather
+   than full-bleed slabs.
+   ========================================================================== */
+@media (max-width: 760px) {
+  :root {
+    --gutter: 22px;
+  }
+
+  /* One gutter, used by every container on the page. */
+  .hero {
+    padding-right: var(--gutter);
+    padding-left: var(--gutter);
+  }
+
+  .section-shell {
+    width: calc(100% - (var(--gutter) * 2));
+  }
+
+  .nav-dock {
+    width: calc(100% - (var(--gutter) * 2));
+    padding-right: 10px;
+    padding-left: 12px;
+  }
+
+  /* The cat is optically centred on the full width, not the padded box. */
+  .hero-cat-peek {
+    width: calc(100% + (var(--gutter) * 2));
+    margin-inline: calc(var(--gutter) * -1);
+  }
+
+  /* Controls sized for a thumb without dominating the screen. */
+  .hero-actions .skeuo-button {
+    min-height: 48px;
+    padding: 12px 18px;
+    font-size: 12px;
+  }
+
+  .skeuo-button {
+    min-height: 46px;
+    padding: 11px 16px;
+    border-radius: 12px;
+    font-size: 12px;
+  }
+
+  /* The quiet action reads as a link, not a second full-width slab. */
+  .hero-actions .skeuo-button-quiet {
+    width: auto;
+    min-height: 40px;
+    justify-self: center;
+    padding: 8px 12px;
+  }
+
+  .nav-cta {
+    min-height: 42px;
+    padding: 10px 14px;
+    font-size: 11.5px;
+  }
+
+  /* Type settles to a comfortable measure inside the new gutter. */
+  .hero h1 {
+    font-size: clamp(30px, 8.8vw, 40px);
+    line-height: 1.06;
+  }
+
+  .hero-support {
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  .privacy-note {
+    gap: 7px;
+    font-size: 12px;
+    line-height: 1.5;
+  }
+
+  /* Cards keep a little breathing room from the gutter edge. */
+  .theatre-console {
+    padding-inline: 14px;
+  }
+
+  .directory-grid article,
+  .privacy-grid article,
+  .pricing-card,
+  .studio-window,
+  .store-teaser-card {
+    padding-inline: 18px;
+  }
+
+  .feature-helps,
+  .directory-helps {
+    padding-inline: 14px;
+  }
+}
+
+@media (max-width: 430px) {
+  :root {
+    --gutter: 18px;
+  }
+
+  .hero h1 {
+    font-size: clamp(27px, 8.4vw, 34px);
+  }
+
+  .hero-actions .skeuo-button {
+    min-height: 46px;
+    font-size: 11.5px;
+  }
+}
