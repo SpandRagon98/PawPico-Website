@@ -12,7 +12,12 @@ import {
   type RefObject,
   type ReactNode,
 } from "react";
-import { featureGroups, featureStories, type FeatureStory } from "../data/features";
+import {
+  featureGroups,
+  featureStories,
+  type FeatureNotice,
+  type FeatureStory,
+} from "../data/features";
 import { sitePath } from "../lib/site-path";
 
 const CAT_ASSET = "/cat/mewmuze-hero-reference-app.png";
@@ -30,6 +35,45 @@ const heroEmotionAssets = {
 } as const;
 
 type HeroEmotion = "neutral" | keyof typeof heroEmotionAssets;
+
+// How the head and eyes behave in each mood. Tuned by eye against the real app
+// sprites: a sad cat looks down and tracks lazily, a cheerful one snaps around.
+type EmotionRig = {
+  headEase: number;
+  pupilEase: number;
+  headGain: number;
+  pupilGain: number;
+  tiltGain: number;
+  tiltBias: number;
+  headDrop: number;
+  gazeDrop: number;
+  sway: number;
+  swaySpeed: number;
+  puff: number;
+};
+
+const emotionRigs: Record<HeroEmotion, EmotionRig> = {
+  neutral: {
+    headEase: 0.105, pupilEase: 0.34, headGain: 1, pupilGain: 1,
+    tiltGain: 1, tiltBias: 0, headDrop: 0, gazeDrop: 0,
+    sway: 1.5, swaySpeed: 0.62, puff: 0,
+  },
+  happy: {
+    headEase: 0.15, pupilEase: 0.42, headGain: 1.12, pupilGain: 1.15,
+    tiltGain: 1.25, tiltBias: 0, headDrop: -2.4, gazeDrop: -1.2,
+    sway: 2.6, swaySpeed: 1.35, puff: 0.014,
+  },
+  cheerful: {
+    headEase: 0.19, pupilEase: 0.5, headGain: 1.24, pupilGain: 1.3,
+    tiltGain: 1.5, tiltBias: -1.1, headDrop: -3.4, gazeDrop: -1.8,
+    sway: 3.4, swaySpeed: 1.95, puff: 0.02,
+  },
+  sad: {
+    headEase: 0.06, pupilEase: 0.2, headGain: 0.72, pupilGain: 0.66,
+    tiltGain: 0.6, tiltBias: 1.4, headDrop: 3.6, gazeDrop: 2.6,
+    sway: 0.8, swaySpeed: 0.34, puff: -0.008,
+  },
+};
 
 function CatFigure({
   className = "",
@@ -209,6 +253,20 @@ function SiteNavigation() {
         View the price
       </SkeuoButton>
     </div>
+  );
+}
+
+/** The app's own notice, recreated on the site so the popup reads as familiar. */
+function AppNotice({ notice, className = "" }: { notice: FeatureNotice; className?: string }) {
+  return (
+    <span className={`app-notice ${className}`} role="status">
+      <span className="app-notice-app">
+        <i aria-hidden="true" />
+        {notice.app}
+      </span>
+      <strong>{notice.title}</strong>
+      <small>{notice.body}</small>
+    </span>
   );
 }
 
@@ -409,6 +467,9 @@ function FeatureTheatre({ reducedMotion }: { reducedMotion: boolean }) {
               <i aria-hidden="true" />
             </div>
             <FeatureFilm feature={feature} reducedMotion={reducedMotion} />
+            {feature.notice && (
+              <AppNotice key={feature.id} notice={feature.notice} className="notice-float" />
+            )}
             <span className="media-caption">{feature.demoLabel}</span>
           </div>
 
@@ -420,6 +481,10 @@ function FeatureTheatre({ reducedMotion }: { reducedMotion: boolean }) {
             <p className="feature-scene">{feature.scene}</p>
             <h3>{feature.title}</h3>
             <p className="feature-story">{feature.story}</p>
+            <div className="feature-helps">
+              <small>WHAT THIS CHANGES FOR YOU</small>
+              <p>{feature.helps}</p>
+            </div>
             <p className="feature-detail">{feature.detail}</p>
             <ul>
               {feature.facts.map((fact) => (
@@ -542,6 +607,13 @@ function FeatureDirectory() {
                     <small>{feature.number}</small>
                     <h4>{feature.title}</h4>
                     <p>{feature.story}</p>
+                    <div className="directory-helps">
+                      <small>HOW IT HELPS</small>
+                      <p>{feature.helps}</p>
+                    </div>
+                    {feature.notice && (
+                      <AppNotice notice={feature.notice} className="notice-inline" />
+                    )}
                     <ul>
                       {feature.facts.map((fact) => (
                         <li key={fact}>{fact}</li>
@@ -670,32 +742,32 @@ function AppearanceStudio() {
 const dayMoments = [
   {
     time: "8:47",
-    title: "The tabs multiply.",
-    copy: "MewMuze watches the cursor pick a path through the morning.",
+    title: "You are not quite alone.",
+    copy: "The tabs multiply like they always do. Something small notices your cursor and follows it, and the morning starts a little differently.",
     tone: "mint",
   },
   {
     time: "10:30",
-    title: "Focus begins.",
-    copy: "The cat parks beside a timer and leaves the pointer alone.",
+    title: "It sits down to work with you.",
+    copy: "Focus begins. The cat parks beside the timer, goes still, and leaves the pointer alone — company without commentary.",
     tone: "blue",
   },
   {
     time: "1:15",
-    title: "Water, apparently.",
-    copy: "A notebook notice arrives with a stretch and a patient stare.",
+    title: "Someone noticed before you did.",
+    copy: "Fifty-two minutes without moving. A notebook notice arrives with a stretch and a patient stare, and you finally stand up.",
     tone: "peach",
   },
   {
     time: "3:00",
-    title: "Meetings stack up.",
-    copy: "Calendar warnings grow clearer while full-screen work stays quiet.",
+    title: "The afternoon stops being flat.",
+    copy: "Mail arrives and it waves instead of buzzing. You drag the cat across the screen, it stretches like warm dough, and the hour you were dreading passes differently.",
     tone: "yellow",
   },
   {
     time: "5:48",
-    title: "One last celebration.",
-    copy: "A finished task earns a tiny cheer before the cat settles down.",
+    title: "You close the laptop last.",
+    copy: "A finished task earns a tiny cheer. Then it yawns, curls up on the window edge and sleeps — and it will be there before your coffee tomorrow.",
     tone: "pink",
   },
 ];
@@ -707,11 +779,20 @@ export default function Home() {
   const [finePointer, setFinePointer] = useState(true);
   const [experienceUnlocked, setExperienceUnlocked] = useState(false);
   const [heroEmotion, setHeroEmotion] = useState<HeroEmotion>("neutral");
+  const [supportDeveloper, setSupportDeveloper] = useState(false);
+  const priceLabel = supportDeveloper ? "6.99" : "5.99";
   const heroRef = useRef<HTMLElement>(null);
   const catMotionRef = useRef<HTMLSpanElement>(null);
   const heroHeadRef = useRef<HTMLSpanElement>(null);
   const leftPupilRef = useRef<HTMLSpanElement>(null);
   const rightPupilRef = useRef<HTMLSpanElement>(null);
+  // Read inside the animation loop so a mood change retunes the motion without
+  // tearing down and restarting the frame loop.
+  const emotionRigRef = useRef<EmotionRig>(emotionRigs.neutral);
+
+  useEffect(() => {
+    emotionRigRef.current = emotionRigs[heroEmotion];
+  }, [heroEmotion]);
 
   useEffect(() => {
     const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -760,11 +841,11 @@ export default function Home() {
       setHeroEmotion(emotions[emotionIndex]);
       emotionIndex = (emotionIndex + 1) % emotions.length;
       window.clearTimeout(neutralTimer);
-      neutralTimer = window.setTimeout(() => setHeroEmotion("neutral"), 1900);
+      neutralTimer = window.setTimeout(() => setHeroEmotion("neutral"), 2400);
     };
 
-    const openingTimer = window.setTimeout(showNextEmotion, 3600);
-    const emotionTimer = window.setInterval(showNextEmotion, 7200);
+    const openingTimer = window.setTimeout(showNextEmotion, 2200);
+    const emotionTimer = window.setInterval(showNextEmotion, 5200);
 
     return () => {
       window.clearTimeout(openingTimer);
@@ -797,26 +878,38 @@ export default function Home() {
   }, [reducedMotion]);
 
   useEffect(() => {
-    if (reducedMotion || !finePointer) return;
+    if (reducedMotion) return;
 
     let frame = 0;
     let isVisible = true;
     const target = { x: 0, y: 0 };
     const pupil = { x: 0, y: 0 };
     const head = { x: 0, y: 0 };
+    const start = performance.now();
 
     const render = () => {
-      pupil.x += (target.x - pupil.x) * 0.34;
-      pupil.y += (target.y - pupil.y) * 0.34;
-      head.x += (target.x - head.x) * 0.105;
-      head.y += (target.y - head.y) * 0.105;
-      const pupilX = pupil.x * 14.5;
-      const pupilY = pupil.y * 9;
-      const headX = head.x * 16;
-      const headY = head.y * 8;
-      const headTilt = head.x * 3.2 - head.y * 0.45;
+      // Each mood leans, bobs and looks around differently, so the head and the
+      // eyes read as the same animal changing feeling rather than a moving image.
+      const rig = emotionRigRef.current;
+      pupil.x += (target.x - pupil.x) * rig.pupilEase;
+      pupil.y += (target.y - pupil.y) * rig.pupilEase;
+      head.x += (target.x - head.x) * rig.headEase;
+      head.y += (target.y - head.y) * rig.headEase;
+
+      // Idle life: a slow breathing sway so the cat never looks frozen, and so
+      // touch devices (which have no cursor to follow) still get a living cat.
+      const seconds = (performance.now() - start) / 1000;
+      const swayX = Math.sin(seconds * rig.swaySpeed) * rig.sway;
+      const swayY = Math.sin(seconds * rig.swaySpeed * 1.7 + 1.1) * rig.sway * 0.6;
+
+      const pupilX = pupil.x * 14.5 * rig.pupilGain + swayX * 1.4;
+      const pupilY = pupil.y * 9 * rig.pupilGain + swayY * 1.1 + rig.gazeDrop;
+      const headX = head.x * 16 * rig.headGain + swayX;
+      const headY = head.y * 8 * rig.headGain + swayY + rig.headDrop;
+      const headTilt =
+        (head.x * 3.2 - head.y * 0.45) * rig.tiltGain + swayX * 0.4 + rig.tiltBias;
       const headScale =
-        1 + Math.min(1, Math.hypot(head.x, head.y)) * 0.012;
+        1 + Math.min(1, Math.hypot(head.x, head.y)) * 0.012 + rig.puff;
 
       leftPupilRef.current?.style.setProperty(
         "transform",
@@ -887,7 +980,7 @@ export default function Home() {
       document.removeEventListener("visibilitychange", resume);
       window.cancelAnimationFrame(frame);
     };
-  }, [finePointer, reducedMotion]);
+  }, [reducedMotion]);
 
   const unlockAndScroll = (targetId: "#story" | "#features") => {
     document.documentElement.classList.remove("mewmuze-scroll-locked");
@@ -921,6 +1014,10 @@ export default function Home() {
       >
         Skip to the MewMuze story
       </a>
+
+      <header className="site-navigation">
+        <SiteNavigation />
+      </header>
 
       <section
         ref={heroRef}
@@ -977,23 +1074,26 @@ export default function Home() {
         </div>
       </section>
 
-      <header className="site-navigation" data-reveal>
-        <SiteNavigation />
-      </header>
-
       <section className="monotony section-shell section-pad" id="story" data-reveal>
         <div className="monotony-copy">
           <Eyebrow>THE ORDINARY DESKTOP</Eyebrow>
           <h2>
-            Most desktops do their job.
+            Nothing is wrong.
             <br />
-            <em>They just don&apos;t keep you company.</em>
+            <em>That is somehow the problem.</em>
           </h2>
           <p>
-            The same windows. The same tabs. The same silent stretch between starting a
-            task and finally finishing it.
+            You spend the best hours of your day alone with a screen. The same three
+            windows. The same tabs. The same silent stretch between starting something
+            and finally finishing it. Not bad, exactly. Just flat — and quiet in a way
+            nobody really talks about.
           </p>
-          <p className="story-turn">Then a tiny pair of green eyes appears.</p>
+          <p>
+            A companion does not fix your job or your inbox. It changes the texture of
+            the hours you spend on them, which turns out to matter far more than it
+            sounds like it should.
+          </p>
+          <p className="story-turn">Then a tiny pair of green eyes looks up at you.</p>
         </div>
         <AppearanceShowcase reducedMotion={reducedMotion} />
       </section>
@@ -1134,8 +1234,8 @@ export default function Home() {
             </div>
             <div className="pricing-price">
               <small>ONE-TIME PRICE</small>
-              <strong id="pricing-title">$5.99</strong>
-              <span>No monthly or annual subscription.</span>
+              <strong id="pricing-title">{`$${priceLabel}`}</strong>
+              <span>Pay once. No subscription, ever.</span>
             </div>
             <ul>
               <li>Personal Windows desktop cat</li>
@@ -1145,21 +1245,55 @@ export default function Home() {
               <li>Smart Clipboard Assistant</li>
               <li>Appearance customization</li>
               <li>Local-first privacy</li>
-              <li>Future feature improvements</li>
+              <li>All future updates and costumes included</li>
             </ul>
+            <label className="tip-toggle">
+              <input
+                type="checkbox"
+                checked={supportDeveloper}
+                onChange={(event) => setSupportDeveloper(event.target.checked)}
+              />
+              <span className="tip-box" aria-hidden="true" />
+              <span className="tip-copy">
+                <strong>Add $1 to support the developer</strong>
+                <small>
+                  One person builds MewMuze. This buys the coffee behind the next
+                  update.
+                </small>
+              </span>
+            </label>
             <button className="skeuo-button skeuo-button-primary pricing-coming" type="button" disabled>
               Coming Soon
             </button>
             <p>Purchasing is not live yet. No order or payment is created here.</p>
           </div>
           <div className="pricing-copy">
-            <Eyebrow>ONE CAT. ONE PRICE.</Eyebrow>
+            <Eyebrow>ONE CAT. ONE PRICE. ONCE.</Eyebrow>
             <h2>
-              A tiny desktop companion.
+              Buy it once.
               <br />
-              <em>Without another subscription.</em>
+              <em>Then never think about it again.</em>
             </h2>
             <p>
+              No monthly plan. No annual renewal. No account to make and no card left
+              on file waiting to charge you in eleven months. You pay a single time and
+              the cat is yours.
+            </p>
+            <ul className="pricing-promises">
+              <li>
+                <strong>One payment, kept forever</strong>
+                <span>There is no subscription to cancel, because there is no subscription.</span>
+              </li>
+              <li>
+                <strong>Every future update, free</strong>
+                <span>New features, new animations and new costumes arrive at no extra cost.</span>
+              </li>
+              <li>
+                <strong>The wardrobe keeps growing</strong>
+                <span>Costumes added after you buy are included — you never re-purchase your cat.</span>
+              </li>
+            </ul>
+            <p className="pricing-footnote">
               The planned one-time MewMuze price is clear now, while checkout remains
               honestly unavailable until the launch path is ready.
             </p>
@@ -1180,12 +1314,14 @@ export default function Home() {
             ordinary minutes in between.
           </p>
           <div className="hero-actions">
-            <SkeuoButton href="#pricing">View the $5.99 price</SkeuoButton>
+            <SkeuoButton href="#pricing">{`View the $${priceLabel} price`}</SkeuoButton>
             <SkeuoButton href="#directory" variant="quiet">
               See every feature
             </SkeuoButton>
           </div>
-          <small>Warning: may cause unnecessary smiling during work hours.</small>
+          <small>
+            One-time payment · no subscription · future updates and costumes included.
+          </small>
         </div>
       </section>
 

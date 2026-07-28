@@ -4488,3 +4488,554 @@ h2 {
     line-height: 1.58;
   }
 }
+
+
+/* ============================================================================
+   MewMuze refresh — nav on the landing view, in-app notices, richer feature
+   copy, developer tip, and a purpose-built phone layout.
+
+   Follows the existing tactile system: solid colours plus inset/drop bevels.
+   No gradients, no backdrop filters — the flat white surface is the identity.
+   ========================================================================== */
+
+/* --- navigation now sits above the hero, so it must float over it --------- */
+.site-navigation {
+  position: sticky;
+  top: 12px;
+  z-index: 70;
+  height: 0;
+  transform: none;
+}
+
+/* --- buttons: deeper, more physical press -------------------------------- */
+.skeuo-button {
+  border-radius: 14px;
+}
+
+.skeuo-button-primary {
+  border-color: #6ba482;
+  color: #10301d;
+  background: #9ed3b3;
+  box-shadow:
+    inset 0 2px 0 #d8f0e2,
+    inset 0 -3px 0 rgba(45, 90, 60, 0.24),
+    0 3px 0 #62997a,
+    0 10px 22px rgba(55, 99, 68, 0.22);
+}
+
+.skeuo-button-primary:hover {
+  background: #aedcc0;
+}
+
+.skeuo-button-primary:active {
+  box-shadow:
+    inset 0 3px 7px rgba(35, 74, 48, 0.32),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.4);
+}
+
+.skeuo-button-secondary {
+  border-color: #d3bda8;
+  background: var(--surface-warm);
+  box-shadow:
+    inset 0 2px 0 #fff,
+    inset 0 -2px 0 rgba(150, 120, 92, 0.14),
+    0 2px 0 #ddc9b3,
+    0 8px 18px rgba(104, 80, 58, 0.12);
+}
+
+.skeuo-button-secondary:hover {
+  background: #fffdf8;
+}
+
+/* --- the app's own notice, recreated on the site ------------------------- */
+.app-notice {
+  display: grid;
+  gap: 5px;
+  width: min(300px, 100%);
+  padding: 12px 14px;
+  border: 1px solid #c9ced4;
+  border-left: 4px solid var(--green);
+  border-radius: 12px;
+  background: var(--surface);
+  box-shadow:
+    inset 0 2px 0 #fff,
+    0 2px 0 #d5d9de,
+    0 12px 26px rgba(31, 35, 39, 0.16);
+  text-align: left;
+}
+
+.app-notice-app {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: #6d7480;
+  font: 750 9px/1 var(--mono);
+  letter-spacing: 0.16em;
+}
+
+.app-notice-app > i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 0 0 3px rgba(118, 185, 127, 0.2);
+}
+
+.app-notice strong {
+  color: var(--text);
+  font-size: 14px;
+  letter-spacing: -0.01em;
+}
+
+.app-notice small {
+  color: var(--text-secondary);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+/* Floats over the feature film and pops in like the real notification. */
+.notice-float {
+  position: absolute;
+  z-index: 5;
+  top: 44px;
+  left: 50%;
+  animation: notice-pop 7s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, -10px);
+}
+
+@keyframes notice-pop {
+  0% { opacity: 0; transform: translate(-50%, -14px) scale(0.95); }
+  7% { opacity: 1; transform: translate(-50%, 0) scale(1); }
+  46% { opacity: 1; transform: translate(-50%, 0) scale(1); }
+  56% { opacity: 0; transform: translate(-50%, -10px) scale(0.98); }
+  100% { opacity: 0; transform: translate(-50%, -14px) scale(0.95); }
+}
+
+.notice-inline {
+  width: 100%;
+  margin: 4px 0 2px;
+}
+
+/* --- feature copy: the payoff, made properly visible --------------------- */
+.feature-helps {
+  display: grid;
+  gap: 7px;
+  margin: 0 0 18px;
+  padding: 16px 18px;
+  border: 1px solid #cfe3d6;
+  border-left: 4px solid var(--green);
+  border-radius: 13px;
+  background: #f3faf6;
+  box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.9);
+}
+
+.feature-helps > small,
+.directory-helps > small {
+  color: #3f7a55;
+  font: 750 9px/1 var(--mono);
+  letter-spacing: 0.16em;
+}
+
+.feature-helps > p,
+.directory-helps > p {
+  margin: 0;
+  color: #33383d;
+  font-size: 15px;
+  line-height: 1.62;
+}
+
+.theatre-copy .feature-detail {
+  color: #4d535a;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.directory-helps {
+  display: grid;
+  gap: 6px;
+  margin: 2px 0 4px;
+  padding: 14px 15px;
+  border: 1px solid #cfe3d6;
+  border-left: 4px solid var(--green);
+  border-radius: 12px;
+  background: #f4faf7;
+}
+
+.directory-helps > p {
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* Legibility pass on the detailed directory. */
+.directory-grid article {
+  gap: 12px;
+}
+
+.directory-grid h4 {
+  font-size: 21px;
+}
+
+.directory-grid p {
+  color: #474d54;
+  font-size: 15px;
+  line-height: 1.62;
+}
+
+.directory-grid li {
+  color: #4d535a;
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.directory-panel > h3 > button strong {
+  font-size: 21px;
+}
+
+/* --- developer tip ------------------------------------------------------- */
+.tip-toggle {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: start;
+  gap: 13px;
+  width: 100%;
+  margin: 4px 0 14px;
+  padding: 15px 16px;
+  border: 1px solid var(--border-dark);
+  border-radius: 14px;
+  background: var(--surface-warm);
+  box-shadow: inset 0 2px 0 #fff, 0 2px 0 #d9dde2;
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 180ms ease, background 180ms ease, box-shadow 180ms ease;
+}
+
+.tip-toggle input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.tip-box {
+  position: relative;
+  display: block;
+  width: 26px;
+  height: 26px;
+  border: 1px solid #b3b8be;
+  border-radius: 8px;
+  background: var(--recessed);
+  box-shadow: inset 0 2px 4px rgba(31, 35, 39, 0.16);
+  transition: background 180ms ease, border-color 180ms ease;
+}
+
+.tip-box::after {
+  content: "";
+  position: absolute;
+  top: 4px;
+  left: 9px;
+  width: 6px;
+  height: 12px;
+  border-right: 3px solid #fff;
+  border-bottom: 3px solid #fff;
+  transform: rotate(42deg) scale(0);
+  transition: transform 200ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.tip-toggle:hover {
+  border-color: #9fb8a8;
+}
+
+.tip-toggle:has(input:checked) {
+  border-color: #6fa27e;
+  background: #eef8f2;
+  box-shadow: inset 0 2px 0 #fff, 0 2px 0 #bcd5c6;
+}
+
+.tip-toggle:has(input:checked) .tip-box {
+  border-color: #5a9070;
+  background: #76b97f;
+  box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.45);
+}
+
+.tip-toggle:has(input:checked) .tip-box::after {
+  transform: rotate(42deg) scale(1);
+}
+
+.tip-toggle:has(input:focus-visible) {
+  outline: 3px solid #76b97f;
+  outline-offset: 3px;
+}
+
+.tip-copy {
+  display: grid;
+  gap: 4px;
+}
+
+.tip-copy strong {
+  font-size: 14px;
+  letter-spacing: -0.01em;
+}
+
+.tip-copy small {
+  color: var(--text-secondary);
+  font-size: 12.5px;
+  line-height: 1.48;
+}
+
+.pricing-price strong {
+  transition: color 200ms ease;
+}
+
+/* --- no-subscription promises -------------------------------------------- */
+.pricing-promises {
+  display: grid;
+  gap: 10px;
+  margin: 26px 0 20px;
+  padding: 0;
+  list-style: none;
+}
+
+.pricing-promises li {
+  display: grid;
+  gap: 4px;
+  padding: 15px 17px;
+  border: 1px solid var(--border);
+  border-radius: 13px;
+  background: var(--surface);
+  box-shadow: inset 0 2px 0 #fff, 0 2px 0 #dfe3e7;
+}
+
+.pricing-promises strong {
+  font-size: 15px;
+  letter-spacing: -0.012em;
+}
+
+.pricing-promises span {
+  color: var(--text-secondary);
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.pricing-footnote {
+  color: var(--text-secondary);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* --- story rhythm -------------------------------------------------------- */
+.monotony-copy .story-turn {
+  margin-top: 22px;
+  font-size: clamp(19px, 1.9vw, 25px);
+  font-weight: 650;
+  letter-spacing: -0.02em;
+}
+
+.day-timeline p {
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+/* --- appearance section polish ------------------------------------------- */
+.appearance-specs span {
+  border-radius: 13px;
+  background: var(--surface);
+  box-shadow: inset 0 2px 0 #fff, 0 2px 0 #dfe3e7;
+}
+
+.choice-block > div > button {
+  border-radius: 11px;
+  background: var(--surface);
+  box-shadow: inset 0 2px 0 #fff, 0 2px 0 #d5d9de;
+  transition: transform 160ms ease, background 160ms ease, box-shadow 160ms ease;
+}
+
+.choice-block > div > button:hover {
+  transform: translateY(-1px);
+}
+
+.choice-block > div > button.is-active {
+  border-color: #6ba482;
+  color: #10301d;
+  background: #b2ddc4;
+  box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.68), 0 2px 0 #62997a;
+}
+
+/* ============================================================================
+   PHONE LAYOUT — its own shape rather than a squeezed desktop: cat first,
+   single column, full-width taps, notices inline so nothing covers the cat.
+   ========================================================================== */
+@media (max-width: 760px) {
+  html {
+    scroll-padding-top: 88px;
+  }
+
+  .site-navigation {
+    top: 8px;
+  }
+
+  .nav-dock {
+    width: calc(100% - 20px);
+    min-height: 62px;
+    padding: 7px 8px 7px 10px;
+    border-radius: 16px;
+  }
+
+  .hero {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding-top: 92px;
+    text-align: left;
+  }
+
+  /* The cat leads the page on a phone, so it must sit in normal flow and
+     reserve its own height instead of floating out of the top of the screen. */
+  .hero-cat-peek {
+    position: relative;
+    inset: auto;
+    order: -1;
+    display: grid;
+    place-items: center;
+    width: 100%;
+    height: 268px;
+    margin: 0 auto;
+  }
+
+  .hero-cat-motion {
+    position: relative;
+    inset: auto;
+    top: auto;
+    left: auto;
+    right: auto;
+    bottom: auto;
+    display: block;
+    width: 248px;
+    height: 248px;
+    margin-inline: auto;
+    transform: none;
+  }
+
+  .hero-cat-art,
+  .hero-cat-layer {
+    width: 100%;
+    height: 100%;
+  }
+
+  .hero-copy {
+    width: 100%;
+  }
+
+  .hero h1 {
+    font-size: clamp(38px, 11.4vw, 54px);
+    line-height: 1.02;
+  }
+
+  .hero-support {
+    font-size: 16px;
+    line-height: 1.62;
+  }
+
+  .hero-actions {
+    display: grid;
+    gap: 12px;
+    width: 100%;
+  }
+
+  .hero-actions .skeuo-button {
+    width: 100%;
+    min-height: 56px;
+  }
+
+  .hero-status {
+    position: static;
+    justify-content: flex-start;
+    margin-top: 18px;
+  }
+
+  .notice-float {
+    position: static;
+    width: 100%;
+    margin: 12px 0 0;
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+
+  .app-notice {
+    width: 100%;
+  }
+
+  .feature-helps {
+    margin-bottom: 15px;
+    padding: 14px 15px;
+  }
+
+  .feature-helps > p,
+  .directory-helps > p {
+    font-size: 14.5px;
+  }
+
+  .directory-grid h4 {
+    font-size: 20px;
+  }
+
+  .directory-grid p {
+    font-size: 14.5px;
+  }
+
+  .pricing-promises li {
+    padding: 14px 15px;
+  }
+
+  .tip-toggle {
+    padding: 14px 15px;
+  }
+
+  .tip-box {
+    width: 28px;
+    height: 28px;
+  }
+
+  .pricing-card,
+  .pricing-copy {
+    width: 100%;
+  }
+
+  .final-cta .hero-actions .skeuo-button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 430px) {
+  .hero h1 {
+    font-size: clamp(34px, 10.6vw, 44px);
+  }
+
+  .app-notice strong {
+    font-size: 13px;
+  }
+
+  .app-notice small {
+    font-size: 12.5px;
+  }
+
+  .tip-copy small {
+    font-size: 12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .notice-float {
+    animation: none;
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+
+  .tip-box::after,
+  .choice-block > div > button {
+    transition-duration: 1ms;
+  }
+}

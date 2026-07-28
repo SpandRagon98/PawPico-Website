@@ -108,18 +108,22 @@ test("gives the landing cat an authentic moving tail and rotating emotional life
 test("implements one efficient, lively pupil-first and delayed-head cursor loop", async () => {
   const page = await source("../app/page.tsx");
   const css = await source("../app/globals.css");
-  const tracking = page.match(/useEffect\(\(\) => \{\s+if \(reducedMotion[\s\S]*?\}, \[finePointer, reducedMotion\]\);/)?.[0] ?? "";
+  // anchor on `let frame` so this matches the cursor loop, not the mood cycler
+  const tracking = page.match(/useEffect\(\(\) => \{\s+if \(reducedMotion\) return;\s+let frame = 0;[\s\S]*?\}, \[reducedMotion\]\);/)?.[0] ?? "";
 
   assert.match(tracking, /requestAnimationFrame/);
   assert.match(tracking, /window\.addEventListener\("pointermove", track/);
   assert.match(tracking, /IntersectionObserver/);
   assert.match(tracking, /visibilitychange/);
-  assert.match(tracking, /pupil\.x \+= \(target\.x - pupil\.x\) \* 0\.34/);
-  assert.match(tracking, /head\.x \+= \(target\.x - head\.x\) \* 0\.105/);
+  // Easing now comes from the per-mood rig; the neutral mood keeps the original
+  // pupil-first / delayed-head feel (0.34 leads, 0.105 trails).
+  assert.match(tracking, /pupil\.x \+= \(target\.x - pupil\.x\) \* rig\.pupilEase/);
+  assert.match(tracking, /head\.x \+= \(target\.x - head\.x\) \* rig\.headEase/);
+  assert.match(page, /neutral:\s*\{\s*headEase:\s*0\.105,\s*pupilEase:\s*0\.34/);
   assert.match(tracking, /const pupilX = pupil\.x \* 14\.5/);
   assert.match(tracking, /const pupilY = pupil\.y \* 9/);
   assert.match(tracking, /const headX = head\.x \* 16/);
-  assert.match(tracking, /const headTilt = head\.x \* 3\.2/);
+  assert.match(tracking, /head\.x \* 3\.2 - head\.y \* 0\.45/);
   assert.match(tracking, /Math\.hypot\(head\.x, head\.y\)/);
   assert.match(tracking, /heroHeadRef\.current\.style\.transform/);
   assert.doesNotMatch(tracking, /forcedLookRef/);
@@ -224,9 +228,9 @@ test("hard-cuts through varied authentic cats and emotions while visible", async
   const html = await response.text();
   const page = await source("../app/page.tsx");
 
-  assert.match(html, /Most desktops do their job\./);
-  assert.match(html, /They just don&#x27;t keep you company\./);
-  assert.match(html, /Then a tiny pair of green eyes appears\./);
+  assert.match(html, /Nothing is wrong\./);
+  assert.match(html, /That is somehow the problem\./);
+  assert.match(html, /Then a tiny pair of green eyes looks up at you\./);
   assert.match(html, /LIVE APPEARANCE \/ AUTHENTIC RENDERER/);
   assert.match(page, /white-grey-flower/);
   assert.match(page, /orange-happy/);
@@ -331,7 +335,7 @@ test("adds an honest one-time $5.99 pricing section without a fake checkout", as
 
   assert.match(html, /ONE-TIME PRICE/);
   assert.match(html, /\$5\.99/);
-  assert.match(html, /No monthly or annual subscription/);
+  assert.match(html, /Pay once\. No subscription, ever\./);
   assert.match(html, /Personal Windows desktop cat/);
   assert.match(html, /Local-first privacy/);
   assert.match(html, /Coming Soon/);
@@ -492,4 +496,109 @@ test("keeps GitHub Pages routing and canonical metadata base-path safe", async (
   assert.match(workflow, /npm run build:pages/);
   assert.match(layout, /alternates: \{ canonical/);
   assert.match(storeLayout, /MewMuze Store — Coming Soon/);
+});
+
+test("puts the navigation bar on the landing view, above the hero", async () => {
+  const response = await render();
+  const html = await response.text();
+  const navAt = html.indexOf('class="site-navigation"');
+  const heroAt = html.search(/class="hero[ "]/);
+  assert.ok(navAt > -1, "site navigation should render");
+  assert.ok(heroAt > -1, "hero should render");
+  assert.ok(navAt < heroAt, "navigation must come before the hero so it shows on the landing screen");
+
+  const page = await source("../app/page.tsx");
+  // The old build hid it behind the reveal observer, which is why it was missing.
+  assert.doesNotMatch(page, /className="site-navigation" data-reveal/);
+
+  const css = await source("../app/globals.css");
+  assert.match(css, /\.site-navigation\s*\{[^}]*position:\s*sticky/s);
+});
+
+test("recreates the app's own notification popups on the connector features", async () => {
+  const response = await render();
+  const html = await response.text();
+  assert.match(html, /Hey! There is a new mail/);
+  assert.match(html, /GMAIL/);
+  assert.match(html, /Design standup/);
+  assert.match(html, /Stand up and stretch/);
+  assert.match(html, /class="app-notice/);
+
+  const css = await source("../app/globals.css");
+  assert.match(css, /@keyframes notice-pop/);
+
+  const features = await source("../data/features.ts");
+  for (const id of ["gmail", "calendar", "reminders", "focus", "agent"]) {
+    assert.match(features, new RegExp(`${id}:\\s*\\{`), `${id} should have a notice`);
+  }
+});
+
+test("explains in plain English what every feature does for the user", async () => {
+  const response = await render();
+  const html = await response.text();
+  assert.match(html, /WHAT THIS CHANGES FOR YOU/);
+  assert.match(html, /HOW IT HELPS/);
+  // one payoff block per feature in the detailed directory
+  assert.equal((html.match(/class="directory-helps"/g) ?? []).length, 20);
+  const features = await source("../data/features.ts");
+  // every feature id in the data must have a payoff line written for it
+  const ids = [...features.matchAll(/^    id: "([a-z]+)",$/gm)].map((m) => m[1]);
+  assert.equal(ids.length, 20);
+  const helpsBlock = features.slice(features.indexOf("const helps"));
+  for (const id of ids) {
+    assert.match(helpsBlock, new RegExp(`\\n  ${id}:`), `${id} needs a payoff line`);
+  }
+});
+
+test("moves the hero cat's head and eyes differently for every mood", async () => {
+  const page = await source("../app/page.tsx");
+  for (const mood of ["neutral", "happy", "cheerful", "sad"]) {
+    assert.match(page, new RegExp(`${mood}:\\s*\\{`), `${mood} needs a motion rig`);
+  }
+  // the loop reads the rig, so a mood change retunes motion without restarting
+  assert.match(page, /emotionRigRef\.current/);
+  assert.match(page, /rig\.headGain/);
+  assert.match(page, /rig\.pupilGain/);
+  assert.match(page, /rig\.headDrop/);
+  assert.match(page, /rig\.gazeDrop/);
+  // idle sway keeps the cat alive with no cursor (and on touch screens)
+  assert.match(page, /swaySpeed/);
+  assert.doesNotMatch(page, /if \(reducedMotion \|\| !finePointer\) return;/);
+});
+
+test("offers a one-time price with an optional $1 developer tip", async () => {
+  const response = await render();
+  const html = await response.text();
+  assert.match(html, /Add \$1 to support the developer/);
+  assert.match(html, /\$5\.99/);
+  assert.doesNotMatch(html, /\$6\.99/); // only after the box is ticked
+  assert.match(html, /Pay once\. No subscription, ever\./);
+  assert.match(html, /All future updates and costumes included/);
+  assert.match(html, /Every future update, free/);
+
+  const page = await source("../app/page.tsx");
+  assert.match(page, /supportDeveloper \? "6\.99" : "5\.99"/);
+
+  const css = await source("../app/globals.css");
+  assert.match(css, /\.tip-toggle:has\(input:checked\)/);
+});
+
+test("tells the story of a flat day that a companion changes", async () => {
+  const response = await render();
+  const html = await response.text();
+  assert.match(html, /Nothing is wrong\./);
+  assert.match(html, /That is somehow the problem\./);
+  assert.match(html, /alone with a screen/);
+  assert.match(html, /Then a tiny pair of green eyes looks up at you\./);
+  assert.match(html, /You close the laptop last\./);
+});
+
+test("gives phones their own layout instead of a squeezed desktop", async () => {
+  const css = await source("../app/globals.css");
+  // hero stacks with the cat first on small screens
+  assert.match(css, /\.hero-cat-peek\s*\{[^}]*order:\s*-1/s);
+  assert.match(css, /\.hero-actions \.skeuo-button\s*\{[^}]*width:\s*100%/s);
+  // notices sit inline on phones so they never cover the cat
+  assert.match(css, /\.notice-float\s*\{[^}]*position:\s*static/s);
+  assert.match(css, /@media \(max-width: 430px\)/);
 });
