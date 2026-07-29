@@ -118,36 +118,26 @@ test("gives the landing cat an authentic moving tail and rotating emotional life
   assert.match(css, /\.hero-cat-art\.emotion-happy \.hero-cat-emotion-happy/);
 });
 
-test("implements one efficient, lively pupil-first and delayed-head cursor loop", async () => {
+test("no longer follows the cursor, keeping only the cat's own animations", async () => {
   const page = await source("../app/page.tsx");
   const css = await source("../app/globals.css");
-  // anchor on `let frame` so this matches the cursor loop, not the mood cycler
-  const tracking = page.match(/useEffect\(\(\) => \{\s+if \(reducedMotion\) return;\s+let frame = 0;[\s\S]*?\}, \[reducedMotion\]\);/)?.[0] ?? "";
 
-  assert.match(tracking, /requestAnimationFrame/);
-  assert.match(tracking, /window\.addEventListener\("pointermove", track/);
-  assert.match(tracking, /IntersectionObserver/);
-  assert.match(tracking, /visibilitychange/);
-  // Easing now comes from the per-mood rig; the neutral mood keeps the original
-  // pupil-first / delayed-head feel (0.34 leads, 0.105 trails).
-  assert.match(tracking, /pupil\.x \+= \(target\.x - pupil\.x\) \* rig\.pupilEase/);
-  assert.match(tracking, /head\.x \+= \(target\.x - head\.x\) \* rig\.headEase/);
-  assert.match(page, /neutral:\s*\{\s*headEase:\s*0\.105,\s*pupilEase:\s*0\.34/);
-  assert.match(tracking, /const pupilX = pupil\.x \* 14\.5/);
-  assert.match(tracking, /const pupilY = pupil\.y \* 9/);
-  assert.match(tracking, /const headX = head\.x \* 16/);
-  assert.match(tracking, /head\.x \* 3\.2 - head\.y \* 0\.45/);
-  assert.match(tracking, /Math\.hypot\(head\.x, head\.y\)/);
-  assert.match(tracking, /heroHeadRef\.current\.style\.transform/);
-  assert.doesNotMatch(tracking, /forcedLookRef/);
-  assert.doesNotMatch(tracking.match(/const track =[\s\S]*?const returnToNeutral/)?.[0] ?? "", /set[A-Z]\w*\(/);
-  assert.match(page, /prefers-reduced-motion: reduce/);
-  assert.match(page, /\(pointer: fine\)/);
-  assert.match(page, /touch-look/);
+  // the whole pointer-tracking loop is gone, along with the per-mood rig table
+  // that existed only to drive it
+  assert.doesNotMatch(page, /requestAnimationFrame/);
+  assert.doesNotMatch(page, /pointermove/);
+  assert.doesNotMatch(page, /emotionRig|EmotionRig|spritePixelRef/);
+  assert.doesNotMatch(page, /heroHeadRef\.current\.style\.transform/);
+
+  // the pupils still exist, sitting centred and looking straight ahead
   assert.match(css, /\.hero-pupil/);
+  assert.match(page, /className="hero-pupil"/);
+
+  // and every animation the cat owns itself is untouched
   assert.match(css, /@keyframes hero-authentic-blink/);
   assert.match(css, /@keyframes hero-ear-check/);
-  assert.match(css, /@media \(prefers-reduced-motion: reduce\)/);
+  assert.match(css, /@keyframes cat-alive/);
+  assert.match(page, /const \[heroEmotion, setHeroEmotion\]/);
 });
 
 test("unlocks into the story while leaving the landing cat stationary", async () => {
@@ -566,22 +556,6 @@ test("explains in plain English what every feature does for the user", async () 
   }
 });
 
-test("moves the hero cat's head and eyes differently for every mood", async () => {
-  const page = await source("../app/page.tsx");
-  for (const mood of ["neutral", "happy", "cheerful", "sad"]) {
-    assert.match(page, new RegExp(`${mood}:\\s*\\{`), `${mood} needs a motion rig`);
-  }
-  // the loop reads the rig, so a mood change retunes motion without restarting
-  assert.match(page, /emotionRigRef\.current/);
-  assert.match(page, /rig\.headGain/);
-  assert.match(page, /rig\.pupilGain/);
-  assert.match(page, /rig\.headDrop/);
-  assert.match(page, /rig\.gazeDrop/);
-  // idle sway keeps the cat alive with no cursor (and on touch screens)
-  assert.match(page, /swaySpeed/);
-  assert.doesNotMatch(page, /if \(reducedMotion \|\| !finePointer\) return;/);
-});
-
 test("offers a one-time price with an optional $1 developer tip", async () => {
   const response = await render();
   const html = await response.text();
@@ -886,7 +860,7 @@ test("requires an account before the purchase step", async () => {
   assert.match(html, /Create an account to buy/);
   assert.match(html, /id="account"/);
   assert.match(html, /Create account/);
-  assert.match(html, /Sign in/);
+  assert.match(html, /Log in/);
   assert.doesNotMatch(html, /Signed in as/);
 
   // the buy control only appears once an account exists
@@ -914,4 +888,120 @@ test("writes the story as prose with no dashes anywhere in the copy", async () =
   assert.match(html, /It sits down when you do/);
   assert.match(html, /Somebody was paying attention to you today/);
   assert.match(html, /You laugh out loud, alone, at your desk/);
+});
+
+test("gives the splash a big title and a bare, blinking cat head", async () => {
+  const html = await (await render()).text();
+  const css = await source("../app/globals.css");
+
+  // the head is the app's own sprite plus the hero's pupil and blink layers,
+  // so it blinks with the real artwork rather than being a static logo tile
+  assert.match(html, /class="splash-layer"/);
+  assert.match(html, /splash-layer splash-blink/);
+  assert.match(html, /hero-eye-track hero-eye-track-left/);
+  assert.match(css, /\.splash-blink\s*\{[^}]*animation: hero-authentic-blink/s);
+
+  // no card behind the head any more
+  assert.match(css, /\.splash-cat\s*\{[^}]*background: transparent/s);
+  assert.match(css, /\.splash-cat\s*\{[^}]*box-shadow: none/s);
+
+  // and a much larger welcome
+  assert.match(css, /\.splash-title\s*\{[^}]*font-size: clamp\(40px, 11vw, 104px\)/s);
+});
+
+test("puts the nav logo in a circle and centres the links", async () => {
+  const css = await source("../app/globals.css");
+  assert.match(css, /\.brand-medallion\s*\{\s*border-radius: 50%/);
+  assert.match(css, /\.brand-medallion img\s*\{\s*border-radius: 50%/);
+  // the links were baseline aligned in a taller row, riding high
+  assert.match(css, /\.desktop-nav\s*\{[^}]*align-items: center;[^}]*align-self: center/s);
+});
+
+test("swaps the nav price button for log in and sign up", async () => {
+  const html = await (await render()).text();
+  const page = await source("../app/page.tsx");
+
+  assert.doesNotMatch(html, /View the price/);
+  assert.match(html, /nav-cta nav-cta-login/);
+  assert.match(html, /nav-cta nav-cta-signup/);
+  assert.match(html, />Sign up</);
+
+  // both jump to the account section and open the matching tab, so the mode is
+  // lifted out of the panel to be shared with the nav
+  assert.match(page, /onAuthIntent\("login"\)/);
+  assert.match(page, /onAuthIntent\("signup"\)/);
+  assert.match(page, /const \[authMode, setAuthMode\]/);
+  // signed in, the pair collapses to one account link
+  assert.match(page, /My account/);
+});
+
+test("collects a name, an account type and a confirmed password on sign up", async () => {
+  const html = await (await render()).text();
+  const page = await source("../app/page.tsx");
+
+  // sign up is the server-rendered default, so these ship in the markup
+  assert.match(html, /Full name/);
+  assert.match(html, /Account type/);
+  assert.match(html, /Confirm password/);
+  // React marks the default option selected, so match loosely
+  assert.match(html, /<option value="individual"[^>]*>Individual</);
+  assert.match(html, /<option value="enterprise"[^>]*>Enterprise</);
+
+  // validated, and the extra fields only apply to sign up
+  assert.match(page, /Those two passwords do not match/);
+  assert.match(page, /Please enter your full name/);
+  assert.match(page, /\{signingUp && \(/);
+
+  // still nothing persisted, and both password fields are cleared on submit
+  assert.match(page, /setConfirm\(""\)/);
+  assert.doesNotMatch(page, /localStorage|sessionStorage/);
+});
+
+test("stops clip-path from cropping the cat's ears on phones", async () => {
+  const css = await source("../app/globals.css");
+  // clip-path crops strictly to .hero-cat-art's own box and ignores ancestor
+  // overflow entirely, which is why relaxing overflow never fixed this. The
+  // head unit is deliberately larger than that box for the ears and crown.
+  assert.match(css, /\.hero-cat-art \{[\s\S]*clip-path: inset\(0\)/);
+  assert.match(css, /@media \(max-width: 760px\) \{\s*\.hero-cat-art \{\s*clip-path: none;/);
+});
+
+test("frames the splash head in a white skeuomorphic disc", async () => {
+  const html = await (await render()).text();
+  const css = await source("../app/globals.css");
+
+  // disc clips, frame carries the sprite grid, so the eye sockets keep working
+  // on the sprite's own coordinates without recalibration
+  assert.match(html, /class="splash-disc"/);
+  assert.match(html, /class="splash-frame"/);
+  assert.match(css, /\.splash-disc\s*\{[^}]*border-radius: 50%/s);
+  assert.match(css, /\.splash-disc\s*\{[^}]*background: #ffffff/s);
+  // lit rim, seated edge and a contact shadow rather than a flat circle
+  assert.match(css, /\.splash-disc\s*\{[^}]*inset 0 3px 0 #ffffff/s);
+  assert.match(css, /\.splash-disc\s*\{[^}]*0 5px 0 #cfe4f7/s);
+
+  // the head only fills the middle of its 128 frame, so the frame is scaled and
+  // offset to centre the head in the disc and close the gap to the title
+  assert.match(css, /\.splash-frame\s*\{[^}]*width: 150%/s);
+  assert.match(css, /\.splash-frame\s*\{[^}]*left: -24\.4%/s);
+});
+
+test("keeps the tablet band from dropping the cat on top of the headline", async () => {
+  const css = await source("../app/globals.css");
+  // .hero-copy goes full width at 1180px and below, but the hero only stacks at
+  // 760px and below, so 761px to 1180px had the cat sitting over the copy
+  assert.match(css, /@media \(min-width: 761px\) and \(max-width: 1180px\)/);
+  // range scoped, so it can never override the phone rules earlier in the file
+  assert.match(css, /@media \(min-width: 961px\) \{\s*\.desktop-nav \{\s*display: flex/);
+});
+
+test("keeps the phone nav bar on a single compact row", async () => {
+  const css = await source("../app/globals.css");
+  const page = await source("../app/page.tsx");
+  // hiding only .nav-cta left .nav-auth as a third grid item, which wrapped to a
+  // second row and doubled the dock height
+  assert.match(css, /\.nav-auth \{\s*display: none;/);
+  assert.match(css, /\.nav-dock \{\s*min-height: 54px/);
+  // the auth links move into the Menu drawer so they stay reachable
+  assert.match(page, /aria-label="Mobile navigation"[\s\S]{0,400}onAuthIntent\("login"\)/);
 });

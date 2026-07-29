@@ -36,45 +36,6 @@ const heroEmotionAssets = {
 
 type HeroEmotion = "neutral" | keyof typeof heroEmotionAssets;
 
-// How the head and eyes behave in each mood. Tuned by eye against the real app
-// sprites: a sad cat looks down and tracks lazily, a cheerful one snaps around.
-type EmotionRig = {
-  headEase: number;
-  pupilEase: number;
-  headGain: number;
-  pupilGain: number;
-  tiltGain: number;
-  tiltBias: number;
-  headDrop: number;
-  gazeDrop: number;
-  sway: number;
-  swaySpeed: number;
-  puff: number;
-};
-
-const emotionRigs: Record<HeroEmotion, EmotionRig> = {
-  neutral: {
-    headEase: 0.105, pupilEase: 0.34, headGain: 1, pupilGain: 1,
-    tiltGain: 1, tiltBias: 0, headDrop: 0, gazeDrop: 0,
-    sway: 1.5, swaySpeed: 0.62, puff: 0,
-  },
-  happy: {
-    headEase: 0.15, pupilEase: 0.42, headGain: 1.12, pupilGain: 1.15,
-    tiltGain: 1.25, tiltBias: 0, headDrop: -2.4, gazeDrop: -1.2,
-    sway: 2.6, swaySpeed: 1.35, puff: 0.014,
-  },
-  cheerful: {
-    headEase: 0.19, pupilEase: 0.5, headGain: 1.24, pupilGain: 1.3,
-    tiltGain: 1.5, tiltBias: -1.1, headDrop: -3.4, gazeDrop: -1.8,
-    sway: 3.4, swaySpeed: 1.95, puff: 0.02,
-  },
-  sad: {
-    headEase: 0.06, pupilEase: 0.2, headGain: 0.72, pupilGain: 0.66,
-    tiltGain: 0.6, tiltBias: 1.4, headDrop: 3.6, gazeDrop: 2.6,
-    sway: 0.8, swaySpeed: 0.34, puff: -0.008,
-  },
-};
-
 function CatFigure({
   className = "",
   priority = false,
@@ -222,7 +183,13 @@ function SiteBrand() {
   );
 }
 
-function SiteNavigation() {
+function SiteNavigation({
+  account,
+  onAuthIntent,
+}: {
+  account: Account;
+  onAuthIntent: (mode: "signup" | "login") => void;
+}) {
   const links = (
     <>
       <a href="#story" aria-current="page">
@@ -247,11 +214,50 @@ function SiteNavigation() {
       </nav>
       <details className="mobile-nav">
         <summary aria-label="Open navigation">Menu</summary>
-        <nav aria-label="Mobile navigation">{links}</nav>
+        {/* The nav bar is too narrow for the auth pair on a phone, so they live
+            in the drawer instead of pushing the dock on to a second row. */}
+        <nav aria-label="Mobile navigation">
+          {links}
+          {account ? (
+            <a href="#account">My account</a>
+          ) : (
+            <>
+              <a href="#account" onClick={() => onAuthIntent("login")}>
+                Log in
+              </a>
+              <a href="#account" onClick={() => onAuthIntent("signup")}>
+                Sign up
+              </a>
+            </>
+          )}
+        </nav>
       </details>
-      <SkeuoButton href="#pricing" variant="secondary" className="nav-cta">
-        View the price
-      </SkeuoButton>
+      <div className="nav-auth">
+        {account ? (
+          <SkeuoButton href="#account" variant="secondary" className="nav-cta">
+            My account
+          </SkeuoButton>
+        ) : (
+          <>
+            <SkeuoButton
+              href="#account"
+              variant="secondary"
+              className="nav-cta nav-cta-login"
+              onClick={() => onAuthIntent("login")}
+            >
+              Log in
+            </SkeuoButton>
+            <SkeuoButton
+              href="#account"
+              variant="primary"
+              className="nav-cta nav-cta-signup"
+              onClick={() => onAuthIntent("signup")}
+            >
+              Sign up
+            </SkeuoButton>
+          </>
+        )}
+      </div>
     </div>
   );
 }
@@ -291,15 +297,42 @@ function WelcomeSplash() {
       aria-live="polite"
     >
       <div className="splash-inner">
+        {/* Same head, pupil and blink stack the hero uses, so the splash cat
+            blinks with the app's own artwork. The eye sockets are positioned in
+            percentages, so they land correctly in any square container. */}
         <span className="splash-cat" aria-hidden="true">
-          <Image
-            src={sitePath(FACE_LOGO_ASSET)}
-            alt=""
-            width={512}
-            height={512}
-            unoptimized
-            priority
-          />
+          {/* splash-disc is the white circle and the clip; splash-frame is the
+              sprite's own 128 grid, scaled up and nudged so the head fills the
+              circle. Keeping the frame as its own element means the eye sockets
+              stay on the sprite's coordinates and need no recalibration. */}
+          <span className="splash-disc">
+            <span className="splash-frame">
+              <Image
+                className="splash-layer"
+                src={sitePath(HERO_CAT_HEAD_ASSET)}
+                alt=""
+                width={128}
+                height={128}
+                unoptimized
+                priority
+              />
+              <span className="hero-eye-track hero-eye-track-left">
+                <span className="hero-pupil" />
+              </span>
+              <span className="hero-eye-track hero-eye-track-right">
+                <span className="hero-pupil" />
+              </span>
+              <Image
+                className="splash-layer splash-blink"
+                src={sitePath(HERO_CAT_BLINK_ASSET)}
+                alt=""
+                width={128}
+                height={128}
+                unoptimized
+                priority
+              />
+            </span>
+          </span>
           <i className="splash-sparkle splash-sparkle-1" />
           <i className="splash-sparkle splash-sparkle-2" />
           <i className="splash-sparkle splash-sparkle-3" />
@@ -314,7 +347,8 @@ function WelcomeSplash() {
   );
 }
 
-type Account = { email: string } | null;
+type AccountKind = "individual" | "enterprise";
+type Account = { email: string; fullName: string; kind: AccountKind } | null;
 
 /**
  * Account gate for the purchase. Checkout is not live yet and there is no
@@ -324,21 +358,41 @@ type Account = { email: string } | null;
  */
 function AccountPanel({
   account,
+  mode,
+  onModeChange,
   onSignIn,
   onSignOut,
 }: {
   account: Account;
-  onSignIn: (email: string) => void;
+  mode: "signup" | "login";
+  onModeChange: (mode: "signup" | "login") => void;
+  onSignIn: (details: { email: string; fullName: string; kind: AccountKind }) => void;
   onSignOut: () => void;
 }) {
-  const [mode, setMode] = useState<"signup" | "login">("signup");
+  const [fullName, setFullName] = useState("");
+  const [kind, setKind] = useState<AccountKind>("individual");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirm, setConfirm] = useState("");
   const [error, setError] = useState("");
+
+  const switchMode = (next: "signup" | "login") => {
+    onModeChange(next);
+    setError("");
+    setPassword("");
+    setConfirm("");
+  };
 
   const submit = (event: React.FormEvent) => {
     event.preventDefault();
+    const signingUp = mode === "signup";
+    const trimmedName = fullName.trim();
     const trimmed = email.trim();
+
+    if (signingUp && trimmedName.length < 2) {
+      setError("Please enter your full name.");
+      return;
+    }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) {
       setError("That email address does not look quite right.");
       return;
@@ -347,9 +401,19 @@ function AccountPanel({
       setError("Please use at least 8 characters for your password.");
       return;
     }
+    if (signingUp && password !== confirm) {
+      setError("Those two passwords do not match.");
+      return;
+    }
+
     setError("");
     setPassword("");
-    onSignIn(trimmed);
+    setConfirm("");
+    onSignIn({
+      email: trimmed,
+      fullName: signingUp ? trimmedName : "",
+      kind,
+    });
   };
 
   if (account) {
@@ -359,8 +423,11 @@ function AccountPanel({
           <i />
         </span>
         <div className="account-copy">
-          <strong>You are signed in</strong>
-          <small>{account.email}</small>
+          <strong>{account.fullName ? `Hello, ${account.fullName}` : "You are signed in"}</strong>
+          <small>
+            {account.email}
+            {account.kind === "enterprise" ? " · Enterprise" : " · Individual"}
+          </small>
         </div>
         <button className="skeuo-button skeuo-button-quiet" type="button" onClick={onSignOut}>
           Sign out
@@ -369,30 +436,59 @@ function AccountPanel({
     );
   }
 
+  const signingUp = mode === "signup";
+
   return (
     <div className="account-panel">
       <div className="account-tabs" role="tablist" aria-label="Account">
         <button
           type="button"
           role="tab"
-          aria-selected={mode === "signup"}
-          className={mode === "signup" ? "is-active" : ""}
-          onClick={() => { setMode("signup"); setError(""); }}
+          aria-selected={signingUp}
+          className={signingUp ? "is-active" : ""}
+          onClick={() => switchMode("signup")}
         >
           Create account
         </button>
         <button
           type="button"
           role="tab"
-          aria-selected={mode === "login"}
-          className={mode === "login" ? "is-active" : ""}
-          onClick={() => { setMode("login"); setError(""); }}
+          aria-selected={!signingUp}
+          className={!signingUp ? "is-active" : ""}
+          onClick={() => switchMode("login")}
         >
-          Sign in
+          Log in
         </button>
       </div>
 
       <form className="account-form" onSubmit={submit} noValidate>
+        {signingUp && (
+          <>
+            <label className="account-field">
+              <span>Full name</span>
+              <input
+                type="text"
+                name="name"
+                autoComplete="name"
+                placeholder="Your full name"
+                value={fullName}
+                onChange={(event) => setFullName(event.target.value)}
+                required
+              />
+            </label>
+            <label className="account-field">
+              <span>Account type</span>
+              <select
+                name="accountKind"
+                value={kind}
+                onChange={(event) => setKind(event.target.value as AccountKind)}
+              >
+                <option value="individual">Individual</option>
+                <option value="enterprise">Enterprise</option>
+              </select>
+            </label>
+          </>
+        )}
         <label className="account-field">
           <span>Email</span>
           <input
@@ -410,13 +506,27 @@ function AccountPanel({
           <input
             type="password"
             name="password"
-            autoComplete={mode === "signup" ? "new-password" : "current-password"}
+            autoComplete={signingUp ? "new-password" : "current-password"}
             placeholder="At least 8 characters"
             value={password}
             onChange={(event) => setPassword(event.target.value)}
             required
           />
         </label>
+        {signingUp && (
+          <label className="account-field">
+            <span>Confirm password</span>
+            <input
+              type="password"
+              name="confirmPassword"
+              autoComplete="new-password"
+              placeholder="Type it once more"
+              value={confirm}
+              onChange={(event) => setConfirm(event.target.value)}
+              required
+            />
+          </label>
+        )}
 
         {error && (
           <p className="account-error" role="alert">
@@ -425,7 +535,7 @@ function AccountPanel({
         )}
 
         <button className="skeuo-button skeuo-button-primary account-submit" type="submit">
-          {mode === "signup" ? "Create my account" : "Sign in"}
+          {signingUp ? "Create my account" : "Log in"}
         </button>
       </form>
 
@@ -968,6 +1078,8 @@ export default function Home() {
   const [heroEmotion, setHeroEmotion] = useState<HeroEmotion>("neutral");
   const [supportDeveloper, setSupportDeveloper] = useState(false);
   const [account, setAccount] = useState<Account>(null);
+  // Lifted so the nav's Log in / Sign up buttons open the matching tab.
+  const [authMode, setAuthMode] = useState<"signup" | "login">("signup");
   const priceLabel = supportDeveloper ? "6.99" : "5.99";
   const heroRef = useRef<HTMLElement>(null);
   const catMotionRef = useRef<HTMLSpanElement>(null);
@@ -976,12 +1088,6 @@ export default function Home() {
   const rightPupilRef = useRef<HTMLSpanElement>(null);
   // Read inside the animation loop so a mood change retunes the motion without
   // tearing down and restarting the frame loop.
-  const emotionRigRef = useRef<EmotionRig>(emotionRigs.neutral);
-
-  useEffect(() => {
-    emotionRigRef.current = emotionRigs[heroEmotion];
-  }, [heroEmotion]);
-
   useEffect(() => {
     const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
     const pointerQuery = window.matchMedia("(pointer: fine)");
@@ -1065,110 +1171,10 @@ export default function Home() {
     return () => observer.disconnect();
   }, [reducedMotion]);
 
-  useEffect(() => {
-    if (reducedMotion) return;
-
-    let frame = 0;
-    let isVisible = true;
-    const target = { x: 0, y: 0 };
-    const pupil = { x: 0, y: 0 };
-    const head = { x: 0, y: 0 };
-    const start = performance.now();
-
-    const render = () => {
-      // Each mood leans, bobs and looks around differently, so the head and the
-      // eyes read as the same animal changing feeling rather than a moving image.
-      const rig = emotionRigRef.current;
-      pupil.x += (target.x - pupil.x) * rig.pupilEase;
-      pupil.y += (target.y - pupil.y) * rig.pupilEase;
-      head.x += (target.x - head.x) * rig.headEase;
-      head.y += (target.y - head.y) * rig.headEase;
-
-      // Idle life: a slow breathing sway so the cat never looks frozen, and so
-      // touch devices (which have no cursor to follow) still get a living cat.
-      const seconds = (performance.now() - start) / 1000;
-      const swayX = Math.sin(seconds * rig.swaySpeed) * rig.sway;
-      const swayY = Math.sin(seconds * rig.swaySpeed * 1.7 + 1.1) * rig.sway * 0.6;
-
-      const pupilX = pupil.x * 14.5 * rig.pupilGain + swayX * 1.4;
-      const pupilY = pupil.y * 9 * rig.pupilGain + swayY * 1.1 + rig.gazeDrop;
-      const headX = head.x * 16 * rig.headGain + swayX;
-      const headY = head.y * 8 * rig.headGain + swayY + rig.headDrop;
-      const headTilt =
-        (head.x * 3.2 - head.y * 0.45) * rig.tiltGain + swayX * 0.4 + rig.tiltBias;
-      const headScale =
-        1 + Math.min(1, Math.hypot(head.x, head.y)) * 0.012 + rig.puff;
-
-      leftPupilRef.current?.style.setProperty(
-        "transform",
-        `translate3d(${pupilX}px, ${pupilY}px, 0)`,
-      );
-      rightPupilRef.current?.style.setProperty(
-        "transform",
-        `translate3d(${pupilX}px, ${pupilY}px, 0)`,
-      );
-      if (heroHeadRef.current) {
-        heroHeadRef.current.style.transform =
-          `translate3d(${headX}px, ${headY}px, 0) rotate(${headTilt}deg) scale(${headScale})`;
-      }
-
-      if (isVisible && document.visibilityState === "visible") {
-        frame = window.requestAnimationFrame(render);
-      }
-    };
-
-    const track = (event: globalThis.PointerEvent) => {
-      const cat = catMotionRef.current?.getBoundingClientRect();
-      if (!cat) return;
-      const centreX = cat.left + cat.width * 0.55;
-      const centreY = cat.top + cat.height * 0.33;
-      target.x = Math.max(
-        -1,
-        Math.min(1, (event.clientX - centreX) / (window.innerWidth * 0.28)),
-      );
-      target.y = Math.max(
-        -1,
-        Math.min(1, (event.clientY - centreY) / (window.innerHeight * 0.3)),
-      );
-    };
-
-    const returnToNeutral = () => {
-      target.x = 0;
-      target.y = 0;
-    };
-
-    const observer = new IntersectionObserver(([entry]) => {
-      isVisible = entry.isIntersecting;
-      window.cancelAnimationFrame(frame);
-      if (isVisible && document.visibilityState === "visible") {
-        frame = window.requestAnimationFrame(render);
-      }
-    });
-
-    const resume = () => {
-      window.cancelAnimationFrame(frame);
-      if (isVisible && document.visibilityState === "visible") {
-        frame = window.requestAnimationFrame(render);
-      }
-    };
-
-    const heroElement = heroRef.current;
-    if (heroElement) observer.observe(heroElement);
-    window.addEventListener("pointermove", track, { passive: true });
-    heroElement?.addEventListener("pointerleave", returnToNeutral, {
-      passive: true,
-    });
-    document.addEventListener("visibilitychange", resume);
-    frame = window.requestAnimationFrame(render);
-
-    return () => {
-      observer.disconnect();
-      window.removeEventListener("pointermove", track);
-      heroElement?.removeEventListener("pointerleave", returnToNeutral);
-      document.removeEventListener("visibilitychange", resume);
-      window.cancelAnimationFrame(frame);
-    };
-  }, [reducedMotion]);
+  // The cursor tracking loop that moved the head and pupils has been removed.
+  // The pupils now sit centred, looking straight ahead, and the cat's life comes
+  // entirely from its own animations: the rotating emotions, the blink, the ear
+  // flicks and the idle breathe.
 
   const unlockAndScroll = (targetId: "#story" | "#features" | "#pricing") => {
     document.documentElement.classList.remove("mewmuze-scroll-locked");
@@ -1205,7 +1211,7 @@ export default function Home() {
       </a>
 
       <header className="site-navigation">
-        <SiteNavigation />
+        <SiteNavigation account={account} onAuthIntent={setAuthMode} />
       </header>
 
       <section
@@ -1444,7 +1450,9 @@ export default function Home() {
           </div>
           <AccountPanel
             account={account}
-            onSignIn={(email) => setAccount({ email })}
+            mode={authMode}
+            onModeChange={setAuthMode}
+            onSignIn={(details) => setAccount(details)}
             onSignOut={() => setAccount(null)}
           />
         </div>

@@ -7739,3 +7739,350 @@ body.mewmuze-splash-open {
     margin-bottom: 22px;
   }
 }
+
+
+/* ============================================================================
+   SPLASH: big title, bare cat head, real blink
+   ========================================================================== */
+
+/* No card behind the head any more: transparent, so the head reads as the cat
+   itself sitting on the blue field rather than a logo in a tile. */
+.splash-cat {
+  position: relative;
+  display: block;
+  width: clamp(150px, 34vw, 260px);
+  aspect-ratio: 1;
+  margin-bottom: 10px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.splash-layer {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+
+/* Reuses the hero's blink keyframes, so the splash cat blinks with the same
+   rhythm and the same artwork the app uses. */
+.splash-blink {
+  z-index: 4;
+  opacity: 0;
+  animation: hero-authentic-blink 4.2s steps(1, end) infinite;
+}
+
+/* Much bigger welcome, and centred over the head above it. */
+.splash-title {
+  font-size: clamp(40px, 11vw, 104px);
+  line-height: 1.02;
+  letter-spacing: -0.02em;
+}
+
+.splash-sub {
+  font-size: clamp(14px, 2.2vw, 17px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .splash-blink {
+    animation: none;
+  }
+}
+
+/* ============================================================================
+   NAV BAR
+   ========================================================================== */
+
+/* Circular logo rather than a rounded square. */
+.brand-medallion {
+  border-radius: 50%;
+}
+
+.brand-medallion img {
+  border-radius: 50%;
+}
+
+/* The links sit on the dock's own centre line. They were baseline aligned
+   inside a taller row, which left them riding high.
+
+   Scoped to 961px and up: .desktop-nav is display:none at 960px and below, and
+   an unscoped `display: flex` here would override that and dump the full link
+   list into the phone nav next to the Menu drawer. */
+@media (min-width: 961px) {
+  .desktop-nav {
+    display: flex;
+    align-items: center;
+    align-self: center;
+    height: 100%;
+  }
+}
+
+.desktop-nav > a {
+  display: inline-flex;
+  align-items: center;
+}
+
+/* Log in and Sign up share the nav-cta format, side by side. */
+.nav-auth {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.nav-cta {
+  min-width: 0;
+  padding-inline: 18px;
+}
+
+@media (max-width: 1180px) {
+  /* the drawer already carries the section links, so keep the pair compact */
+  .nav-auth {
+    gap: 6px;
+  }
+
+  .nav-cta {
+    padding-inline: 14px;
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 560px) {
+  /* on the narrowest phones only Sign up stays in the bar, Log in lives in the
+     account section a tap away */
+  .nav-cta-login {
+    display: none;
+  }
+}
+
+/* ============================================================================
+   iPHONE HEAD CLIPPING, ACTUAL CAUSE
+
+   .hero-cat-art carries clip-path: inset(0), which crops strictly to its own
+   box. The head unit is deliberately larger than that box so the ear tufts and
+   flower crown are not cut by the art frame, so the clip was slicing them off.
+   Earlier passes only relaxed overflow on the ancestors, which clip-path
+   ignores entirely. Phones do not need the clip at all: it exists for the
+   desktop "peeking from the bottom" crop.
+   ========================================================================== */
+@media (max-width: 760px) {
+  .hero-cat-art {
+    clip-path: none;
+  }
+}
+
+/* ============================================================================
+   ACCOUNT FORM: the added fields
+   ========================================================================== */
+.account-field select {
+  min-height: 50px;
+  padding: 0 14px;
+  border: 2px solid var(--border);
+  border-radius: 14px;
+  background: #fbfdff;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 15px;
+  cursor: pointer;
+  appearance: none;
+  background-image: linear-gradient(45deg, transparent 50%, #3d6c8e 50%),
+    linear-gradient(135deg, #3d6c8e 50%, transparent 50%);
+  background-position: calc(100% - 20px) center, calc(100% - 14px) center;
+  background-size: 6px 6px, 6px 6px;
+  background-repeat: no-repeat;
+  transition: border-color 200ms ease, box-shadow 200ms ease;
+}
+
+.account-field select:focus {
+  border-color: #4fb2e8;
+  box-shadow: 0 0 0 4px rgba(79, 178, 232, 0.18);
+  outline: none;
+}
+
+/* ============================================================================
+   TABLET / SMALL LAPTOP BAND (761px to 1180px)
+
+   Pre-existing collision, not introduced by the cursor or clip-path work:
+   .hero-copy goes full width at 1180px and below, but .hero-cat-peek stays
+   absolutely positioned and the hero only switches to a stacked column at
+   760px and below. Between those two breakpoints the cat sat on top of the
+   headline and the buttons.
+
+   Range-scoped on purpose, so it can never override the phone rules that live
+   earlier in this file.
+   ========================================================================== */
+@media (min-width: 761px) and (max-width: 1180px) {
+  .hero {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 18px;
+    padding-top: 118px;
+    padding-bottom: 38px;
+  }
+
+  .hero-cat-peek {
+    position: relative;
+    inset: auto;
+    order: -1;
+    display: grid;
+    width: 100%;
+    height: min(340px, 38dvh);
+    place-items: center;
+    overflow: visible;
+    transform: none;
+  }
+
+  .hero-cat-motion {
+    position: relative;
+    top: auto;
+    right: auto;
+    bottom: auto;
+    left: auto;
+    width: min(340px, 38dvh);
+    height: min(340px, 38dvh);
+    transform: none;
+  }
+
+  /* the head unit overshoots the art box for the ears and crown */
+  .hero-cat-art {
+    clip-path: none;
+  }
+
+  /* anchored to the desktop cat position, so it lands nowhere useful here */
+  .cat-speech {
+    display: none;
+  }
+}
+
+/* ============================================================================
+   PHONE NAV BAR HEIGHT
+
+   .nav-cta was hidden at 760px and below, but its .nav-auth wrapper stayed a
+   grid item. In a 1fr/auto grid that third item wrapped on to a second row and
+   left an empty band under the brand, roughly doubling the dock height. Hiding
+   the wrapper itself puts the dock back on one row; the auth links move into
+   the Menu drawer so they are still one tap away.
+   ========================================================================== */
+@media (max-width: 760px) {
+  .nav-auth {
+    display: none;
+  }
+
+  .nav-dock {
+    min-height: 54px;
+    padding: 6px 10px;
+  }
+
+  .brand-link {
+    min-height: 40px;
+  }
+
+  .brand-medallion {
+    width: 34px;
+    height: 34px;
+  }
+
+  .site-brand {
+    gap: 9px;
+  }
+
+  .site-brand strong {
+    font-size: 16px;
+  }
+
+  /* the descriptor is redundant next to the wordmark at this size */
+  .site-brand small {
+    display: none;
+  }
+
+  .mobile-nav > summary {
+    min-width: 64px;
+    height: 36px;
+    padding: 0 13px;
+    font-size: 11px;
+  }
+}
+
+/* ============================================================================
+   SPLASH HEAD: white skeuomorphic disc, tight to the title
+
+   The head sprite only occupies the middle of its 128 frame (roughly x27-100,
+   y4-76), so the frame's own transparent lower third was what pushed the title
+   away. splash-frame scales that grid to 150% and offsets it so the head is
+   centred in the disc, which both fills the circle and closes the gap.
+   ========================================================================== */
+.splash-cat {
+  position: relative;
+  display: grid;
+  width: clamp(132px, 30vw, 208px);
+  aspect-ratio: 1;
+  place-items: center;
+  /* small, because the disc now ends where the head ends */
+  margin-bottom: clamp(14px, 2vw, 22px);
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.splash-disc {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+  border: 1px solid #dceafb;
+  border-radius: 50%;
+  background: #ffffff;
+  /* skeuomorphic: lit top rim, seated bottom edge, contact shadow, soft lift */
+  box-shadow:
+    inset 0 3px 0 #ffffff,
+    inset 0 -7px 12px rgba(120, 165, 214, 0.16),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.9),
+    0 5px 0 #cfe4f7,
+    0 16px 30px rgba(120, 165, 214, 0.34);
+}
+
+.splash-frame {
+  position: absolute;
+  top: 3.1%;
+  left: -24.4%;
+  width: 150%;
+  height: 150%;
+}
+
+.splash-layer {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+
+/* sparkles ride the rim of the disc, outside its clip */
+.splash-sparkle-1 { top: 2%; right: -4%; }
+.splash-sparkle-2 { bottom: 4%; left: -6%; }
+.splash-sparkle-3 { top: 44%; right: -9%; }
+
+/* the sub line tucks under the title rather than floating */
+.splash-sub {
+  margin: 4px 0 22px;
+}
+
+/* Pull the disc down on to the title. The gap left over is the huge title's
+   own leading rather than margin, so the line box tightens too. */
+.splash-cat {
+  margin-bottom: clamp(2px, 0.6vw, 8px);
+}
+
+.splash-title {
+  line-height: 0.96;
+}
