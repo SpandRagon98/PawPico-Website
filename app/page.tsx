@@ -777,7 +777,12 @@ const futureConcepts = ["Mecha Hero", "Shield Guardian", "Web Scout", "Moon Mage
 export default function Home() {
   const [reducedMotion, setReducedMotion] = useState(false);
   const [finePointer, setFinePointer] = useState(true);
-  const [experienceUnlocked, setExperienceUnlocked] = useState(false);
+  // Starts true: the landing hero used to lock scrolling until a button was
+  // pressed. Every lock/force-scroll/gate below only fires when this is
+  // false, so starting unlocked removes the lock entirely without touching
+  // the effect, the buttons, or the one-time "assemble" animation they used
+  // to trigger - it now just plays once on mount instead.
+  const [experienceUnlocked, setExperienceUnlocked] = useState(true);
   const [heroEmotion, setHeroEmotion] = useState<HeroEmotion>("neutral");
   const [supportDeveloper, setSupportDeveloper] = useState(false);
   const priceLabel = supportDeveloper ? "6.99" : "5.99";
@@ -1058,7 +1063,7 @@ export default function Home() {
             <SkeuoButton
               onClick={() => unlockAndScroll("#story")}
               variant="secondary"
-              className={`hero-explore ${experienceUnlocked ? "is-pressed" : ""}`}
+              className="hero-explore"
             >
               Explore Now <span aria-hidden="true">↓</span>
             </SkeuoButton>

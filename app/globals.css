@@ -6488,17 +6488,51 @@ html {
   background: transparent;
 }
 
-/* soft pastel wash behind everything */
+/* Soft pastel wash behind everything. Two identically-shaped layers crossfade
+   opacity in sync, so the wash cycles between light blue and light yellow on
+   a 7s loop instead of sitting as a static pink tint. */
+body::before {
+  position: fixed;
+  z-index: -3;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 60% 40% at 12% 8%, rgba(196, 229, 255, 0.7), transparent 62%),
+    radial-gradient(ellipse 55% 42% at 88% 26%, rgba(196, 229, 255, 0.55), transparent 64%),
+    radial-gradient(ellipse 70% 40% at 50% 100%, rgba(196, 229, 255, 0.5), transparent 66%);
+  content: "";
+  pointer-events: none;
+  animation: kw-aura-blue 7s ease-in-out infinite;
+}
+
 body::after {
   position: fixed;
   z-index: -2;
   inset: 0;
   background:
-    radial-gradient(ellipse 60% 40% at 12% 8%, rgba(255, 214, 232, 0.7), transparent 62%),
-    radial-gradient(ellipse 55% 42% at 88% 26%, rgba(196, 229, 255, 0.6), transparent 64%),
-    radial-gradient(ellipse 70% 40% at 50% 100%, rgba(221, 208, 251, 0.55), transparent 66%);
+    radial-gradient(ellipse 60% 40% at 12% 8%, rgba(255, 244, 194, 0.7), transparent 62%),
+    radial-gradient(ellipse 55% 42% at 88% 26%, rgba(255, 244, 194, 0.55), transparent 64%),
+    radial-gradient(ellipse 70% 40% at 50% 100%, rgba(255, 244, 194, 0.5), transparent 66%);
   content: "";
   pointer-events: none;
+  animation: kw-aura-yellow 7s ease-in-out infinite;
+}
+
+@keyframes kw-aura-blue {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+@keyframes kw-aura-yellow {
+  0%, 100% { opacity: 0; }
+  50% { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body::before,
+  body::after {
+    animation: none;
+    opacity: 0.55;
+  }
 }
 
 /* --- TYPE: rounded and friendly --------------------------------------- */
@@ -7266,4 +7300,36 @@ body {
 
 .skeuo-button-quiet:hover {
   color: #83305a;
+}
+
+/* ============================================================================
+   iPhone 15 (and similar tall phones): the cat was clipped.
+
+   Measured on a real 393x852 viewport: .hero-cat-peek resolved to 243px tall
+   with overflow:hidden, while .hero-cat-motion inside it resolved to 247px and
+   .hero-cat-head-unit - which deliberately overshoots its own box so the ear
+   tufts and flower crown aren't cropped by the art frame - resolved to 255px.
+   The peek container was clipping ~9px off the top of the cat and ~4px off
+   the bottom. Mobile never needs to crop the cat (that cropping is a desktop-
+   only "peeking from the bottom" effect), so the container now hugs its
+   content instead of clipping it.
+   ========================================================================== */
+@media (max-width: 760px) {
+  .hero-cat-peek {
+    overflow: visible;
+    height: auto;
+  }
+
+  .hero-cat-motion {
+    position: relative;
+    width: min(250px, 29dvh);
+    height: min(250px, 29dvh);
+  }
+}
+
+@media (max-width: 760px) and (max-height: 700px) {
+  .hero-cat-motion {
+    width: min(190px, 24dvh);
+    height: min(190px, 24dvh);
+  }
 }

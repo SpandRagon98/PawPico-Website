@@ -30,7 +30,8 @@ test("renders the exact full-screen MewMuze opening story", async () => {
   assert.match(html, /Hi\. I live here now\./);
   assert.match(html, />Explore Now/);
   assert.match(html, />See every feature/);
-  assert.match(html, /experience-locked/);
+  // scrolling is free from first paint - see the dedicated unlock test
+  assert.match(html, /experience-unlocked/);
   assert.match(html, /mewmuze-hero-front-body-alive\.webp/);
   assert.match(html, /mewmuze-hero-front-head-app\.png/);
   assert.match(html, /mewmuze-face-logo-hd\.png/);
@@ -39,19 +40,31 @@ test("renders the exact full-screen MewMuze opening story", async () => {
   assert.doesNotMatch(await source("../app/page.tsx"), /\bPawPico\b/);
 });
 
-test("locks scrolling until Explore Now unlocks the experience", async () => {
+test("scrolls freely from the first paint instead of locking until a button is pressed", async () => {
+  const response = await render();
+  const html = await response.text();
   const page = await source("../app/page.tsx");
   const css = await source("../app/globals.css");
 
-  assert.match(page, /const \[experienceUnlocked, setExperienceUnlocked\] = useState\(false\)/);
+  // starts true: every lock/force-scroll/gate in the effect and CSS below is
+  // conditioned on `!experienceUnlocked`, so starting unlocked retires the
+  // lock without needing to touch the effect, the buttons, or the one-time
+  // "assemble" animation they used to trigger (it now just plays on mount)
+  assert.match(page, /const \[experienceUnlocked, setExperienceUnlocked\] = useState\(true\)/);
+  assert.match(html, /class="experience-unlocked"/);
+  // the Explore button no longer carries a permanent "pressed" look now that
+  // experienceUnlocked is always true - it only reflects real :active presses
+  assert.doesNotMatch(html, /hero-explore is-pressed/);
+  assert.match(page, /className="hero-explore"/);
+
+  // the dormant lock machinery stays in the code (harmless: its only trigger
+  // is `!experienceUnlocked`, which is now never true), so removing the lock
+  // was a one-line default change rather than a rewrite
   assert.match(page, /mewmuze-scroll-locked/);
-  assert.match(page, /setExperienceUnlocked\(true\)/);
-  assert.match(page, /experience-\$\{experienceUnlocked \? "unlocked" : "locked"\}/);
   assert.match(css, /html\.mewmuze-scroll-locked/);
   assert.match(css, /body\.mewmuze-scroll-locked/);
   assert.match(css, /overflow: hidden !important/);
   assert.match(css, /\.hero \{[\s\S]*height: 100dvh/);
-  assert.match(css, /\.experience-locked \.hero[\s\S]*touch-action: none/);
 });
 
 test("uses a large, seated app-density pixel cat with independent head and eye layers", async () => {
@@ -707,7 +720,7 @@ test("puts a buy call to action on the landing page", async () => {
   // it unlocks the locked hero and takes you to pricing
   assert.match(page, /unlockAndScroll\("#pricing"\)/);
   // the buy action leads, Explore Now steps back to secondary
-  assert.match(page, /variant="secondary"\s+className=\{`hero-explore/);
+  assert.match(page, /variant="secondary"\s+className="hero-explore"/);
   assert.match(css, /@keyframes buy-sheen/);
 });
 
@@ -771,4 +784,30 @@ test("aligns the mobile nav and keeps kawaii text readable", async () => {
   // leaving the headline at 1.24:1
   assert.match(css, /\.privacy\s*\{\s*background: #f4eefc/);
   assert.match(css, /\.pricing-price strong\s*\{\s*color: #c94a78/);
+});
+
+test("cycles the background wash between light blue and light yellow every 7s", async () => {
+  const css = await source("../app/globals.css");
+  // two identically-shaped layers crossfade in sync, replacing the old
+  // static pink-dominant wash
+  assert.match(css, /body::before\s*\{[^}]*animation:\s*kw-aura-blue 7s/s);
+  assert.match(css, /body::after\s*\{[^}]*animation:\s*kw-aura-yellow 7s/s);
+  assert.match(css, /rgba\(196, 229, 255,/); // light blue
+  assert.match(css, /rgba\(255, 244, 194,/); // light yellow
+  assert.doesNotMatch(css, /rgba\(255, 214, 232,/); // the old pink wash
+  assert.match(css, /@keyframes kw-aura-blue/);
+  assert.match(css, /@keyframes kw-aura-yellow/);
+});
+
+test("keeps the mobile cat fully visible instead of clipped by its own frame", async () => {
+  const css = await source("../app/globals.css");
+  // .hero-cat-peek used to clip with overflow:hidden while its own children
+  // (.hero-cat-motion, then .hero-cat-head-unit overshooting further for the
+  // ear tufts and flower crown) resolved taller than it on a real 393x852
+  // viewport, cropping the top and bottom of the cat
+  assert.match(css, /iPhone 15/);
+  assert.match(css, /@media \(max-width: 760px\) \{\s*\.hero-cat-peek \{\s*overflow: visible;\s*height: auto;/);
+  // dvh instead of vh so the sizing tracks Safari's real visible viewport
+  // rather than the address-bar-hidden "large" viewport
+  assert.match(css, /\.hero-cat-motion\s*\{[^}]*width:\s*min\(250px, 29dvh\)/s);
 });
