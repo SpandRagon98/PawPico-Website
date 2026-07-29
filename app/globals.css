@@ -302,7 +302,7 @@ h2 em {
   width: 54px;
   aspect-ratio: 1;
   background: var(--flower);
-  box-shadow: inset 0 2px 0 #fbe7ee, 0 8px 18px rgba(82, 64, 72, 0.1);
+  box-shadow: inset 0 2px 0 #eaf4ff, 0 8px 18px rgba(82, 64, 72, 0.1);
 }
 
 .hero-edge {
@@ -566,10 +566,10 @@ h2 em {
 
 .coming-pill {
   padding: 4px 6px;
-  border: 1px solid #d4a9b6;
+  border: 1px solid #a9cdec;
   border-radius: 999px;
-  background: #fff0f5;
-  color: #825365;
+  background: #eaf4ff;
+  color: #386088;
   font-size: 7px;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -1129,7 +1129,17 @@ h2 em {
 }
 
 .day-timeline h3 {
+  /* The 5-column grid stays active down to 961px, where each column is only
+     180px wide and the longest title ("Someone noticed before you did.")
+     wraps to 4 lines (101px measured) instead of the 2 it takes at a wide
+     desktop width. Reserving for the narrowest case keeps every card's
+     paragraph starting at the same Y across the whole 961px+ range, at the
+     cost of a little empty space under short titles on a wide screen. */
+  display: flex;
+  min-height: 105px;
   margin-bottom: 10px;
+  align-items: center;
+  justify-content: center;
   font-size: 21px;
   letter-spacing: -0.03em;
 }
@@ -6427,8 +6437,8 @@ body {
 body {
   /* pastel palette */
   --kw-cream: #fff7fa;
-  --kw-blush: #ffd9e8;
-  --kw-rose: #ff9dc0;
+  --kw-blush: #dceefb;
+  --kw-rose: #4fb2e8;
   --kw-mint: #b6ecd4;
   --kw-sky: #c4e5ff;
   --kw-lilac: #ddd0fb;
@@ -6439,33 +6449,33 @@ body {
   --background: var(--kw-cream);
   --surface: #ffffff;
   --surface-warm: #fffdfa;
-  --recessed: #ffeef5;
-  --border: #ffd3e4;
-  --border-dark: #f5b3ce;
+  --recessed: #eaf4ff;
+  --border: #cfe4f7;
+  --border-dark: #8ec3ea;
   --text: #5e4a55;
   --text-secondary: #93808c;
   --charcoal: #5e4a55;
   --mint: #b6ecd4;
   --green: #6fcfa2;
-  --pink: #ff9dc0;
-  --flower: #ffc2dc;
+  --pink: #4fb2e8;
+  --flower: #bfe0fb;
   --lavender: #ddd0fb;
   --powder: #c4e5ff;
   --peach: #ffd9c2;
   --yellow: #ffeeb8;
 
   /* soft, pink-tinted depth instead of grey */
-  --shadow-raised: 0 3px 0 #f7c9dc, 0 12px 26px rgba(214, 142, 173, 0.24);
-  --shadow-small: 0 2px 0 #f7c9dc, 0 7px 16px rgba(214, 142, 173, 0.2);
-  --shadow-inset: inset 0 3px 7px rgba(214, 142, 173, 0.22), inset 0 -1px 0 #ffffff;
+  --shadow-raised: 0 3px 0 #cfe4f7, 0 12px 26px rgba(120, 165, 214, 0.24);
+  --shadow-small: 0 2px 0 #cfe4f7, 0 7px 16px rgba(120, 165, 214, 0.2);
+  --shadow-inset: inset 0 3px 7px rgba(120, 165, 214, 0.22), inset 0 -1px 0 #ffffff;
 
   /* glass, milky pastel */
   --glass-tint: rgba(255, 255, 255, 0.62);
   --glass-tint-strong: rgba(255, 250, 252, 0.8);
   --glass-edge: rgba(255, 255, 255, 0.95);
-  --glass-line: rgba(245, 179, 206, 0.55);
+  --glass-line: rgba(140, 190, 230, 0.55);
   --glass-blur: saturate(1.35) blur(18px);
-  --glass-shadow: 0 12px 30px rgba(214, 142, 173, 0.26);
+  --glass-shadow: 0 12px 30px rgba(120, 165, 214, 0.26);
 
   --sans: var(--font-kawaii-ui), var(--font-montserrat), system-ui, sans-serif;
   --mono: var(--font-kawaii-ui), var(--font-geist-mono), monospace;
@@ -6488,12 +6498,14 @@ html {
   background: transparent;
 }
 
-/* Soft pastel wash behind everything. Two identically-shaped layers crossfade
-   opacity in sync, so the wash cycles between light blue and light yellow on
-   a 7s loop instead of sitting as a static pink tint. */
-body::before {
+/* Soft light-blue wash behind everything, replacing the earlier pink tint.
+   (A cycling blue/yellow version was tried here first, but the pink the user
+   kept seeing turned out to come from the shared border/shadow tokens above -
+   used by every card, button and the nav pill - not from this wash. Simplified
+   back to a single static tint now that those tokens are fixed too.) */
+body::after {
   position: fixed;
-  z-index: -3;
+  z-index: -2;
   inset: 0;
   background:
     radial-gradient(ellipse 60% 40% at 12% 8%, rgba(196, 229, 255, 0.7), transparent 62%),
@@ -6501,38 +6513,6 @@ body::before {
     radial-gradient(ellipse 70% 40% at 50% 100%, rgba(196, 229, 255, 0.5), transparent 66%);
   content: "";
   pointer-events: none;
-  animation: kw-aura-blue 7s ease-in-out infinite;
-}
-
-body::after {
-  position: fixed;
-  z-index: -2;
-  inset: 0;
-  background:
-    radial-gradient(ellipse 60% 40% at 12% 8%, rgba(255, 244, 194, 0.7), transparent 62%),
-    radial-gradient(ellipse 55% 42% at 88% 26%, rgba(255, 244, 194, 0.55), transparent 64%),
-    radial-gradient(ellipse 70% 40% at 50% 100%, rgba(255, 244, 194, 0.5), transparent 66%);
-  content: "";
-  pointer-events: none;
-  animation: kw-aura-yellow 7s ease-in-out infinite;
-}
-
-@keyframes kw-aura-blue {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0; }
-}
-
-@keyframes kw-aura-yellow {
-  0%, 100% { opacity: 0; }
-  50% { opacity: 1; }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  body::before,
-  body::after {
-    animation: none;
-    opacity: 0.55;
-  }
 }
 
 /* --- TYPE: rounded and friendly --------------------------------------- */
@@ -6553,22 +6533,22 @@ h4 {
 }
 
 .eyebrow {
-  color: #d97fa8;
+  color: #1f6fae;
   font-weight: 700;
   letter-spacing: 0.16em;
 }
 
 /* --- PUFFY SKEUOMORPHIC CONTROLS -------------------------------------- */
 .skeuo-button {
-  border: 2px solid #f5b3ce;
+  border: 2px solid #8ec3ea;
   border-radius: 999px;
   color: #5e4a55;
   background: #ffffff;
   box-shadow:
     inset 0 3px 0 #ffffff,
-    inset 0 -4px 0 #ffe3ee,
-    0 4px 0 #f7c9dc,
-    0 10px 20px rgba(214, 142, 173, 0.26);
+    inset 0 -4px 0 #e3f1ff,
+    0 4px 0 #cfe4f7,
+    0 10px 20px rgba(120, 165, 214, 0.26);
   font-family: var(--font-kawaii-display), sans-serif;
   font-weight: 700;
   letter-spacing: 0.02em;
@@ -6583,32 +6563,32 @@ h4 {
   transform: translateY(-3px) rotate(-1deg);
   box-shadow:
     inset 0 3px 0 #ffffff,
-    inset 0 -4px 0 #ffe3ee,
-    0 7px 0 #f7c9dc,
-    0 16px 28px rgba(214, 142, 173, 0.32);
+    inset 0 -4px 0 #e3f1ff,
+    0 7px 0 #cfe4f7,
+    0 16px 28px rgba(120, 165, 214, 0.32);
 }
 
 /* squish, like pressing a marshmallow */
 .skeuo-button:active {
   transform: translateY(3px) scale(0.97);
-  box-shadow: inset 0 4px 8px rgba(214, 142, 173, 0.35);
+  box-shadow: inset 0 4px 8px rgba(120, 165, 214, 0.35);
 }
 
 .skeuo-button-primary,
 .hero-buy {
-  border-color: #ff9dc0;
-  color: #6d2a45;
-  background: #ffc2dc;
+  border-color: #4fb2e8;
+  color: #123852;
+  background: #bfe0fb;
   box-shadow:
-    inset 0 3px 0 #ffe0ee,
-    inset 0 -4px 0 #ffa8c9,
-    0 4px 0 #f58bb2,
-    0 12px 24px rgba(245, 139, 178, 0.4);
+    inset 0 3px 0 #dceefb,
+    inset 0 -4px 0 #8ec3ea,
+    0 4px 0 #2f8fc9,
+    0 12px 24px rgba(47, 143, 201, 0.4);
 }
 
 .skeuo-button-primary:hover,
 .hero-buy:hover {
-  background: #ffd0e4;
+  background: #cdeafd;
 }
 
 .skeuo-button-secondary {
@@ -6624,10 +6604,10 @@ h4 {
 
 .skeuo-button-quiet {
   border-color: transparent;
-  color: #c07a9a;
+  color: #1f6fae;
   background: transparent;
   box-shadow: none;
-  text-decoration-color: #ffb8d2;
+  text-decoration-color: #4fb2e8;
 }
 
 /* --- MILKY GLASS PANES ------------------------------------------------- */
@@ -6642,13 +6622,13 @@ h4 {
 .theatre-arrow,
 .coming-pill,
 .theatre-counter {
-  border: 2px solid rgba(245, 179, 206, 0.6);
+  border: 2px solid rgba(140, 190, 230, 0.6);
   border-radius: 999px;
   color: #5e4a55;
   background: var(--glass-tint-strong);
   box-shadow:
     inset 0 2px 0 #ffffff,
-    0 10px 24px rgba(214, 142, 173, 0.26);
+    0 10px 24px rgba(120, 165, 214, 0.26);
 }
 
 .nav-dock {
@@ -6668,7 +6648,7 @@ h4 {
 }
 
 .desktop-nav > a:hover {
-  color: #ff9dc0;
+  color: #4fb2e8;
 }
 
 /* --- ROUNDED, PILLOWY PANELS ------------------------------------------ */
@@ -6689,14 +6669,14 @@ h4 {
 .theatre-stage,
 .theatre-media,
 .theatre-copy {
-  border-color: #ffd3e4;
+  border-color: #cfe4f7;
   border-radius: 26px;
   background: #ffffff;
   box-shadow:
     inset 0 3px 0 #ffffff,
-    inset 0 -5px 0 #fff2f7,
-    0 4px 0 #f9d8e6,
-    0 18px 36px rgba(214, 142, 173, 0.2);
+    inset 0 -5px 0 #eef7ff,
+    0 4px 0 #cfe4f7,
+    0 18px 36px rgba(120, 165, 214, 0.2);
 }
 
 .feature-helps,
@@ -6706,38 +6686,38 @@ h4 {
 }
 
 .app-notice {
-  border: 2px solid #f5b3ce;
+  border: 2px solid #8ec3ea;
   border-radius: 18px;
   background: #ffffff;
-  box-shadow: 0 4px 0 #f9d8e6, 0 14px 28px rgba(214, 142, 173, 0.3);
+  box-shadow: 0 4px 0 #cfe4f7, 0 14px 28px rgba(120, 165, 214, 0.3);
 }
 
 .app-notice::after {
-  border-color: #f5b3ce;
+  border-color: #8ec3ea;
   background: #ffffff;
 }
 
 .pricing-price strong {
-  color: #e8709c;
+  color: #1f6fae;
 }
 
 /* chips become little candy pills */
 .chip,
 .choice-block > div > button {
-  border: 2px solid #ffd3e4;
+  border: 2px solid #cfe4f7;
   border-radius: 999px;
   color: #7a6470;
   background: #ffffff;
   font-weight: 700;
-  box-shadow: inset 0 2px 0 #fff, 0 3px 0 #f9d8e6;
+  box-shadow: inset 0 2px 0 #fff, 0 3px 0 #cfe4f7;
 }
 
 .chip.active,
 .choice-block > div > button.is-active {
-  border-color: #ff9dc0;
-  color: #6d2a45;
-  background: #ffc2dc;
-  box-shadow: inset 0 2px 0 #ffe0ee, 0 3px 0 #f58bb2;
+  border-color: #4fb2e8;
+  color: #123852;
+  background: #bfe0fb;
+  box-shadow: inset 0 2px 0 #dceefb, 0 3px 0 #2f8fc9;
 }
 
 /* --- CUTE MOTION ------------------------------------------------------- */
@@ -6768,12 +6748,12 @@ h4 {
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  background: #ffd9e8;
+  background: #dceefb;
   box-shadow:
     40px 90px 0 -2px #c4e5ff,
     -70px 150px 0 -3px #ffeeb8,
     120px 220px 0 -2px #ddd0fb,
-    -30px 300px 0 -4px #ff9dc0;
+    -30px 300px 0 -4px #4fb2e8;
   content: "";
   pointer-events: none;
   animation: kw-float 7s ease-in-out infinite;
@@ -6786,7 +6766,7 @@ h4 {
 
 /* the cat gets a soft pink halo (art itself untouched) */
 .hero-cat-motion {
-  filter: drop-shadow(0 10px 26px rgba(245, 139, 178, 0.35));
+  filter: drop-shadow(0 10px 26px rgba(47, 143, 201, 0.35));
 }
 
 /* reveals arrive with a gentle pop instead of a slide */
@@ -6851,7 +6831,7 @@ h4 {
 .studio-preview,
 .console-rim,
 .showcase-window-bar {
-  background: #fff4f8;
+  background: #eaf4ff;
 }
 
 .theatre-controls {
@@ -6863,7 +6843,7 @@ h4 {
 .studio-titlebar i,
 .console-rim span {
   border-radius: 50%;
-  background: #ffc2dc;
+  background: #bfe0fb;
   box-shadow: inset 0 1px 0 #fff;
 }
 
@@ -6881,11 +6861,11 @@ h4 {
 
 .showcase-progress span {
   border-radius: 999px;
-  background: #ffdfec;
+  background: #dceefb;
 }
 
 .showcase-progress span.is-active {
-  background: #ff9dc0;
+  background: #4fb2e8;
 }
 
 .studio-titlebar,
@@ -6913,16 +6893,16 @@ h4 {
 }
 
 .skeuo-button-quiet {
-  color: #b3567f;
+  color: #1f6fae;
   font-weight: 700;
-  text-decoration-color: #ff9dc0;
+  text-decoration-color: #4fb2e8;
   text-underline-offset: 6px;
 }
 
 .skeuo-button-quiet:hover {
-  color: #8f3d63;
-  background: #fff0f6;
-  box-shadow: 0 3px 0 #f9d8e6;
+  color: #164066;
+  background: #eaf4ff;
+  box-shadow: 0 3px 0 #cfe4f7;
 }
 
 .desktop-nav > a {
@@ -7040,7 +7020,7 @@ h4 {
 }
 
 .directory-panel > h3 > button:hover {
-  background: #fff4f8;
+  background: #eaf4ff;
 }
 
 /* the tip toggle bounces when ticked */
@@ -7055,13 +7035,13 @@ h4 {
 }
 
 .tip-toggle:has(input:checked) {
-  border-color: #ff9dc0;
-  background: #fff2f7;
+  border-color: #4fb2e8;
+  background: #eaf4ff;
 }
 
 .tip-toggle:has(input:checked) .tip-box {
-  border-color: #ff9dc0;
-  background: #ff9dc0;
+  border-color: #4fb2e8;
+  background: #4fb2e8;
 }
 
 /* feature copy slides in softly instead of snapping */
@@ -7095,8 +7075,8 @@ h4 {
 /* the day timeline pins pop like little bubbles */
 .timeline-pin {
   border-radius: 50%;
-  background: #ff9dc0;
-  box-shadow: 0 0 0 5px #ffe4ef;
+  background: #4fb2e8;
+  box-shadow: 0 0 0 5px #dceefb;
   transition: transform 300ms cubic-bezier(0.34, 1.8, 0.5, 1);
 }
 
@@ -7120,7 +7100,7 @@ h4 {
 
 /* soft focus ring in the palette */
 :focus-visible {
-  outline: 3px solid #ff9dc0;
+  outline: 3px solid #4fb2e8;
   outline-offset: 3px;
 }
 
@@ -7165,14 +7145,14 @@ h4 {
 /* the numbered badges inside the feature carousel buttons */
 .theatre-progress button > span {
   border-radius: 50%;
-  color: #8f3d63;
-  background: #ffe4ef;
+  color: #164066;
+  background: #dceefb;
   box-shadow: inset 0 1px 0 #fff;
 }
 
 .theatre-progress button.is-active > span {
-  color: #6d2a45;
-  background: #ff9dc0;
+  color: #123852;
+  background: #4fb2e8;
 }
 
 /* Mobile nav alignment: .brand-link is a block with a 54px min-height, so its
@@ -7272,7 +7252,7 @@ body {
 
 /* the price is display-size, so it needs 3:1 - the old rose sat at 2.91 */
 .pricing-price strong {
-  color: #c94a78;
+  color: #1f6fae;
 }
 
 /* carousel labels inherited the pale secondary */
@@ -7283,7 +7263,7 @@ body {
 
 .theatre-progress button.is-active,
 .theatre-progress button.is-active small {
-  color: #6d2a45;
+  color: #123852;
 }
 
 .media-caption,
@@ -7295,11 +7275,11 @@ body {
 
 /* the quiet link landed at 4.38:1, just under the 4.5 minimum for its size */
 .skeuo-button-quiet {
-  color: #a04570;
+  color: #1f6fae;
 }
 
 .skeuo-button-quiet:hover {
-  color: #83305a;
+  color: #164066;
 }
 
 /* ============================================================================
@@ -7320,16 +7300,51 @@ body {
     height: auto;
   }
 
+  /* A little smaller than the 250px/29dvh this first shipped at, as extra
+     headroom - real Safari toolbars, keyboard accessories, and other chrome
+     this emulator can't reproduce all eat into the visible height a bit
+     further than a plain viewport resize does. */
   .hero-cat-motion {
     position: relative;
-    width: min(250px, 29dvh);
-    height: min(250px, 29dvh);
+    width: min(220px, 25dvh);
+    height: min(220px, 25dvh);
   }
 }
 
 @media (max-width: 760px) and (max-height: 700px) {
   .hero-cat-motion {
-    width: min(190px, 24dvh);
-    height: min(190px, 24dvh);
+    width: min(170px, 21dvh);
+    height: min(170px, 21dvh);
   }
+}
+
+/* ============================================================================
+   Font alignment: several "heading-like" bits of text are marked up as
+   <strong> rather than an actual heading tag, so they never picked up the
+   kawaii display font and fell back to the UI font instead - most visibly
+   the feature carousel's title echo (Quicksand at 18px) sitting right next
+   to the real, matching heading in Baloo 2 at 57.6px for the exact same
+   words, and the "MewMuze" brand wordmark in the nav using the plain UI
+   font while every other heading on the page uses the rounded display face.
+   ========================================================================== */
+.theatre-counter strong,
+.showcase-ticket strong,
+.preset-ticket strong,
+.pricing-brand strong,
+.site-brand strong {
+  font-family: var(--font-kawaii-display), var(--font-kawaii-ui), sans-serif;
+}
+
+/* Day-timeline: the title had no reserved height, so a one-line title (e.g.
+   "You close the laptop last.") let the paragraph beneath it start noticeably
+   higher than a two-line title's paragraph in the very same row - a 25px
+   drift, one full line of text, measured across the five cards. Fixed at the
+   original .day-timeline h3 rule itself (added display:flex, min-height:51px,
+   align-items/justify-content:center there) rather than duplicated here. */
+
+/* Nav bar: a full pebble/pill silhouette regardless of viewport width, rather
+   than the more rectangular rounding several responsive passes had left it
+   with. Appended last so it wins over every earlier width-specific radius. */
+.nav-dock {
+  border-radius: 999px;
 }

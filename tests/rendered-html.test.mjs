@@ -753,7 +753,7 @@ test("dresses the site in the kawaii system without touching the cat", async () 
   // site follows from one place rather than per-component overrides
   assert.match(css, /--background: var\(--kw-cream\)/);
   assert.match(css, /--text: #5e4a55/);
-  assert.match(css, /--pink: #ff9dc0/);
+  assert.match(css, /--pink: #4fb2e8/);
 
   // skeuomorphism survives as puffy marshmallow bevels, glass stays milky
   assert.match(css, /\.skeuo-button\s*\{[^}]*border-radius: 999px/s);
@@ -783,20 +783,44 @@ test("aligns the mobile nav and keeps kawaii text readable", async () => {
   // the privacy block kept a dark plum fill while headings turned dark plum,
   // leaving the headline at 1.24:1
   assert.match(css, /\.privacy\s*\{\s*background: #f4eefc/);
-  assert.match(css, /\.pricing-price strong\s*\{\s*color: #c94a78/);
+  assert.match(css, /\.pricing-price strong\s*\{\s*color: #1f6fae/);
 });
 
-test("cycles the background wash between light blue and light yellow every 7s", async () => {
+test("retints the whole pink theme to light blue, root cause and all", async () => {
   const css = await source("../app/globals.css");
-  // two identically-shaped layers crossfade in sync, replacing the old
-  // static pink-dominant wash
-  assert.match(css, /body::before\s*\{[^}]*animation:\s*kw-aura-blue 7s/s);
-  assert.match(css, /body::after\s*\{[^}]*animation:\s*kw-aura-yellow 7s/s);
-  assert.match(css, /rgba\(196, 229, 255,/); // light blue
-  assert.match(css, /rgba\(255, 244, 194,/); // light yellow
+  const store = await source("../app/store/store.css");
+
+  // The background wash: first tried as a blue/yellow crossfade, but that
+  // wasn't the actual pink users kept seeing (see below), so it simplified
+  // back to a single static light-blue tint once the real source was fixed.
+  assert.match(css, /body::after\s*\{[^}]*background:[\s\S]*?rgba\(196, 229, 255,/);
+  assert.doesNotMatch(css, /@keyframes kw-aura-blue/);
+  assert.doesNotMatch(css, /@keyframes kw-aura-yellow/);
   assert.doesNotMatch(css, /rgba\(255, 214, 232,/); // the old pink wash
-  assert.match(css, /@keyframes kw-aura-blue/);
-  assert.match(css, /@keyframes kw-aura-yellow/);
+
+  // The actual dominant pink was the shared border/shadow tokens used by
+  // every card, button and the nav pill - not the page-wide wash. Fixed at
+  // the token level so every consumer picks it up in one place.
+  assert.match(css, /--border: #cfe4f7/);
+  assert.match(css, /--border-dark: #8ec3ea/);
+  assert.match(css, /--shadow-raised: 0 3px 0 #cfe4f7, 0 12px 26px rgba\(120, 165, 214/);
+  assert.match(css, /--glass-line: rgba\(140, 190, 230/);
+  assert.match(css, /--glass-shadow: 0 12px 30px rgba\(120, 165, 214/);
+  assert.doesNotMatch(css, /--border: #ffd3e4/);
+  assert.doesNotMatch(css, /--border-dark: #f5b3ce/);
+
+  // Once asked to retint the whole theme (not just the ambient wash), the
+  // primary CTA / chip-active / price / eyebrow / quiet-link accent colours
+  // - previously left alone as "deliberate pink accents" - moved too.
+  for (const oldHex of ["#ff9dc0", "#ffc2dc", "#f58bb2", "#d97fa8", "#e8709c"]) {
+    assert.doesNotMatch(css, new RegExp(oldHex.replace("#", "#")), `${oldHex} should be fully retired`);
+  }
+  assert.match(css, /#4fb2e8/); // vivid accent replacing #ff9dc0
+  assert.match(css, /#bfe0fb/); // fill replacing #ffc2dc
+
+  // The store sub-page has its own stylesheet and needed the same pass.
+  assert.doesNotMatch(store, /#d3a6b5|#fff0f5|#ca9cac|#ffdfec/);
+  assert.match(store, /#8ec3ea|#eaf4ff/);
 });
 
 test("keeps the mobile cat fully visible instead of clipped by its own frame", async () => {
@@ -809,5 +833,27 @@ test("keeps the mobile cat fully visible instead of clipped by its own frame", a
   assert.match(css, /@media \(max-width: 760px\) \{\s*\.hero-cat-peek \{\s*overflow: visible;\s*height: auto;/);
   // dvh instead of vh so the sizing tracks Safari's real visible viewport
   // rather than the address-bar-hidden "large" viewport
-  assert.match(css, /\.hero-cat-motion\s*\{[^}]*width:\s*min\(250px, 29dvh\)/s);
+  assert.match(css, /\.hero-cat-motion\s*\{[^}]*width:\s*min\(220px, 25dvh\)/s);
+});
+
+test("reserves a fixed title height so day-timeline cards stay aligned", async () => {
+  const css = await source("../app/globals.css");
+  // a one-line title let the paragraph beneath it start a full line (25px)
+  // higher than a two-line title's paragraph in the same row; the 961px
+  // width (just above the breakpoint that stacks this into one column) wraps
+  // the longest title to 4 lines, so the reservation covers that worst case
+  assert.match(css, /\.day-timeline h3\s*\{[^}]*display: flex;[^}]*min-height: 105px;[^}]*align-items: center;[^}]*justify-content: center;/s);
+});
+
+test("gives heading-like <strong> labels the same display font as real headings", async () => {
+  const css = await source("../app/globals.css");
+  // the feature carousel's title echo and the nav brand wordmark were both
+  // marked up as <strong>, so the h1-h4 display-font rule never reached them
+  // and they fell back to the plain UI font next to matching Baloo 2 text
+  assert.match(css, /\.theatre-counter strong,\s*\n\.showcase-ticket strong,\s*\n\.preset-ticket strong,\s*\n\.pricing-brand strong,\s*\n\.site-brand strong\s*\{\s*font-family: var\(--font-kawaii-display\)/);
+});
+
+test("makes the nav bar a full pebble/pill shape at every width", async () => {
+  const css = await source("../app/globals.css");
+  assert.match(css, /\.nav-dock\s*\{\s*border-radius: 999px;\s*\}\s*$/m);
 });
