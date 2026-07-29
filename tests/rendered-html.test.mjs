@@ -1005,3 +1005,24 @@ test("keeps the phone nav bar on a single compact row", async () => {
   // the auth links move into the Menu drawer so they stay reachable
   assert.match(page, /aria-label="Mobile navigation"[\s\S]{0,400}onAuthIntent\("login"\)/);
 });
+
+test("centres the nav logo despite its off-centre source art", async () => {
+  const css = await source("../app/globals.css");
+  // measured on a 128 grid, the face-logo ink spans x11-127 and y9-121, so its
+  // centre is (69, 65) not (64, 64) and it is clipped flush at the right edge.
+  // The offsets below cancel exactly that error.
+  assert.match(css, /\.brand-medallion img\s*\{[^}]*left: -6\.06%/s);
+  assert.match(css, /\.brand-medallion img\s*\{[^}]*top: -2\.83%/s);
+  assert.match(css, /\.brand-medallion img\s*\{[^}]*width: 104%/s);
+});
+
+test("keeps the neutral pupil the same round shape as the painted ones", async () => {
+  const css = await source("../app/globals.css");
+  // Only the neutral head has pupil-less eyes, so these CSS pupils stand in for
+  // the ones happy and sad have painted in. A stepped clip-path was tried to
+  // "pixelate" them and read as a boxy rounded rectangle with square glints,
+  // which matched the painted pupils worse than the round original did.
+  assert.match(css, /\.hero-pupil \{[\s\S]*?border-radius: 47%/);
+  assert.doesNotMatch(css, /\.hero-pupil \{[^}]*clip-path/s);
+  assert.match(css, /\.hero-pupil::before,\s*\n\.hero-pupil::after \{[\s\S]*?border-radius: 48%/);
+});

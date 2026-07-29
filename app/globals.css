@@ -8086,3 +8086,28 @@ body.mewmuze-splash-open {
 .splash-title {
   line-height: 0.96;
 }
+
+/* ============================================================================
+   NAV LOGO CENTRING
+
+   The face-logo source is not centred in its own frame: measured on a 128 grid
+   the ink spans x11 to x127 and y9 to y121, so its centre sits at (69, 65)
+   rather than (64, 64), and it is clipped flush against the right edge. Dropping
+   it into a circle therefore looked shifted, however the circle was aligned.
+
+   Rendering it slightly larger than the medallion and offsetting by that exact
+   error puts the art's own centre on the circle's centre. 104% keeps the ears
+   inside the crop while leaving no background crescent.
+   ========================================================================== */
+.brand-medallion {
+  position: relative;
+}
+
+.brand-medallion img {
+  position: absolute;
+  top: -2.83%;
+  left: -6.06%;
+  width: 104%;
+  height: 104%;
+  object-fit: fill;
+}
