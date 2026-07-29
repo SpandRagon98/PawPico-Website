@@ -7140,3 +7140,130 @@ h4 {
   color: #6d2a45;
   background: #ff9dc0;
 }
+
+/* Mobile nav alignment: .brand-link is a block with a 54px min-height, so its
+   inline-flex child sat flush to the top - the logo and name centred 6px above
+   the Menu button. Making the link a centring flex row lines the whole brand
+   up with the control opposite it. */
+.brand-link {
+  display: flex;
+  align-items: center;
+}
+
+@media (max-width: 760px) {
+  .nav-dock {
+    min-height: 62px;
+    align-items: center;
+    /* symmetric, so the brand and the Menu control sit the same distance in */
+    padding: 8px 12px;
+  }
+
+  .brand-link {
+    min-height: 46px;
+  }
+
+  .site-brand {
+    gap: 10px;
+  }
+
+  .brand-medallion {
+    width: 40px;
+    height: 40px;
+    border-radius: 13px;
+  }
+
+  /* one line of brand text, optically centred on the medallion */
+  .site-brand > span:last-child {
+    align-content: center;
+    gap: 1px;
+  }
+
+  .site-brand strong {
+    font-size: 18px;
+    line-height: 1.1;
+  }
+
+  .mobile-nav > summary {
+    min-width: 72px;
+    height: 42px;
+    padding: 0 14px;
+    border-radius: 999px;
+    font-size: 11.5px;
+  }
+}
+
+/* ============================================================================
+   Kawaii contrast pass.
+
+   Pastels are easy to push too pale. An audit of every text node against its
+   effective background found 89 combinations under the WCAG minimum, the worst
+   being the privacy headline at 1.24:1 - the section kept a dark plum fill from
+   the old design while headings had become dark plum too.
+   ========================================================================== */
+
+body {
+  /* was #93808c, which failed on white at 14px */
+  --text-secondary: #6b5560;
+}
+
+/* The privacy block is a soft lilac panel now, not a dark slab, so it belongs
+   to the pastel system and its text reads. */
+.privacy {
+  background: #f4eefc;
+}
+
+.privacy-copy h2,
+.privacy-grid h3 {
+  color: #4a3a52;
+}
+
+.privacy-copy p,
+.privacy-grid p {
+  color: #6b5560;
+}
+
+.privacy .eyebrow {
+  color: #9a5fa8;
+}
+
+.privacy-grid article {
+  background: #ffffff;
+  border-color: #e6d9f7;
+}
+
+.privacy-grid article > span {
+  color: #2f6b4e;
+  background: #d8f3e5;
+}
+
+/* the price is display-size, so it needs 3:1 - the old rose sat at 2.91 */
+.pricing-price strong {
+  color: #c94a78;
+}
+
+/* carousel labels inherited the pale secondary */
+.theatre-progress button small,
+.theatre-progress button {
+  color: #6b5560;
+}
+
+.theatre-progress button.is-active,
+.theatre-progress button.is-active small {
+  color: #6d2a45;
+}
+
+.media-caption,
+.showcase-ticket small,
+.preset-ticket small,
+.studio-titlebar {
+  color: #6b5560;
+}
+
+/* the quiet link landed at 4.38:1, just under the 4.5 minimum for its size */
+.skeuo-button-quiet {
+  color: #a04570;
+}
+
+.skeuo-button-quiet:hover {
+  color: #83305a;
+}

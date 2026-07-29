@@ -756,3 +756,19 @@ test("dresses the site in the kawaii system without touching the cat", async () 
   assert.match(css, /\.hero-eye-track\s*\{[\s\S]*?border-radius:\s*48%/);
   assert.match(css, /\.hero-pupil\s*\{[\s\S]*?border-radius:\s*47%/);
 });
+
+test("aligns the mobile nav and keeps kawaii text readable", async () => {
+  const css = await source("../app/globals.css");
+
+  // .brand-link was a block, so its inline-flex child sat flush to the top and
+  // the brand centred 6px above the Menu control opposite it
+  assert.match(css, /\.brand-link\s*\{[^}]*display: flex;[^}]*align-items: center/s);
+  assert.match(css, /\.nav-dock\s*\{[^}]*padding: 8px 12px/s);
+
+  // pastel text had drifted too pale: 89 nodes were under the WCAG minimum
+  assert.match(css, /--text-secondary: #6b5560/);
+  // the privacy block kept a dark plum fill while headings turned dark plum,
+  // leaving the headline at 1.24:1
+  assert.match(css, /\.privacy\s*\{\s*background: #f4eefc/);
+  assert.match(css, /\.pricing-price strong\s*\{\s*color: #c94a78/);
+});
