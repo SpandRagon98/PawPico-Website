@@ -256,6 +256,188 @@ function SiteNavigation() {
   );
 }
 
+/**
+ * Opening curtain. Holds for a beat on a soft blue field, fills a loading bar,
+ * then lifts away. Rendered on the server too, so there is no flash of the page
+ * underneath before it appears.
+ */
+function WelcomeSplash() {
+  const [phase, setPhase] = useState<"loading" | "leaving" | "gone">("loading");
+
+  useEffect(() => {
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const hold = reduced ? 260 : 2150;
+    const lift = reduced ? 120 : 720;
+    const toLeaving = window.setTimeout(() => setPhase("leaving"), hold);
+    const toGone = window.setTimeout(() => setPhase("gone"), hold + lift);
+    return () => {
+      window.clearTimeout(toLeaving);
+      window.clearTimeout(toGone);
+    };
+  }, []);
+
+  useEffect(() => {
+    // Keep the page still underneath while the curtain is up.
+    document.body.classList.toggle("mewmuze-splash-open", phase !== "gone");
+    return () => document.body.classList.remove("mewmuze-splash-open");
+  }, [phase]);
+
+  if (phase === "gone") return null;
+
+  return (
+    <div
+      className={phase === "leaving" ? "welcome-splash is-leaving" : "welcome-splash"}
+      role="status"
+      aria-live="polite"
+    >
+      <div className="splash-inner">
+        <span className="splash-cat" aria-hidden="true">
+          <Image
+            src={sitePath(FACE_LOGO_ASSET)}
+            alt=""
+            width={512}
+            height={512}
+            unoptimized
+            priority
+          />
+          <i className="splash-sparkle splash-sparkle-1" />
+          <i className="splash-sparkle splash-sparkle-2" />
+          <i className="splash-sparkle splash-sparkle-3" />
+        </span>
+        <p className="splash-title">Welcome to MewMuze</p>
+        <p className="splash-sub">Waking up your desktop cat</p>
+        <span className="splash-bar" aria-hidden="true">
+          <i />
+        </span>
+      </div>
+    </div>
+  );
+}
+
+type Account = { email: string } | null;
+
+/**
+ * Account gate for the purchase. Checkout is not live yet and there is no
+ * backend on a static export, so this deliberately keeps the password only for
+ * the moment the form is submitted and never stores or transmits it. Only the
+ * email is held, in memory, to unlock the buy step.
+ */
+function AccountPanel({
+  account,
+  onSignIn,
+  onSignOut,
+}: {
+  account: Account;
+  onSignIn: (email: string) => void;
+  onSignOut: () => void;
+}) {
+  const [mode, setMode] = useState<"signup" | "login">("signup");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+
+  const submit = (event: React.FormEvent) => {
+    event.preventDefault();
+    const trimmed = email.trim();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) {
+      setError("That email address does not look quite right.");
+      return;
+    }
+    if (password.length < 8) {
+      setError("Please use at least 8 characters for your password.");
+      return;
+    }
+    setError("");
+    setPassword("");
+    onSignIn(trimmed);
+  };
+
+  if (account) {
+    return (
+      <div className="account-panel is-signed-in">
+        <span className="account-badge" aria-hidden="true">
+          <i />
+        </span>
+        <div className="account-copy">
+          <strong>You are signed in</strong>
+          <small>{account.email}</small>
+        </div>
+        <button className="skeuo-button skeuo-button-quiet" type="button" onClick={onSignOut}>
+          Sign out
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="account-panel">
+      <div className="account-tabs" role="tablist" aria-label="Account">
+        <button
+          type="button"
+          role="tab"
+          aria-selected={mode === "signup"}
+          className={mode === "signup" ? "is-active" : ""}
+          onClick={() => { setMode("signup"); setError(""); }}
+        >
+          Create account
+        </button>
+        <button
+          type="button"
+          role="tab"
+          aria-selected={mode === "login"}
+          className={mode === "login" ? "is-active" : ""}
+          onClick={() => { setMode("login"); setError(""); }}
+        >
+          Sign in
+        </button>
+      </div>
+
+      <form className="account-form" onSubmit={submit} noValidate>
+        <label className="account-field">
+          <span>Email</span>
+          <input
+            type="email"
+            name="email"
+            autoComplete="email"
+            placeholder="you@example.com"
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
+            required
+          />
+        </label>
+        <label className="account-field">
+          <span>Password</span>
+          <input
+            type="password"
+            name="password"
+            autoComplete={mode === "signup" ? "new-password" : "current-password"}
+            placeholder="At least 8 characters"
+            value={password}
+            onChange={(event) => setPassword(event.target.value)}
+            required
+          />
+        </label>
+
+        {error && (
+          <p className="account-error" role="alert">
+            {error}
+          </p>
+        )}
+
+        <button className="skeuo-button skeuo-button-primary account-submit" type="submit">
+          {mode === "signup" ? "Create my account" : "Sign in"}
+        </button>
+      </form>
+
+      <p className="account-note">
+        Accounts are not connected to a server yet, so nothing you type here leaves
+        this page and your password is never saved. This is the front door for the
+        real thing, ready for when checkout opens.
+      </p>
+    </div>
+  );
+}
+
 /** The app's own notice, recreated on the site so the popup reads as familiar. */
 function AppNotice({ notice, className = "" }: { notice: FeatureNotice; className?: string }) {
   return (
@@ -742,33 +924,33 @@ function AppearanceStudio() {
 const dayMoments = [
   {
     time: "8:47",
-    title: "You are not quite alone.",
-    copy: "The tabs multiply like they always do. Something small notices your cursor and follows it, and the morning starts a little differently.",
+    title: "The first thing that looks back",
+    copy: "You open the laptop the way you always do, half awake, already behind. The screen fills with the same tabs and the same quiet. Then something small lifts its head near the corner and watches your cursor move. It is not doing anything useful. It is just glad you are here.",
     tone: "mint",
   },
   {
     time: "10:30",
-    title: "It sits down to work with you.",
-    copy: "Focus begins. The cat parks beside the timer, goes still, and leaves the pointer alone — company without commentary.",
+    title: "It sits down when you do",
+    copy: "You start the timer and brace for the long stretch. The cat pads over, folds its paws, and settles beside it. No nudging, no badges, no advice. Just a small warm shape working alongside you, the way a real one would.",
     tone: "blue",
   },
   {
     time: "1:15",
-    title: "Someone noticed before you did.",
-    copy: "Fifty-two minutes without moving. A notebook notice arrives with a stretch and a patient stare, and you finally stand up.",
+    title: "Someone noticed before you did",
+    copy: "Fifty two minutes and you have not moved. You did not count. It did. There is a stretch, a slow blink, and a patient stare you cannot argue with, so you finally stand up and roll your shoulders. Somebody was paying attention to you today.",
     tone: "peach",
   },
   {
     time: "3:00",
-    title: "The afternoon stops being flat.",
-    copy: "Mail arrives and it waves instead of buzzing. You drag the cat across the screen, it stretches like warm dough, and the hour you were dreading passes differently.",
+    title: "The hour you were dreading",
+    copy: "Mail lands and it waves at you instead of buzzing. You drag the little body across the screen just to watch it stretch like warm dough, and it wobbles back into place looking mildly offended. You laugh out loud, alone, at your desk. The afternoon stops feeling flat.",
     tone: "yellow",
   },
   {
     time: "5:48",
-    title: "You close the laptop last.",
-    copy: "A finished task earns a tiny cheer. Then it yawns, curls up on the window edge and sleeps — and it will be there before your coffee tomorrow.",
-    tone: "pink",
+    title: "You close the laptop last",
+    copy: "The task finishes and it throws both paws in the air like it has been waiting all day for this. Then it yawns, turns twice, and curls up on the window edge to sleep. You linger a second before shutting the lid. Tomorrow it will be there before your coffee is.",
+    tone: "blue",
   },
 ];
 
@@ -785,6 +967,7 @@ export default function Home() {
   const [experienceUnlocked, setExperienceUnlocked] = useState(true);
   const [heroEmotion, setHeroEmotion] = useState<HeroEmotion>("neutral");
   const [supportDeveloper, setSupportDeveloper] = useState(false);
+  const [account, setAccount] = useState<Account>(null);
   const priceLabel = supportDeveloper ? "6.99" : "5.99";
   const heroRef = useRef<HTMLElement>(null);
   const catMotionRef = useRef<HTMLSpanElement>(null);
@@ -1007,6 +1190,7 @@ export default function Home() {
       id="top"
       className={`experience-${experienceUnlocked ? "unlocked" : "locked"}`}
     >
+      <WelcomeSplash />
       <a
         className="skip-link"
         href="#story"
@@ -1050,8 +1234,8 @@ export default function Home() {
           <Eyebrow>A PERSONAL DESKTOP CAT FOR WINDOWS</Eyebrow>
           <h1 id="hero-title">Your screen could use a little more life.</h1>
           <p className="hero-support">
-            MewMuze lives quietly on your desktop—keeping you company, helping with the
-            little things and making an ordinary workday feel a little less ordinary.
+            MewMuze lives quietly on your desktop, keeping you company, helping with the
+            little things, and making an ordinary workday feel a little less ordinary.
           </p>
           <div className="hero-actions">
             <SkeuoButton
@@ -1095,17 +1279,17 @@ export default function Home() {
             <em>That is somehow the problem.</em>
           </h2>
           <p>
-            You spend the best hours of your day alone with a screen. The same three
-            windows. The same tabs. The same silent stretch between starting something
-            and finally finishing it. Not bad, exactly. Just flat — and quiet in a way
-            nobody really talks about.
+            You give the best hours of your day to a screen. The same three windows. The
+            same tabs. The same long silence between starting something and finally
+            finishing it. Nothing is going badly. It is just flat, and quiet in a way
+            nobody really admits to.
           </p>
           <p>
-            A companion does not fix your job or your inbox. It changes the texture of
-            the hours you spend on them, which turns out to matter far more than it
-            sounds like it should.
+            A companion will not fix your job or empty your inbox. What it changes is the
+            texture of the hours you spend on them, and that turns out to matter far more
+            than it sounds like it should.
           </p>
-          <p className="story-turn">Then a tiny pair of green eyes looks up at you.</p>
+          <p className="story-turn">Then a small pair of green eyes looks up at you.</p>
         </div>
         <AppearanceShowcase reducedMotion={reducedMotion} />
       </section>
@@ -1123,7 +1307,7 @@ export default function Home() {
                 <em>Quiet in the important ones.</em>
               </h2>
             </div>
-            <p>A companion rhythm built around a real workday—not a dashboard demanding attention.</p>
+            <p>A companion rhythm built around a real workday, not a dashboard demanding attention.</p>
           </div>
           <ol className="day-timeline">
             {dayMoments.map((moment) => (
@@ -1210,7 +1394,7 @@ export default function Home() {
           <div className="privacy-grid">
             {[
               ["Local file work", "Quick Tools processes selected images and PDFs on your computer."],
-              ["Gmail envelope only", "Newest sender, subject, UID and unread count—never the email body."],
+              ["Gmail envelope only", "Newest sender, subject, UID and unread count. Never the email body."],
               ["Private calendar feed", "Upcoming timed events are fetched only after you add a private iCal address."],
               ["No microphone audio", "MewMuze reads capture-active state, not a recording or transcription."],
               ["No hidden screen reading", "Context uses broad app category and aggregate activity, not screen pixels."],
@@ -1225,6 +1409,44 @@ export default function Home() {
               </article>
             ))}
           </div>
+        </div>
+      </section>
+
+      <section className="account-section section-pad" id="account" data-reveal>
+        <div className="section-shell account-shell">
+          <div className="account-copy-block">
+            <Eyebrow>YOUR MEWMUZE ACCOUNT</Eyebrow>
+            <h2>
+              One small sign up.
+              <br />
+              <em>Then the cat is yours.</em>
+            </h2>
+            <p>
+              Your account is what keeps your cat yours. It remembers the licence, so
+              a new laptop or a fresh install brings back the same companion, wearing
+              the same coat, with every costume you have collected still in the
+              wardrobe.
+            </p>
+            <ul className="account-perks">
+              <li>
+                <strong>Your licence, kept safe</strong>
+                <span>Reinstall any time and sign back in to the same cat.</span>
+              </li>
+              <li>
+                <strong>Your wardrobe travels</strong>
+                <span>Every costume you own follows you to any Windows machine.</span>
+              </li>
+              <li>
+                <strong>Free updates, forever</strong>
+                <span>New features and seasonal outfits arrive at no extra cost.</span>
+              </li>
+            </ul>
+          </div>
+          <AccountPanel
+            account={account}
+            onSignIn={(email) => setAccount({ email })}
+            onSignOut={() => setAccount(null)}
+          />
         </div>
       </section>
 
@@ -1274,10 +1496,31 @@ export default function Home() {
                 </small>
               </span>
             </label>
-            <button className="skeuo-button skeuo-button-primary pricing-coming" type="button" disabled>
-              Coming Soon
-            </button>
-            <p>Purchasing is not live yet. No order or payment is created here.</p>
+            {account ? (
+              <>
+                <button
+                  className="skeuo-button skeuo-button-primary pricing-coming"
+                  type="button"
+                  disabled
+                >
+                  Coming Soon
+                </button>
+                <p>
+                  Signed in as {account.email}. Checkout opens soon and no order or
+                  payment is created here yet.
+                </p>
+              </>
+            ) : (
+              <>
+                <a className="skeuo-button skeuo-button-primary pricing-gate" href="#account">
+                  Create an account to buy
+                </a>
+                <p>
+                  An account is needed before buying. Checkout is not live yet, so no
+                  order or payment is created here.
+                </p>
+              </>
+            )}
           </div>
           <div className="pricing-copy">
             <Eyebrow>ONE CAT. ONE PRICE. ONCE.</Eyebrow>
@@ -1302,7 +1545,7 @@ export default function Home() {
               </li>
               <li>
                 <strong>The wardrobe keeps growing</strong>
-                <span>Costumes added after you buy are included — you never re-purchase your cat.</span>
+                <span>Costumes added after you buy are included, so you never buy your cat twice.</span>
               </li>
             </ul>
             <p className="pricing-footnote">

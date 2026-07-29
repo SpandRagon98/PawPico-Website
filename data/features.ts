@@ -206,7 +206,7 @@ const stories: Omit<FeatureStory, "helps" | "notice">[] = [
     demoLabel: "upcoming → warn → now",
     video: "/videos/calendar-connector.mp4",
     accent: "yellow",
-    facts: ["Private iCal address", "0–120 minute warning", "Five-minute snooze"],
+    facts: ["Private iCal address", "0 to 120 minute warning", "Five-minute snooze"],
   },
   {
     id: "physics",
@@ -234,7 +234,7 @@ const stories: Omit<FeatureStory, "helps" | "notice">[] = [
     story:
       "Broad app category and activity select a fitting pose: notebook, tiny keyboard, reading strip or glasses.",
     detail:
-      "MewMuze uses executable category and aggregate activity—not typed content or screen capture.",
+      "MewMuze uses executable category and aggregate activity, never typed content or screen capture.",
     demoLabel: "write → type → read → rest",
     video: "/videos/context-companion.mp4",
     accent: "blue",
@@ -356,13 +356,13 @@ const stories: Omit<FeatureStory, "helps" | "notice">[] = [
 
 const helps: Record<string, string> = {
   cursor:
-    "The screen stops feeling like furniture. Something in there registers that you are present — you move the mouse, it looks up, and the room is a little less empty than it was a second ago.",
+    "The screen stops feeling like furniture. Something in there registers that you are present. You move the mouse, it looks up, and the room feels a little less empty than it did a second ago.",
   petting:
     "Thirty seconds of stroking a warm little animal is a genuinely better reset after a hard message than another lap around social media. It costs nothing and it is always within reach.",
   sleep:
     "The cat winds down when you do, so your desktop stops shouting at the end of the day. Watching something curl up and go quiet is a surprisingly strong signal that you are allowed to stop too.",
   work:
-    "You stop handing private documents to a free converter website. The two file jobs you actually do — images into a PDF, a PDF back into images — happen on your own machine in seconds.",
+    "You stop handing private documents to a free converter website. The two file jobs you actually do, images into a PDF and a PDF back into images, happen on your own machine in seconds.",
   clipboard:
     "The thing you copied is still there when you need it two steps later, so you stop re-finding the same link, code or address for the third time in ten minutes.",
   focus:
@@ -372,36 +372,36 @@ const helps: Record<string, string> = {
   breaks:
     "You actually stand up. A break you watch a cat take with you is much harder to dismiss than a notification you have already learned to click away without reading.",
   reminders:
-    "The small things that fall through — the tablet, the callback, the water — arrive in your own words from something you like looking at, so they land instead of blending into the noise.",
+    "The small things that fall through, the tablet, the callback, the water, arrive in your own words from something you like looking at, so they land instead of blending into the noise.",
   gmail:
     "You close the inbox tab that has been eating your afternoon. When something genuinely new lands, the cat waves and tells you who it is and what it is about. One line, no red badge, no falling back into the inbox.",
   calendar:
     "You stop joining calls four minutes late because a browser notification appeared behind a full-screen window. The warning comes from something always on top, with enough lead time to actually get ready.",
   physics:
-    "This is the part that makes people call a colleague over. Your real windows are the world — the cat walks your taskbar, hops between the apps you have open, and hangs off the edge of what you are typing in.",
+    "This is the part that makes people call a colleague over. Your real windows are the world. The cat walks your taskbar, hops between the apps you have open, and hangs off the edge of whatever you are typing in.",
   context:
     "The cat reads the room without reading your screen. Open an editor and glasses appear; type hard for ten minutes and it starts steaming. You feel accompanied at work, from nothing more sensitive than an app name.",
   music:
-    "Your music gets a tiny dancing audience. It costs you nothing — MewMuze never learns the artist or the track, only that something is playing.",
+    "Your music gets a tiny dancing audience. It costs you nothing, because MewMuze never learns the artist or the track, only that something is playing.",
   microphone:
-    "Every call ends with a small bow. The cat knows the mic went live and nothing else — no stream is opened, recorded or transcribed.",
+    "Every call ends with a small bow. The cat knows the mic went live and nothing else. No stream is opened, recorded or transcribed.",
   appearance:
-    "The cat becomes yours rather than a stock mascot. People rebuild a cat they have lost, match a partner's tabby, or invent something that never existed — and it greets them in that form every morning.",
+    "The cat becomes yours rather than a stock mascot. People rebuild a cat they have lost, match a partner's tabby, or invent something that never existed, and it greets them in that form every single morning.",
   personality:
-    "This is why it does not get old in week three. Energy drains and recovers, moods carry over, affection is remembered — so the cat you have in March behaves like one you have lived with, not a looping GIF.",
+    "This is why it does not get old in week three. Energy drains and recovers, moods carry over, affection is remembered, so the cat you have in March behaves like one you have lived with rather than a looping GIF.",
   peek:
     "It never costs you a meeting. When you present or go full screen, the cat steps aside on its own, so you get a companion without a single embarrassing moment.",
   agent:
     "Stop babysitting a long build. The cat works while the job runs and celebrates from across the screen when it lands, so you can go make tea and still know the moment it finishes.",
   lightweight:
-    "It behaves itself. No taskbar clutter, clicks pass through to whatever is underneath, and it goes near-idle when hidden — so company never costs you a battery or a frame rate.",
+    "It behaves itself. No taskbar clutter, clicks pass through to whatever is underneath, and it goes near idle when hidden, so company never costs you a battery or a frame rate.",
 };
 
 const notices: Record<string, FeatureNotice> = {
   gmail: {
     app: "GMAIL",
     title: "Priya Raman",
-    body: "Hey! There is a new mail — “Re: the deck for Monday”",
+    body: "Hey! There is a new mail. “Re: the deck for Monday”",
   },
   calendar: {
     app: "CALENDAR",
@@ -416,7 +416,7 @@ const notices: Record<string, FeatureNotice> = {
   focus: {
     app: "FOCUS",
     title: "25:00 complete",
-    body: "Nice run. Take five — I will guard the desk.",
+    body: "Nice run. Take five, I will guard the desk.",
   },
   breaks: {
     app: "BREAK",

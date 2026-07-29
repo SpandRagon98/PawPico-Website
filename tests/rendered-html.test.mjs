@@ -243,7 +243,7 @@ test("hard-cuts through varied authentic cats and emotions while visible", async
 
   assert.match(html, /Nothing is wrong\./);
   assert.match(html, /That is somehow the problem\./);
-  assert.match(html, /Then a tiny pair of green eyes looks up at you\./);
+  assert.match(html, /Then a small pair of green eyes looks up at you\./);
   assert.match(html, /LIVE APPEARANCE \/ AUTHENTIC RENDERER/);
   assert.match(page, /white-grey-flower/);
   assert.match(page, /orange-happy/);
@@ -352,7 +352,7 @@ test("adds an honest one-time $5.99 pricing section without a fake checkout", as
   assert.match(html, /Personal Windows desktop cat/);
   assert.match(html, /Local-first privacy/);
   assert.match(html, /Coming Soon/);
-  assert.match(html, /Purchasing is not live yet/);
+  assert.match(html, /Checkout is not live yet/);
   assert.doesNotMatch(html, />\s*(?:Buy now|Checkout)\s*</i);
   assert.doesNotMatch(html, /Limited-time|refund policy/i);
 });
@@ -419,7 +419,7 @@ test("explains privacy without inventing screen, email-body, or microphone acces
 
   assert.match(html, /Local file work/);
   assert.match(html, /Gmail envelope only/);
-  assert.match(html, /never the email body/);
+  assert.match(html, /Never the email body/);
   assert.match(html, /Private calendar feed/);
   assert.match(html, /No microphone audio/);
   assert.match(html, /not a recording or transcription/);
@@ -604,9 +604,9 @@ test("tells the story of a flat day that a companion changes", async () => {
   const html = await response.text();
   assert.match(html, /Nothing is wrong\./);
   assert.match(html, /That is somehow the problem\./);
-  assert.match(html, /alone with a screen/);
-  assert.match(html, /Then a tiny pair of green eyes looks up at you\./);
-  assert.match(html, /You close the laptop last\./);
+  assert.match(html, /give the best hours of your day to a screen/);
+  assert.match(html, /Then a small pair of green eyes looks up at you\./);
+  assert.match(html, /You close the laptop last/);
 });
 
 test("gives phones their own layout instead of a squeezed desktop", async () => {
@@ -636,7 +636,7 @@ test("fits the whole locked hero on a phone screen", async () => {
 test("uses a soft kawaii canvas with the hero's left-hand bar removed", async () => {
   const css = await source("../app/globals.css");
   // the white canvas was repainted blush-cream by the kawaii theme
-  assert.match(css, /html\s*\{\s*background:\s*#fff7fa/);
+  assert.match(css, /html\s*\{\s*background:\s*#f7fbff/);
   assert.match(css, /\.hero-edge\s*\{\s*display:\s*none/);
   // the flat tactile system stays: depth comes from bevels, never gradients
   // Glass is now part of the design language, so backdrop-filter and the soft
@@ -752,13 +752,13 @@ test("dresses the site in the kawaii system without touching the cat", async () 
   // the palette is applied by repainting the existing tokens, so the whole
   // site follows from one place rather than per-component overrides
   assert.match(css, /--background: var\(--kw-cream\)/);
-  assert.match(css, /--text: #5e4a55/);
+  assert.match(css, /--text: #48505c/);
   assert.match(css, /--pink: #4fb2e8/);
 
   // skeuomorphism survives as puffy marshmallow bevels, glass stays milky
   assert.match(css, /\.skeuo-button\s*\{[^}]*border-radius: 999px/s);
   assert.match(css, /\.skeuo-button:active\s*\{[^}]*scale\(0\.97\)/s);
-  assert.match(css, /--glass-tint-strong: rgba\(255, 250, 252/);
+  assert.match(css, /--glass-tint-strong: rgba\(250, 253, 255/);
 
   // cute motion
   for (const kf of ["kw-bob", "kw-wiggle", "kw-float", "kw-cat-in", "kw-tick", "kw-heartbeat"]) {
@@ -779,10 +779,10 @@ test("aligns the mobile nav and keeps kawaii text readable", async () => {
   assert.match(css, /\.nav-dock\s*\{[^}]*padding: 8px 12px/s);
 
   // pastel text had drifted too pale: 89 nodes were under the WCAG minimum
-  assert.match(css, /--text-secondary: #6b5560/);
+  assert.match(css, /--text-secondary: #586270/);
   // the privacy block kept a dark plum fill while headings turned dark plum,
   // leaving the headline at 1.24:1
-  assert.match(css, /\.privacy\s*\{\s*background: #f4eefc/);
+  assert.match(css, /\.privacy\s*\{\s*background: #eef5fd/);
   assert.match(css, /\.pricing-price strong\s*\{\s*color: #1f6fae/);
 });
 
@@ -856,4 +856,62 @@ test("gives heading-like <strong> labels the same display font as real headings"
 test("makes the nav bar a full pebble/pill shape at every width", async () => {
   const css = await source("../app/globals.css");
   assert.match(css, /\.nav-dock\s*\{\s*border-radius: 999px;\s*\}\s*$/m);
+});
+
+test("shows a welcome curtain with a loading bar before the site appears", async () => {
+  const html = await (await render()).text();
+  const page = await source("../app/page.tsx");
+  const css = await source("../app/globals.css");
+
+  // rendered server side too, so the page never flashes through underneath
+  assert.match(html, /class="welcome-splash"/);
+  assert.match(html, /Welcome to MewMuze/);
+  assert.match(html, /class="splash-bar"/);
+
+  // it lifts itself away and unlocks the page again
+  assert.match(page, /setPhase\("leaving"\)/);
+  assert.match(page, /setPhase\("gone"\)/);
+  assert.match(page, /mewmuze-splash-open/);
+  assert.match(css, /@keyframes splash-fill/);
+  assert.match(css, /\.welcome-splash\.is-leaving/);
+  // soft blue field, matching the page it hands over to
+  assert.match(css, /\.welcome-splash\s*\{[^}]*background: #eef7ff/s);
+});
+
+test("requires an account before the purchase step", async () => {
+  const html = await (await render()).text();
+  const page = await source("../app/page.tsx");
+
+  // signed out is the server-rendered default, so the gate is what ships
+  assert.match(html, /Create an account to buy/);
+  assert.match(html, /id="account"/);
+  assert.match(html, /Create account/);
+  assert.match(html, /Sign in/);
+  assert.doesNotMatch(html, /Signed in as/);
+
+  // the buy control only appears once an account exists
+  assert.match(page, /account \? \(/);
+  assert.match(page, /pricing-gate/);
+
+  // honest about the state of it: no backend, and the password is never kept
+  assert.match(page, /setPassword\(""\)/);
+  assert.match(html, /nothing you type here leaves/);
+  assert.doesNotMatch(page, /localStorage|sessionStorage/);
+});
+
+test("writes the story as prose with no dashes anywhere in the copy", async () => {
+  const page = await source("../app/page.tsx");
+  const features = await source("../data/features.ts");
+
+  // em dash and en dash are both out of the copy entirely
+  for (const [name, src] of [["page.tsx", page], ["features.ts", features]]) {
+    assert.doesNotMatch(src, /[–—]/, `${name} still contains a dash`);
+  }
+
+  const html = await (await render()).text();
+  // the rewritten beats read as a narrative rather than feature captions
+  assert.match(html, /The first thing that looks back/);
+  assert.match(html, /It sits down when you do/);
+  assert.match(html, /Somebody was paying attention to you today/);
+  assert.match(html, /You laugh out loud, alone, at your desk/);
 });

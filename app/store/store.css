@@ -140,7 +140,7 @@
   border: 2px solid #986476;
   border-radius: 50%;
   background: var(--flower);
-  box-shadow: 0 0 0 3px #fcebf1;
+  box-shadow: 0 0 0 3px #e3f0fb;
 }
 
 .store-hero h1,
@@ -1159,5 +1159,5 @@
 
 .store-swatch,
 .concept-figure {
-  background: #fff4f8;
+  background: #f2f9ff;
 }
