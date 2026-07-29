@@ -1142,3 +1142,22 @@
     line-height: 1;
   }
 }
+
+/* 🌸 Kawaii: the store inherits the palette through tokens; these are the few
+   hard-coded cool greys that needed warming to match. */
+.store-hero,
+.concept-card,
+.concept-figure,
+.store-note {
+  border-radius: 26px;
+}
+
+.store-page [style*="#e1e4e6"],
+.concept-progress span {
+  background: #ffdfec;
+}
+
+.store-swatch,
+.concept-figure {
+  background: #fff4f8;
+}

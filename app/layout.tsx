@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Geist_Mono, Montserrat } from "next/font/google";
+import { Baloo_2, Geist_Mono, Montserrat, Quicksand } from "next/font/google";
 import "./globals.css";
 
 const montserrat = Montserrat({
@@ -8,6 +8,17 @@ const montserrat = Montserrat({
   weight: ["400", "500", "600", "700", "800"],
 });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
+// Kawaii type: a soft rounded display face, and a friendly rounded UI face.
+const baloo = Baloo_2({
+  variable: "--font-kawaii-display",
+  subsets: ["latin"],
+  weight: ["500", "600", "700", "800"],
+});
+const quicksand = Quicksand({
+  variable: "--font-kawaii-ui",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+});
 const siteUrl =
   process.env.NEXT_PUBLIC_SITE_URL ?? "https://spandragon98.github.io/PawPico-Website";
 const catIcon = `${siteUrl}/cat/mewmuze-face-logo-192.png`;
@@ -60,7 +71,9 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
-      <body className={`${montserrat.variable} ${geistMono.variable}`}>
+      <body
+        className={`${montserrat.variable} ${geistMono.variable} ${baloo.variable} ${quicksand.variable}`}
+      >
         {children}
       </body>
     </html>

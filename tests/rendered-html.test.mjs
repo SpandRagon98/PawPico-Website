@@ -620,9 +620,10 @@ test("fits the whole locked hero on a phone screen", async () => {
   assert.match(css, /\.choice-block > div > button\s*\{[^}]*min-height:\s*46px/s);
 });
 
-test("uses a white canvas with the hero's left-hand bar removed", async () => {
+test("uses a soft kawaii canvas with the hero's left-hand bar removed", async () => {
   const css = await source("../app/globals.css");
-  assert.match(css, /body\s*\{\s*background:\s*#ffffff/);
+  // the white canvas was repainted blush-cream by the kawaii theme
+  assert.match(css, /html\s*\{\s*background:\s*#fff7fa/);
   assert.match(css, /\.hero-edge\s*\{\s*display:\s*none/);
   // the flat tactile system stays: depth comes from bevels, never gradients
   // Glass is now part of the design language, so backdrop-filter and the soft
@@ -723,4 +724,35 @@ test("layers glassmorphism over the tactile system without breaking it", async (
   assert.match(css, /overflow-x: clip/);
   // a fallback for browsers without backdrop-filter
   assert.match(css, /@supports not \(\(backdrop-filter/);
+});
+
+test("dresses the site in the kawaii system without touching the cat", async () => {
+  const layout = await source("../app/layout.tsx");
+  const css = await source("../app/globals.css");
+
+  // rounded display + UI faces
+  assert.match(layout, /Baloo_2/);
+  assert.match(layout, /Quicksand/);
+  assert.match(layout, /variable: "--font-kawaii-display"/);
+  assert.match(css, /--font-kawaii-display/);
+
+  // the palette is applied by repainting the existing tokens, so the whole
+  // site follows from one place rather than per-component overrides
+  assert.match(css, /--background: var\(--kw-cream\)/);
+  assert.match(css, /--text: #5e4a55/);
+  assert.match(css, /--pink: #ff9dc0/);
+
+  // skeuomorphism survives as puffy marshmallow bevels, glass stays milky
+  assert.match(css, /\.skeuo-button\s*\{[^}]*border-radius: 999px/s);
+  assert.match(css, /\.skeuo-button:active\s*\{[^}]*scale\(0\.97\)/s);
+  assert.match(css, /--glass-tint-strong: rgba\(255, 250, 252/);
+
+  // cute motion
+  for (const kf of ["kw-bob", "kw-wiggle", "kw-float", "kw-cat-in", "kw-tick", "kw-heartbeat"]) {
+    assert.match(css, new RegExp(`@keyframes ${kf}`), `${kf} keyframe missing`);
+  }
+
+  // and the cat itself is untouched
+  assert.match(css, /\.hero-eye-track\s*\{[\s\S]*?border-radius:\s*48%/);
+  assert.match(css, /\.hero-pupil\s*\{[\s\S]*?border-radius:\s*47%/);
 });

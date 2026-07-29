@@ -6412,3 +6412,731 @@ body {
     opacity: 0;
   }
 }
+
+/* ============================================================================
+   🌸 KAWAII UI
+
+   Same trick as before: repaint the design tokens rather than restyle
+   components, so most of the site turns soft from ~30 declarations.
+
+   Skeuomorphism stays (puffy, marshmallow bevels instead of hard metal) and
+   the glass panes stay (milky pastel instead of clear). Nothing about the cat
+   changes - the sprites, eyes and pupils are untouched.
+   ========================================================================== */
+
+body {
+  /* pastel palette */
+  --kw-cream: #fff7fa;
+  --kw-blush: #ffd9e8;
+  --kw-rose: #ff9dc0;
+  --kw-mint: #b6ecd4;
+  --kw-sky: #c4e5ff;
+  --kw-lilac: #ddd0fb;
+  --kw-butter: #ffeeb8;
+  --kw-cocoa: #6b5560;
+
+  /* --- existing tokens, softened ------------------------------------- */
+  --background: var(--kw-cream);
+  --surface: #ffffff;
+  --surface-warm: #fffdfa;
+  --recessed: #ffeef5;
+  --border: #ffd3e4;
+  --border-dark: #f5b3ce;
+  --text: #5e4a55;
+  --text-secondary: #93808c;
+  --charcoal: #5e4a55;
+  --mint: #b6ecd4;
+  --green: #6fcfa2;
+  --pink: #ff9dc0;
+  --flower: #ffc2dc;
+  --lavender: #ddd0fb;
+  --powder: #c4e5ff;
+  --peach: #ffd9c2;
+  --yellow: #ffeeb8;
+
+  /* soft, pink-tinted depth instead of grey */
+  --shadow-raised: 0 3px 0 #f7c9dc, 0 12px 26px rgba(214, 142, 173, 0.24);
+  --shadow-small: 0 2px 0 #f7c9dc, 0 7px 16px rgba(214, 142, 173, 0.2);
+  --shadow-inset: inset 0 3px 7px rgba(214, 142, 173, 0.22), inset 0 -1px 0 #ffffff;
+
+  /* glass, milky pastel */
+  --glass-tint: rgba(255, 255, 255, 0.62);
+  --glass-tint-strong: rgba(255, 250, 252, 0.8);
+  --glass-edge: rgba(255, 255, 255, 0.95);
+  --glass-line: rgba(245, 179, 206, 0.55);
+  --glass-blur: saturate(1.35) blur(18px);
+  --glass-shadow: 0 12px 30px rgba(214, 142, 173, 0.26);
+
+  --sans: var(--font-kawaii-ui), var(--font-montserrat), system-ui, sans-serif;
+  --mono: var(--font-kawaii-ui), var(--font-geist-mono), monospace;
+
+  background: var(--kw-cream);
+  color: var(--text);
+  font-family: var(--sans);
+}
+
+html {
+  background: #fff7fa;
+}
+
+/* the page had hard-coded white sections */
+.hero,
+.monotony,
+.feature-directory,
+.final-cta,
+.site-footer {
+  background: transparent;
+}
+
+/* soft pastel wash behind everything */
+body::after {
+  position: fixed;
+  z-index: -2;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 60% 40% at 12% 8%, rgba(255, 214, 232, 0.7), transparent 62%),
+    radial-gradient(ellipse 55% 42% at 88% 26%, rgba(196, 229, 255, 0.6), transparent 64%),
+    radial-gradient(ellipse 70% 40% at 50% 100%, rgba(221, 208, 251, 0.55), transparent 66%);
+  content: "";
+  pointer-events: none;
+}
+
+/* --- TYPE: rounded and friendly --------------------------------------- */
+h1,
+h2,
+h3,
+h4 {
+  color: #4f3d47;
+  font-family: var(--font-kawaii-display), var(--font-kawaii-ui), sans-serif;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  text-transform: none;
+}
+
+.hero h1 {
+  font-size: clamp(40px, 5.4vw, 88px);
+  line-height: 1.06;
+}
+
+.eyebrow {
+  color: #d97fa8;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+}
+
+/* --- PUFFY SKEUOMORPHIC CONTROLS -------------------------------------- */
+.skeuo-button {
+  border: 2px solid #f5b3ce;
+  border-radius: 999px;
+  color: #5e4a55;
+  background: #ffffff;
+  box-shadow:
+    inset 0 3px 0 #ffffff,
+    inset 0 -4px 0 #ffe3ee,
+    0 4px 0 #f7c9dc,
+    0 10px 20px rgba(214, 142, 173, 0.26);
+  font-family: var(--font-kawaii-display), sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: none;
+  transition:
+    transform 240ms cubic-bezier(0.34, 1.7, 0.5, 1),
+    box-shadow 240ms ease,
+    background-color 200ms ease;
+}
+
+.skeuo-button:hover {
+  transform: translateY(-3px) rotate(-1deg);
+  box-shadow:
+    inset 0 3px 0 #ffffff,
+    inset 0 -4px 0 #ffe3ee,
+    0 7px 0 #f7c9dc,
+    0 16px 28px rgba(214, 142, 173, 0.32);
+}
+
+/* squish, like pressing a marshmallow */
+.skeuo-button:active {
+  transform: translateY(3px) scale(0.97);
+  box-shadow: inset 0 4px 8px rgba(214, 142, 173, 0.35);
+}
+
+.skeuo-button-primary,
+.hero-buy {
+  border-color: #ff9dc0;
+  color: #6d2a45;
+  background: #ffc2dc;
+  box-shadow:
+    inset 0 3px 0 #ffe0ee,
+    inset 0 -4px 0 #ffa8c9,
+    0 4px 0 #f58bb2,
+    0 12px 24px rgba(245, 139, 178, 0.4);
+}
+
+.skeuo-button-primary:hover,
+.hero-buy:hover {
+  background: #ffd0e4;
+}
+
+.skeuo-button-secondary {
+  border-color: #a8dcc6;
+  color: #2f5c47;
+  background: #d6f5e7;
+  box-shadow:
+    inset 0 3px 0 #ecfbf4,
+    inset 0 -4px 0 #b9e8d4,
+    0 4px 0 #9adcc0,
+    0 10px 20px rgba(122, 200, 168, 0.34);
+}
+
+.skeuo-button-quiet {
+  border-color: transparent;
+  color: #c07a9a;
+  background: transparent;
+  box-shadow: none;
+  text-decoration-color: #ffb8d2;
+}
+
+/* --- MILKY GLASS PANES ------------------------------------------------- */
+.nav-dock,
+.cat-speech,
+.hero-status,
+.media-label,
+.media-caption,
+.showcase-ticket,
+.preset-ticket,
+.studio-live-badge,
+.theatre-arrow,
+.coming-pill,
+.theatre-counter {
+  border: 2px solid rgba(245, 179, 206, 0.6);
+  border-radius: 999px;
+  color: #5e4a55;
+  background: var(--glass-tint-strong);
+  box-shadow:
+    inset 0 2px 0 #ffffff,
+    0 10px 24px rgba(214, 142, 173, 0.26);
+}
+
+.nav-dock {
+  border-radius: 26px;
+}
+
+.media-label,
+.media-caption,
+.showcase-ticket,
+.preset-ticket {
+  border-radius: 18px;
+}
+
+.desktop-nav > a {
+  color: #7a6470;
+  font-weight: 700;
+}
+
+.desktop-nav > a:hover {
+  color: #ff9dc0;
+}
+
+/* --- ROUNDED, PILLOWY PANELS ------------------------------------------ */
+.theatre-console,
+.studio-window,
+.pricing-card,
+.appearance-showcase,
+.store-teaser-card,
+.cta-cat,
+.directory-panel,
+.directory-grid article,
+.privacy-grid article,
+.pricing-promises li,
+.day-timeline li,
+.feature-helps,
+.directory-helps,
+.tip-toggle,
+.theatre-stage,
+.theatre-media,
+.theatre-copy {
+  border-color: #ffd3e4;
+  border-radius: 26px;
+  background: #ffffff;
+  box-shadow:
+    inset 0 3px 0 #ffffff,
+    inset 0 -5px 0 #fff2f7,
+    0 4px 0 #f9d8e6,
+    0 18px 36px rgba(214, 142, 173, 0.2);
+}
+
+.feature-helps,
+.directory-helps {
+  border-left: 4px solid #b6ecd4;
+  background: #f4fdf8;
+}
+
+.app-notice {
+  border: 2px solid #f5b3ce;
+  border-radius: 18px;
+  background: #ffffff;
+  box-shadow: 0 4px 0 #f9d8e6, 0 14px 28px rgba(214, 142, 173, 0.3);
+}
+
+.app-notice::after {
+  border-color: #f5b3ce;
+  background: #ffffff;
+}
+
+.pricing-price strong {
+  color: #e8709c;
+}
+
+/* chips become little candy pills */
+.chip,
+.choice-block > div > button {
+  border: 2px solid #ffd3e4;
+  border-radius: 999px;
+  color: #7a6470;
+  background: #ffffff;
+  font-weight: 700;
+  box-shadow: inset 0 2px 0 #fff, 0 3px 0 #f9d8e6;
+}
+
+.chip.active,
+.choice-block > div > button.is-active {
+  border-color: #ff9dc0;
+  color: #6d2a45;
+  background: #ffc2dc;
+  box-shadow: inset 0 2px 0 #ffe0ee, 0 3px 0 #f58bb2;
+}
+
+/* --- CUTE MOTION ------------------------------------------------------- */
+/* the whole hero breathes a touch */
+.hero-buy {
+  animation: kw-bob 2.8s ease-in-out infinite;
+}
+
+@keyframes kw-bob {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-3px) rotate(-0.8deg); }
+}
+
+.hero-buy:hover {
+  animation: kw-wiggle 0.5s ease-in-out infinite;
+}
+
+@keyframes kw-wiggle {
+  0%, 100% { transform: rotate(-2deg) translateY(-3px); }
+  50% { transform: rotate(2deg) translateY(-3px); }
+}
+
+/* sparkles drifting up behind the hero copy */
+.hero-copy::after {
+  position: absolute;
+  top: 8%;
+  right: 6%;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #ffd9e8;
+  box-shadow:
+    40px 90px 0 -2px #c4e5ff,
+    -70px 150px 0 -3px #ffeeb8,
+    120px 220px 0 -2px #ddd0fb,
+    -30px 300px 0 -4px #ff9dc0;
+  content: "";
+  pointer-events: none;
+  animation: kw-float 7s ease-in-out infinite;
+}
+
+@keyframes kw-float {
+  0%, 100% { opacity: 0.75; transform: translateY(0); }
+  50% { opacity: 1; transform: translateY(-16px); }
+}
+
+/* the cat gets a soft pink halo (art itself untouched) */
+.hero-cat-motion {
+  filter: drop-shadow(0 10px 26px rgba(245, 139, 178, 0.35));
+}
+
+/* reveals arrive with a gentle pop instead of a slide */
+[data-reveal] .directory-panel,
+[data-reveal] .privacy-grid article,
+[data-reveal] .day-timeline li,
+[data-reveal] .pricing-promises li {
+  transform: translate3d(0, 20px, 0) scale(0.97);
+}
+
+[data-reveal].is-revealed .directory-panel,
+[data-reveal].is-revealed .privacy-grid article,
+[data-reveal].is-revealed .day-timeline li,
+[data-reveal].is-revealed .pricing-promises li {
+  transition-timing-function: cubic-bezier(0.34, 1.6, 0.5, 1);
+  transform: translate3d(0, 0, 0) scale(1);
+}
+
+/* cards tilt a little when you hover them */
+.directory-grid article:hover,
+.privacy-grid article:hover {
+  transform: translateY(-4px) rotate(-0.6deg);
+}
+
+@media (max-width: 760px) {
+  .hero-copy::after {
+    display: none;
+  }
+
+  .theatre-console,
+  .studio-window,
+  .pricing-card,
+  .cta-cat,
+  .directory-grid article {
+    border-radius: 22px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-buy,
+  .hero-copy::after {
+    animation: none;
+  }
+
+  .skeuo-button:hover,
+  .directory-grid article:hover,
+  .privacy-grid article:hover {
+    transform: none;
+  }
+}
+
+
+/* ============================================================================
+   🌸 KAWAII, PART TWO — the surfaces the token repaint missed, stronger
+   contrast on the pale controls, and the full set of cute motions.
+   ========================================================================== */
+
+/* --- 1. LEFTOVER COOL-GREY SURFACES ------------------------------------- */
+.theatre-controls,
+.theatre-stage,
+.showcase-cat-well,
+.studio-preview,
+.console-rim,
+.showcase-window-bar {
+  background: #fff4f8;
+}
+
+.theatre-controls {
+  border-radius: 22px;
+}
+
+/* window-bar dots and console rim become candy buttons */
+.showcase-window-bar i,
+.studio-titlebar i,
+.console-rim span {
+  border-radius: 50%;
+  background: #ffc2dc;
+  box-shadow: inset 0 1px 0 #fff;
+}
+
+.showcase-window-bar i:nth-child(2),
+.studio-titlebar i:nth-child(2),
+.console-rim span:nth-child(2) {
+  background: #ffeeb8;
+}
+
+.showcase-window-bar i:nth-child(3),
+.studio-titlebar i:nth-child(3),
+.console-rim span:nth-child(3) {
+  background: #b6ecd4;
+}
+
+.showcase-progress span {
+  border-radius: 999px;
+  background: #ffdfec;
+}
+
+.showcase-progress span.is-active {
+  background: #ff9dc0;
+}
+
+.studio-titlebar,
+.showcase-ticket small,
+.media-label {
+  color: #7a6470;
+}
+
+/* --- 2. CONTRAST ON THE PALE CONTROLS ----------------------------------
+   The mint secondary and the quiet link were washing out on a light page.
+   ------------------------------------------------------------------------ */
+.skeuo-button-secondary {
+  border-color: #7fc9a8;
+  color: #1f5240;
+  background: #b9ebd6;
+  box-shadow:
+    inset 0 3px 0 #ddf7ec,
+    inset 0 -4px 0 #97dcbd,
+    0 4px 0 #74c2a1,
+    0 10px 20px rgba(96, 178, 145, 0.34);
+}
+
+.skeuo-button-secondary:hover {
+  background: #c9f2e1;
+}
+
+.skeuo-button-quiet {
+  color: #b3567f;
+  font-weight: 700;
+  text-decoration-color: #ff9dc0;
+  text-underline-offset: 6px;
+}
+
+.skeuo-button-quiet:hover {
+  color: #8f3d63;
+  background: #fff0f6;
+  box-shadow: 0 3px 0 #f9d8e6;
+}
+
+.desktop-nav > a {
+  color: #6b5560;
+}
+
+.nav-cta {
+  border-color: #7fc9a8;
+  color: #1f5240;
+  background: #b9ebd6;
+}
+
+/* --- 3. CUTE MOTION, EVERYWHERE ----------------------------------------- */
+
+/* nav links hop when you point at them */
+.desktop-nav > a {
+  display: inline-block;
+  transition: transform 260ms cubic-bezier(0.34, 1.7, 0.5, 1), color 200ms ease;
+}
+
+.desktop-nav > a:hover {
+  transform: translateY(-3px);
+}
+
+/* the whole hero pops in on load */
+.hero-copy > .eyebrow,
+.hero-copy > h1,
+.hero-copy > .hero-support,
+.hero-copy > .hero-actions,
+.hero-copy > .privacy-note {
+  animation-timing-function: cubic-bezier(0.34, 1.6, 0.5, 1);
+}
+
+.hero-cat-peek {
+  animation: kw-cat-in 900ms cubic-bezier(0.34, 1.5, 0.5, 1) both;
+}
+
+@keyframes kw-cat-in {
+  from { opacity: 0; transform: translate3d(0, 40px, 0) scale(0.94); }
+  to { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+}
+
+/* the cat leans in when you point at it */
+.hero-cat-peek:hover .hero-cat-art {
+  animation-duration: 2.6s;
+}
+
+/* chips and choices squish like jelly */
+.chip,
+.choice-block > div > button,
+.theatre-progress button {
+  transition: transform 240ms cubic-bezier(0.34, 1.7, 0.5, 1), background-color 200ms ease,
+    box-shadow 200ms ease, color 200ms ease;
+}
+
+.chip:hover,
+.choice-block > div > button:hover,
+.theatre-progress button:hover {
+  transform: translateY(-3px) rotate(-1.5deg);
+}
+
+.chip:active,
+.choice-block > div > button:active,
+.theatre-progress button:active {
+  transform: scale(0.93);
+}
+
+/* tickets and badges bob gently */
+.showcase-ticket,
+.preset-ticket,
+.studio-live-badge,
+.coming-pill {
+  animation: kw-bob 3.4s ease-in-out infinite;
+}
+
+.preset-ticket { animation-delay: 0.4s; }
+.studio-live-badge { animation-delay: 0.8s; }
+.coming-pill { animation-delay: 1.2s; }
+
+/* the price gives a happy little pulse */
+.pricing-price strong {
+  display: inline-block;
+  animation: kw-heartbeat 2.6s ease-in-out infinite;
+}
+
+@keyframes kw-heartbeat {
+  0%, 100% { transform: scale(1); }
+  14% { transform: scale(1.06); }
+  28% { transform: scale(1); }
+  42% { transform: scale(1.04); }
+  56% { transform: scale(1); }
+}
+
+/* carousel arrows roll toward their direction */
+.theatre-arrow {
+  transition: transform 260ms cubic-bezier(0.34, 1.7, 0.5, 1), background-color 200ms ease,
+    box-shadow 200ms ease;
+}
+
+.theatre-arrow-left:hover:not(:disabled) {
+  transform: translateX(-4px) rotate(-8deg);
+}
+
+.theatre-arrow-right:hover:not(:disabled) {
+  transform: translateX(4px) rotate(8deg);
+}
+
+/* accordion opens with a bounce */
+.directory-panel > h3 > button > i {
+  transition: transform 400ms cubic-bezier(0.34, 1.7, 0.5, 1);
+}
+
+.directory-panel.is-open > h3 > button > i {
+  transform: rotate(135deg) scale(1.15);
+}
+
+.directory-panel > h3 > button:hover {
+  background: #fff4f8;
+}
+
+/* the tip toggle bounces when ticked */
+.tip-toggle:has(input:checked) .tip-box {
+  animation: kw-tick 460ms cubic-bezier(0.34, 1.8, 0.5, 1);
+}
+
+@keyframes kw-tick {
+  0% { transform: scale(0.7) rotate(-12deg); }
+  60% { transform: scale(1.16) rotate(6deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+
+.tip-toggle:has(input:checked) {
+  border-color: #ff9dc0;
+  background: #fff2f7;
+}
+
+.tip-toggle:has(input:checked) .tip-box {
+  border-color: #ff9dc0;
+  background: #ff9dc0;
+}
+
+/* feature copy slides in softly instead of snapping */
+.theatre-copy {
+  animation: kw-slide-in 520ms cubic-bezier(0.34, 1.6, 0.5, 1) both;
+}
+
+@keyframes kw-slide-in {
+  from { opacity: 0; transform: translate3d(0, 16px, 0) scale(0.985); }
+  to { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+}
+
+.feature-media-cat {
+  animation: kw-cat-pop 560ms cubic-bezier(0.34, 1.7, 0.5, 1) both;
+}
+
+@keyframes kw-cat-pop {
+  from { opacity: 0; transform: scale(0.86) rotate(-3deg); }
+  to { opacity: 1; transform: scale(1) rotate(0deg); }
+}
+
+/* section headings drift up with a little overshoot */
+[data-reveal].is-revealed .section-heading > div > h2,
+[data-reveal].is-revealed .monotony-copy > h2,
+[data-reveal].is-revealed .appearance-copy > h2,
+[data-reveal].is-revealed .pricing-copy > h2,
+[data-reveal].is-revealed .privacy-copy > h2 {
+  transition-timing-function: cubic-bezier(0.34, 1.55, 0.5, 1);
+}
+
+/* the day timeline pins pop like little bubbles */
+.timeline-pin {
+  border-radius: 50%;
+  background: #ff9dc0;
+  box-shadow: 0 0 0 5px #ffe4ef;
+  transition: transform 300ms cubic-bezier(0.34, 1.8, 0.5, 1);
+}
+
+.day-timeline li:hover .timeline-pin {
+  transform: scale(1.35);
+}
+
+/* the notice wobbles in */
+.notice-float {
+  animation: kw-notice 7s cubic-bezier(0.34, 1.6, 0.5, 1) infinite;
+}
+
+@keyframes kw-notice {
+  0% { opacity: 0; transform: translate(-50%, -14px) scale(0.86) rotate(-3deg); }
+  6% { opacity: 1; transform: translate(-50%, 3px) scale(1.04) rotate(1.5deg); }
+  11% { transform: translate(-50%, 0) scale(1) rotate(0deg); }
+  46% { opacity: 1; transform: translate(-50%, 0) scale(1); }
+  54% { opacity: 0; transform: translate(-50%, -10px) scale(0.96); }
+  100% { opacity: 0; transform: translate(-50%, -14px) scale(0.86); }
+}
+
+/* soft focus ring in the palette */
+:focus-visible {
+  outline: 3px solid #ff9dc0;
+  outline-offset: 3px;
+}
+
+/* --- 4. PHONE ------------------------------------------------------------ */
+@media (max-width: 760px) {
+  .theatre-controls {
+    border-radius: 18px;
+  }
+
+  .showcase-ticket,
+  .preset-ticket,
+  .studio-live-badge,
+  .coming-pill {
+    animation: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-cat-peek,
+  .showcase-ticket,
+  .preset-ticket,
+  .studio-live-badge,
+  .coming-pill,
+  .pricing-price strong,
+  .theatre-copy,
+  .feature-media-cat,
+  .notice-float,
+  .tip-toggle:has(input:checked) .tip-box {
+    animation: none;
+  }
+
+  .desktop-nav > a:hover,
+  .chip:hover,
+  .choice-block > div > button:hover,
+  .theatre-progress button:hover,
+  .theatre-arrow:hover:not(:disabled),
+  .day-timeline li:hover .timeline-pin {
+    transform: none;
+  }
+}
+
+/* the numbered badges inside the feature carousel buttons */
+.theatre-progress button > span {
+  border-radius: 50%;
+  color: #8f3d63;
+  background: #ffe4ef;
+  box-shadow: inset 0 1px 0 #fff;
+}
+
+.theatre-progress button.is-active > span {
+  color: #6d2a45;
+  background: #ff9dc0;
+}
