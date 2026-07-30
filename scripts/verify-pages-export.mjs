@@ -1,7 +1,10 @@
 import assert from "node:assert/strict";
 import { access, readFile, stat } from "node:fs/promises";
 
-const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "/PawPico-Website";
+const basePath =
+  process.env.HOSTINGER_BUILD === "true"
+    ? ""
+    : process.env.NEXT_PUBLIC_BASE_PATH ?? "/PawPico-Website";
 const html = await readFile(new URL("../out/index.html", import.meta.url), "utf8");
 const storeHtml = await readFile(new URL("../out/store/index.html", import.meta.url), "utf8");
 const detailHtml = await readFile(
@@ -17,10 +20,12 @@ for (const expected of [
   assert.ok(html.includes(expected), `Static export is missing ${expected}`);
 }
 
-assert.doesNotMatch(
-  html,
-  /(?:src|href|poster)="\/(?:_next|cat|videos|mewmuze-|pawpico-)/,
-);
+if (basePath) {
+  assert.doesNotMatch(
+    html,
+    /(?:src|href|poster)="\/(?:_next|cat|videos|mewmuze-|pawpico-)/,
+  );
+}
 assert.ok(
   storeHtml.includes("The wardrobe is still being stitched."),
   "Static export is missing the Store hero",
@@ -30,14 +35,18 @@ assert.ok(
   "Store links do not include the Pages base path",
 );
 assert.ok(detailHtml.includes("Mecha Hero"), "Static export is missing concept detail pages");
-assert.ok(
-  !storeHtml.includes(`href="${basePath}${basePath}`),
-  "A Store link contains the Pages base path twice",
-);
-assert.doesNotMatch(
-  storeHtml,
-  /(?:src|href)="\/(?:_next|cat|store|mewmuze-|pawpico-)/,
-);
+if (basePath) {
+  assert.ok(
+    !storeHtml.includes(`href="${basePath}${basePath}`),
+    "A Store link contains the Pages base path twice",
+  );
+}
+if (basePath) {
+  assert.doesNotMatch(
+    storeHtml,
+    /(?:src|href)="\/(?:_next|cat|store|mewmuze-|pawpico-)/,
+  );
+}
 assert.doesNotMatch(
   storeHtml,
   /Iron Man|Spider-Man|Captain America|Avengers|Naruto|Itachi|Mock buy|\$\d+\.\d{2}|Dummy total|USD/i,
