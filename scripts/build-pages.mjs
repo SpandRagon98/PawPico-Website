@@ -2,11 +2,14 @@ import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
 const repositoryRoot = fileURLToPath(new URL("../", import.meta.url));
+const isHostingerBuild = process.env.HOSTINGER_BUILD === "true";
 const pagesEnvironment = {
   ...process.env,
   GITHUB_PAGES: "true",
   NEXT_PUBLIC_BASE_PATH:
-    process.env.NEXT_PUBLIC_BASE_PATH ?? "/PawPico-Website",
+    isHostingerBuild
+      ? ""
+      : process.env.NEXT_PUBLIC_BASE_PATH ?? "/PawPico-Website",
 };
 
 for (const script of [
