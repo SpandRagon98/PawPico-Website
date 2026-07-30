@@ -16,7 +16,7 @@ permissions:
   id-token: write
 
 jobs:
-  deploy:
+  github-pages:
     name: Build and deploy GitHub Pages
     runs-on: ubuntu-latest
     timeout-minutes: 20
@@ -60,3 +60,44 @@ jobs:
 
       - name: Add public URL to the Actions summary
         run: echo "### MewMuze is live at ${{ steps.deployment.outputs.page_url }}" >> "$GITHUB_STEP_SUMMARY"
+
+  hostinger:
+    name: Build and deploy mewmuze.com
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment:
+      name: production
+      url: https://mewmuze.com
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install locked dependencies
+        run: npm ci
+
+      - name: Build and verify the Hostinger static site
+        run: npm run build:pages
+        env:
+          HOSTINGER_BUILD: "true"
+          NEXT_PUBLIC_SITE_URL: https://mewmuze.com
+
+      - name: Deploy to Hostinger over encrypted FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.4.0
+        with:
+          server: ${{ secrets.HOSTINGER_FTP_SERVER }}
+          username: ${{ secrets.HOSTINGER_FTP_USERNAME }}
+          password: ${{ secrets.HOSTINGER_FTP_PASSWORD }}
+          protocol: ftps
+          port: 21
+          local-dir: ./out/
+          server-dir: ./
+          log-level: minimal
+
+      - name: Add production URL to the Actions summary
+        run: echo "### MewMuze is live at https://mewmuze.com" >> "$GITHUB_STEP_SUMMARY"
