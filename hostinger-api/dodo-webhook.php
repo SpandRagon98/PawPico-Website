@@ -31,6 +31,7 @@ $status = first_text($data, [['status']]);
 $licenseId = first_text($data, [['license_key_id'], ['entitlement_id'], ['id']]);
 $licenseKey = first_text($data, [['license_key'], ['key']]);
 $licenseLastFour = $licenseKey === '' ? '' : substr($licenseKey, -4);
+$nullable = static fn(string $value): ?string => $value === '' ? null : $value;
 
 try {
     $db = mewmuze_db($config);
@@ -55,8 +56,8 @@ try {
         $customer = $db->prepare(
             'INSERT INTO customers
              (dodo_customer_id, email, full_name, country_code, created_at, updated_at)
-             VALUES (NULLIF(:customer_id, ""), NULLIF(:email, ""), NULLIF(:full_name, ""),
-                     NULLIF(:country, ""), UTC_TIMESTAMP(), UTC_TIMESTAMP())
+             VALUES (:customer_id, :email, :full_name, :country,
+                     UTC_TIMESTAMP(), UTC_TIMESTAMP())
              ON DUPLICATE KEY UPDATE
                email = COALESCE(VALUES(email), email),
                full_name = COALESCE(VALUES(full_name), full_name),
@@ -64,10 +65,10 @@ try {
                updated_at = UTC_TIMESTAMP()'
         );
         $customer->execute([
-            ':customer_id' => $customerId,
-            ':email' => $email,
-            ':full_name' => $name,
-            ':country' => $country,
+            ':customer_id' => $nullable($customerId),
+            ':email' => $nullable($email),
+            ':full_name' => $nullable($name),
+            ':country' => $nullable($country),
         ]);
     }
 
@@ -76,9 +77,8 @@ try {
             'INSERT INTO payments
              (dodo_payment_id, dodo_customer_id, customer_email, amount_minor, currency,
               status, event_type, created_at, updated_at)
-             VALUES (:payment_id, NULLIF(:customer_id, ""), NULLIF(:email, ""),
-                     NULLIF(:amount, ""), NULLIF(:currency, ""), NULLIF(:status, ""),
-                     NULLIF(:event_type, ""), UTC_TIMESTAMP(), UTC_TIMESTAMP())
+             VALUES (:payment_id, :customer_id, :email, :amount, :currency, :status,
+                     :event_type, UTC_TIMESTAMP(), UTC_TIMESTAMP())
              ON DUPLICATE KEY UPDATE
                dodo_customer_id = COALESCE(VALUES(dodo_customer_id), dodo_customer_id),
                customer_email = COALESCE(VALUES(customer_email), customer_email),
@@ -90,12 +90,12 @@ try {
         );
         $payment->execute([
             ':payment_id' => $paymentId,
-            ':customer_id' => $customerId,
-            ':email' => $email,
-            ':amount' => $amount,
-            ':currency' => $currency,
-            ':status' => $status,
-            ':event_type' => $type,
+            ':customer_id' => $nullable($customerId),
+            ':email' => $nullable($email),
+            ':amount' => $nullable($amount),
+            ':currency' => $nullable($currency),
+            ':status' => $nullable($status),
+            ':event_type' => $nullable($type),
         ]);
     }
 
@@ -104,8 +104,7 @@ try {
             'INSERT INTO licences
              (dodo_licence_id, dodo_payment_id, customer_email, key_last_four,
               status, event_type, created_at, updated_at)
-             VALUES (NULLIF(:licence_id, ""), NULLIF(:payment_id, ""), NULLIF(:email, ""),
-                     NULLIF(:last_four, ""), NULLIF(:status, ""), NULLIF(:event_type, ""),
+             VALUES (:licence_id, :payment_id, :email, :last_four, :status, :event_type,
                      UTC_TIMESTAMP(), UTC_TIMESTAMP())
              ON DUPLICATE KEY UPDATE
                dodo_payment_id = COALESCE(VALUES(dodo_payment_id), dodo_payment_id),
@@ -117,11 +116,11 @@ try {
         );
         $licence->execute([
             ':licence_id' => $licenseId !== '' ? $licenseId : $webhookId,
-            ':payment_id' => $paymentId,
-            ':email' => $email,
-            ':last_four' => $licenseLastFour,
-            ':status' => $status,
-            ':event_type' => $type,
+            ':payment_id' => $nullable($paymentId),
+            ':email' => $nullable($email),
+            ':last_four' => $nullable($licenseLastFour),
+            ':status' => $nullable($status),
+            ':event_type' => $nullable($type),
         ]);
     }
 
