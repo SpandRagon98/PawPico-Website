@@ -6,6 +6,7 @@ import {
   useEffect,
   useRef,
   useState,
+  useSyncExternalStore,
   type CSSProperties,
   type KeyboardEvent,
   type PointerEvent,
@@ -18,7 +19,13 @@ import {
   type FeatureNotice,
   type FeatureStory,
 } from "../data/features";
-import { checkoutUrlFor, commerce, commerceMode } from "../lib/commerce";
+import {
+  checkoutUrlFor,
+  commerce,
+  commerceMode,
+  prefersRupees,
+  priceLabelFor,
+} from "../lib/commerce";
 import { sitePath } from "../lib/site-path";
 
 const CAT_ASSET = "/cat/mewmuze-hero-reference-app.png";
@@ -28,6 +35,10 @@ const HERO_CAT_HEAD_ASSET = "/cat/mewmuze-hero-front-head-app.png";
 const HERO_CAT_BLINK_ASSET = "/cat/mewmuze-hero-front-head-blink-app.png";
 const HERO_CAT_EARS_ASSET = "/cat/mewmuze-hero-front-head-ears-app.png";
 const FACE_LOGO_ASSET = "/cat/mewmuze-face-logo-hd.png";
+
+/** The visitor's timezone cannot change mid-visit, so there is nothing to subscribe to. */
+const noSubscribe = () => () => {};
+const serverPrefersRupees = () => false;
 
 const heroEmotionAssets = {
   happy: "/cat/hero-emotions/happy.webp",
@@ -839,7 +850,10 @@ export default function Home() {
   const [heroEmotion, setHeroEmotion] = useState<HeroEmotion>("neutral");
   const [supportDeveloper, setSupportDeveloper] = useState(false);
   const supportSelected = supportDeveloper && commerce.supporterConfigured;
-  const priceLabel = supportSelected ? "6.99" : "5.99";
+  // Dollars on the server, rupees after mount for Indian visitors. The server
+  // snapshot is what makes one static file safe to serve worldwide.
+  const rupees = useSyncExternalStore(noSubscribe, prefersRupees, serverPrefersRupees);
+  const priceLabel = priceLabelFor(rupees, supportSelected);
   const checkoutUrl = checkoutUrlFor(supportSelected);
   const heroRef = useRef<HTMLElement>(null);
   const catMotionRef = useRef<HTMLSpanElement>(null);
@@ -1008,7 +1022,7 @@ export default function Home() {
               onClick={() => unlockAndScroll("#pricing")}
               className="hero-buy"
             >
-              {`Get MewMuze · $${priceLabel}`}
+              {`Get MewMuze · ${priceLabel}`}
             </SkeuoButton>
             <SkeuoButton
               onClick={() => unlockAndScroll("#story")}
@@ -1250,7 +1264,7 @@ export default function Home() {
             </div>
             <div className="pricing-price">
               <small>ONE-TIME PRICE</small>
-              <strong id="pricing-title">{`$${priceLabel}`}</strong>
+              <strong id="pricing-title">{priceLabel}</strong>
               <span>Pay once. No subscription, ever.</span>
             </div>
             <ul>
@@ -1302,6 +1316,7 @@ export default function Home() {
               {commerceMode === "test"
                 ? "Test mode uses Dodo's sandbox: no real charge is made."
                 : "Secure checkout is hosted by Dodo Payments. MewMuze never sees your card details."}
+              {rupees ? " Dodo confirms the exact amount before you pay." : ""}
             </p>
           </div>
           <div className="pricing-copy">
@@ -1352,7 +1367,7 @@ export default function Home() {
             ordinary minutes in between.
           </p>
           <div className="hero-actions">
-            <SkeuoButton href="#pricing">{`View the $${priceLabel} price`}</SkeuoButton>
+            <SkeuoButton href="#pricing">{`View the ${priceLabel} price`}</SkeuoButton>
             <SkeuoButton href="#directory" variant="quiet">
               See every feature
             </SkeuoButton>

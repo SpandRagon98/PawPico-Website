@@ -356,6 +356,35 @@ test("adds a Dodo-ready one-time $5.99 purchase section", async () => {
   assert.doesNotMatch(html, /Limited-time|refund policy/i);
 });
 
+test("shows rupees to Indian visitors and dollars to everyone else", async () => {
+  const { prefersRupees, priceLabelFor } = await import("../lib/commerce.ts");
+  const html = await (await render()).text();
+
+  assert.equal(priceLabelFor(false, false), "$5.99");
+  assert.equal(priceLabelFor(true, false), "₹499");
+  assert.equal(priceLabelFor(true, true), "₹599");
+
+  // Server-rendered HTML must stay in dollars: the export is one static file
+  // served worldwide, so rupees are only ever swapped in after mount.
+  assert.match(html, /\$5\.99/);
+  assert.doesNotMatch(html, /₹/);
+
+  const withZone = (zone) => {
+    const real = Intl.DateTimeFormat;
+    Intl.DateTimeFormat = function () {
+      return { resolvedOptions: () => ({ timeZone: zone }) };
+    };
+    try {
+      return prefersRupees();
+    } finally {
+      Intl.DateTimeFormat = real;
+    }
+  };
+  assert.equal(withZone("Asia/Kolkata"), true);
+  assert.equal(withZone("Asia/Calcutta"), true); // legacy alias
+  assert.equal(withZone("America/New_York"), false);
+});
+
 test("uses the face-only MewMuze mark for navigation, metadata, and Store branding", async () => {
   const home = await (await render()).text();
   const store = await (await render("/store")).text();
@@ -578,7 +607,8 @@ test("keeps the optional supporter checkout behind its own configured Dodo link"
   const commerce = await source("../lib/commerce.ts");
   assert.match(page, /commerce\.supporterConfigured/);
   assert.match(page, /Add \$1 to support the developer/);
-  assert.match(page, /supportSelected \? "6\.99" : "5\.99"/);
+  assert.match(page, /priceLabelFor\(rupees, supportSelected\)/);
+  assert.match(commerce, /supportDeveloper \? "\$6\.99" : "\$5\.99"/);
   assert.match(commerce, /NEXT_PUBLIC_DODO_SUPPORT_CHECKOUT_URL/);
 
   const css = await source("../app/globals.css");
