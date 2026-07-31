@@ -4501,11 +4501,11 @@ h2 {
 
 
 /* ============================================================================
-   MewMuze refresh â€” nav on the landing view, in-app notices, richer feature
+   MewMuze refresh — nav on the landing view, in-app notices, richer feature
    copy, developer tip, and a purpose-built phone layout.
 
    Follows the existing tactile system: solid colours plus inset/drop bevels.
-   No gradients, no backdrop filters â€” the flat white surface is the identity.
+   No gradients, no backdrop filters — the flat white surface is the identity.
    ========================================================================== */
 
 /* --- navigation now sits above the hero, so it must float over it --------- */
@@ -4874,7 +4874,7 @@ h2 {
 }
 
 /* ============================================================================
-   PHONE LAYOUT â€” its own shape rather than a squeezed desktop: cat first,
+   PHONE LAYOUT — its own shape rather than a squeezed desktop: cat first,
    single column, full-width taps, notices inline so nothing covers the cat.
    ========================================================================== */
 @media (max-width: 760px) {
@@ -5289,7 +5289,7 @@ body {
   display: none;
 }
 
-/* --- 3. A LIVELIER CAT (motion only â€” every element is untouched) --------
+/* --- 3. A LIVELIER CAT (motion only — every element is untouched) --------
    The sprites, eyes, pupils and sizes are exactly as they were. This only
    adds breathing and a slow idle drift on top.
    ------------------------------------------------------------------------ */
@@ -5745,7 +5745,7 @@ html.mewmuze-reveal-ready [data-reveal] {
    shoulders hero crop, entrance animations for the landing copy, and richer
    interaction motion everywhere.
 
-   No cat element is touched â€” the sprite layers, eyes, pupils, blink and ears
+   No cat element is touched — the sprite layers, eyes, pupils, blink and ears
    all keep their existing rules. Only the frame around the cat changes.
    ========================================================================== */
 
@@ -6424,7 +6424,7 @@ body {
 }
 
 /* ============================================================================
-   ðŸŒ¸ KAWAII UI
+   🌸 KAWAII UI
 
    Same trick as before: repaint the design tokens rather than restyle
    components, so most of the site turns soft from ~30 declarations.
@@ -6820,7 +6820,7 @@ h4 {
 
 
 /* ============================================================================
-   ðŸŒ¸ KAWAII, PART TWO â€” the surfaces the token repaint missed, stronger
+   🌸 KAWAII, PART TWO — the surfaces the token repaint missed, stronger
    contrast on the pale controls, and the full set of cute motions.
    ========================================================================== */
 
