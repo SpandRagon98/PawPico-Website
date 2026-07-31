@@ -117,6 +117,15 @@ export default function CheckoutSuccess() {
           </p>
         )}
 
+        {succeeded && (
+          <p className="install-note">
+            Windows may say <strong>&ldquo;Windows protected your PC&rdquo;</strong> when
+            you open the installer, because MewMuze is not code signed yet. Choose{" "}
+            <strong>More info</strong>, then <strong>Run anyway</strong>. This page is the
+            only official download.
+          </p>
+        )}
+
         <div className="commerce-actions">
           {succeeded && (
             <a

@@ -2529,6 +2529,19 @@ h2 em {
   background: rgba(228, 245, 255, 0.78);
 }
 
+/* Sets expectations for the unsigned installer's SmartScreen prompt, so a
+   warning does not read as "this purchase went wrong". */
+.install-note {
+  margin: 22px 0 0;
+  padding: 14px 16px;
+  border: 1px solid rgba(214, 168, 63, 0.4);
+  border-radius: 14px;
+  background: rgba(255, 247, 224, 0.85);
+  color: var(--muted);
+  font-size: 14.5px;
+  line-height: 1.6;
+}
+
 .activation-steps {
   display: grid;
   gap: 12px;
