@@ -4501,11 +4501,11 @@ h2 {
 
 
 /* ============================================================================
-   MewMuze refresh — nav on the landing view, in-app notices, richer feature
+   MewMuze refresh â€” nav on the landing view, in-app notices, richer feature
    copy, developer tip, and a purpose-built phone layout.
 
    Follows the existing tactile system: solid colours plus inset/drop bevels.
-   No gradients, no backdrop filters — the flat white surface is the identity.
+   No gradients, no backdrop filters â€” the flat white surface is the identity.
    ========================================================================== */
 
 /* --- navigation now sits above the hero, so it must float over it --------- */
@@ -4874,7 +4874,7 @@ h2 {
 }
 
 /* ============================================================================
-   PHONE LAYOUT — its own shape rather than a squeezed desktop: cat first,
+   PHONE LAYOUT â€” its own shape rather than a squeezed desktop: cat first,
    single column, full-width taps, notices inline so nothing covers the cat.
    ========================================================================== */
 @media (max-width: 760px) {
@@ -5289,7 +5289,7 @@ body {
   display: none;
 }
 
-/* --- 3. A LIVELIER CAT (motion only — every element is untouched) --------
+/* --- 3. A LIVELIER CAT (motion only â€” every element is untouched) --------
    The sprites, eyes, pupils and sizes are exactly as they were. This only
    adds breathing and a slow idle drift on top.
    ------------------------------------------------------------------------ */
@@ -5745,7 +5745,7 @@ html.mewmuze-reveal-ready [data-reveal] {
    shoulders hero crop, entrance animations for the landing copy, and richer
    interaction motion everywhere.
 
-   No cat element is touched — the sprite layers, eyes, pupils, blink and ears
+   No cat element is touched â€” the sprite layers, eyes, pupils, blink and ears
    all keep their existing rules. Only the frame around the cat changes.
    ========================================================================== */
 
@@ -6424,7 +6424,7 @@ body {
 }
 
 /* ============================================================================
-   🌸 KAWAII UI
+   ðŸŒ¸ KAWAII UI
 
    Same trick as before: repaint the design tokens rather than restyle
    components, so most of the site turns soft from ~30 declarations.
@@ -6820,7 +6820,7 @@ h4 {
 
 
 /* ============================================================================
-   🌸 KAWAII, PART TWO — the surfaces the token repaint missed, stronger
+   ðŸŒ¸ KAWAII, PART TWO â€” the surfaces the token repaint missed, stronger
    contrast on the pale controls, and the full set of cute motions.
    ========================================================================== */
 
@@ -8111,3 +8111,851 @@ body.mewmuze-splash-open {
   height: 104%;
   object-fit: fill;
 }
+
+/* ============================================================================
+   RESPONSIVE REMEDIATION
+
+   The site has been through several desktop visual passes. A number of those
+   late rules were winning over the original responsive layer, which left
+   phone content inside desktop-sized nested panels. This final layer gives
+   tablets and phones their own deliberate composition while preserving the
+   desktop presentation and all existing content.
+   ========================================================================== */
+
+@media (min-width: 761px) and (max-width: 1024px) {
+  .section-shell,
+  .feature-theatre.section-shell {
+    width: min(100% - 48px, 900px);
+  }
+
+  .section-pad,
+  .feature-theatre {
+    padding-block: 84px;
+  }
+
+  .theatre-console {
+    margin-inline: 0;
+    padding: 62px 28px 28px;
+  }
+
+  .theatre-stage {
+    min-height: 0;
+    grid-template-columns: 1fr;
+  }
+
+  .theatre-media {
+    min-height: 520px;
+  }
+
+  .theatre-copy {
+    padding: 34px;
+  }
+
+  .theatre-progress {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .day-timeline {
+    gap: 18px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .day-timeline::before {
+    display: none;
+  }
+
+  .day-timeline li {
+    min-height: 0;
+    padding: 28px;
+    text-align: left;
+  }
+
+  .day-timeline h3 {
+    min-height: 0;
+    justify-content: flex-start;
+    text-align: left;
+  }
+}
+
+@media (max-width: 760px) {
+  :root {
+    --mobile-gutter: clamp(18px, 5vw, 24px);
+  }
+
+  html,
+  body {
+    max-width: 100%;
+    overflow-x: clip;
+  }
+
+  html {
+    scroll-padding-top: 84px;
+  }
+
+  body {
+    min-width: 0;
+  }
+
+  .section-shell,
+  .feature-theatre.section-shell {
+    width: calc(100% - (var(--mobile-gutter) * 2));
+    max-width: none;
+    margin-inline: auto;
+  }
+
+  .section-pad,
+  .feature-theatre {
+    padding-block: clamp(68px, 18vw, 88px);
+  }
+
+  h2 {
+    margin-bottom: 18px;
+    font-size: clamp(36px, 10.5vw, 48px);
+    line-height: 1.04;
+    letter-spacing: -0.04em;
+  }
+
+  .eyebrow {
+    gap: 8px;
+    margin-bottom: 18px;
+    font-size: 10.5px;
+    line-height: 1.45;
+    letter-spacing: 0.095em;
+  }
+
+  .eyebrow > span {
+    flex: 0 0 auto;
+  }
+
+  .section-heading {
+    display: grid;
+    gap: 16px;
+    grid-template-columns: 1fr;
+    margin-bottom: 38px;
+  }
+
+  .section-heading > p,
+  .monotony-copy > p,
+  .appearance-copy > p,
+  .privacy-copy > p,
+  .pricing-copy > p,
+  .final-cta > div:last-child > p {
+    max-width: none;
+    margin-inline: 0;
+    font-size: 16px;
+    line-height: 1.66;
+  }
+
+  /* Navigation: one compact, safe-area-aware row with a drawer that never
+     exceeds the phone viewport. */
+  .site-navigation {
+    top: max(8px, env(safe-area-inset-top));
+  }
+
+  .nav-dock {
+    width: calc(100% - (var(--mobile-gutter) * 2));
+    min-height: 60px;
+    gap: 10px;
+    grid-template-columns: minmax(0, 1fr) auto;
+    padding: 8px 10px;
+    border-radius: 999px;
+  }
+
+  .brand-link {
+    min-width: 0;
+    min-height: 42px;
+  }
+
+  .site-brand {
+    min-width: 0;
+    gap: 10px;
+  }
+
+  .brand-medallion {
+    width: 40px;
+    height: 40px;
+    flex: 0 0 40px;
+  }
+
+  .site-brand strong {
+    overflow: hidden;
+    font-size: 18px;
+    line-height: 1;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .site-brand small,
+  .nav-auth {
+    display: none;
+  }
+
+  .mobile-nav > summary {
+    min-width: 72px;
+    height: 42px;
+    padding: 0 16px;
+    border-radius: 999px;
+    font-size: 12px;
+  }
+
+  .mobile-nav nav {
+    top: 50px;
+    right: 0;
+    width: min(310px, calc(100vw - (var(--mobile-gutter) * 2)));
+    padding: 10px 12px;
+    border-radius: 20px;
+  }
+
+  .mobile-nav nav a {
+    min-height: 52px;
+    padding-inline: 12px;
+    font-size: 13px;
+  }
+
+  /* Landing: the cat owns a real row below the floating navigation. It is no
+     longer cropped by an absolute desktop frame or hidden behind the dock. */
+  .hero {
+    display: flex;
+    width: 100%;
+    height: auto;
+    min-height: 0;
+    max-height: none;
+    align-items: stretch;
+    justify-content: flex-start;
+    gap: 18px;
+    padding:
+      calc(88px + env(safe-area-inset-top))
+      var(--mobile-gutter)
+      72px;
+    overflow: hidden;
+    text-align: left;
+  }
+
+  .hero-cat-peek {
+    position: relative;
+    inset: auto;
+    z-index: 4;
+    order: -1;
+    display: grid;
+    width: 100%;
+    height: clamp(245px, 68vw, 300px);
+    margin: 0;
+    place-items: center;
+    overflow: visible;
+    animation: none;
+    transform: none;
+  }
+
+  .hero-cat-motion {
+    position: relative;
+    inset: auto;
+    display: block;
+    width: clamp(240px, 68vw, 292px);
+    height: clamp(240px, 68vw, 292px);
+    margin: 0 auto;
+    filter: drop-shadow(0 12px 24px rgba(47, 143, 201, 0.24));
+    transform: none;
+  }
+
+  .hero-cat-art {
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    clip-path: none;
+  }
+
+  .cat-speech,
+  .hero-status {
+    display: none;
+  }
+
+  .hero-copy {
+    position: relative;
+    z-index: 7;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+  }
+
+  .hero-copy > .eyebrow,
+  .hero-copy > h1,
+  .hero-copy > .hero-support,
+  .hero-copy > .hero-actions,
+  .hero-copy > .privacy-note {
+    animation-duration: 560ms;
+  }
+
+  .hero h1 {
+    max-width: 11ch;
+    margin-bottom: 20px;
+    font-size: clamp(42px, 12.4vw, 56px);
+    line-height: 1;
+    letter-spacing: -0.045em;
+  }
+
+  .hero-support {
+    max-width: 38rem;
+    margin-bottom: 26px;
+    font-size: 16.5px;
+    line-height: 1.64;
+  }
+
+  .hero-actions {
+    display: grid;
+    width: 100%;
+    gap: 12px;
+  }
+
+  .hero-actions .skeuo-button {
+    width: 100%;
+    min-height: 54px;
+    padding: 14px 18px;
+    border-radius: 18px;
+    font-size: 14px;
+    line-height: 1.15;
+  }
+
+  .hero-actions .skeuo-button-quiet {
+    width: max-content;
+    min-height: 44px;
+    justify-self: center;
+    padding-inline: 14px;
+  }
+
+  .privacy-note {
+    align-items: flex-start;
+    margin-top: 22px;
+    font-size: 13px;
+    line-height: 1.55;
+  }
+
+  .hero::before {
+    top: 2%;
+    right: -28%;
+    width: 94vw;
+    height: 94vw;
+  }
+
+  .hero::after {
+    right: 12%;
+    bottom: 3%;
+  }
+
+  /* Story and supporting showcases */
+  .monotony,
+  .appearance-shell,
+  .privacy-shell,
+  .account-shell,
+  .pricing-shell,
+  .store-teaser-card,
+  .final-cta {
+    display: grid;
+    gap: 38px;
+    grid-template-columns: 1fr;
+  }
+
+  .monotony-copy .story-turn {
+    margin-top: 26px;
+    font-size: 22px;
+    line-height: 1.35;
+  }
+
+  .appearance-showcase,
+  .studio-window,
+  .pricing-card,
+  .store-teaser-card,
+  .account-panel {
+    width: 100%;
+    max-width: 100%;
+    border-radius: 24px;
+  }
+
+  .appearance-showcase {
+    min-height: 480px;
+  }
+
+  .showcase-cat-well {
+    inset: 60px 14px 54px;
+  }
+
+  /* Feature theatre: remove the desktop console-within-console squeeze. The
+     media and narrative remain tactile cards, but each gets the full phone
+     reading width. */
+  .feature-theatre.section-shell {
+    padding-top: clamp(68px, 18vw, 88px);
+    padding-bottom: clamp(68px, 18vw, 88px);
+  }
+
+  .theatre-heading {
+    width: 100%;
+    margin-inline: 0;
+  }
+
+  .theatre-console {
+    width: 100%;
+    margin: 0;
+    padding: 52px 12px 18px;
+    border-radius: 26px;
+  }
+
+  .console-rim {
+    top: 18px;
+    right: 18px;
+    left: 18px;
+    padding-bottom: 12px;
+  }
+
+  .theatre-stage {
+    display: grid;
+    min-height: 0;
+    gap: 16px;
+    grid-template-columns: 1fr;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .theatre-media {
+    display: grid;
+    min-height: 0;
+    gap: 10px;
+    grid-template-rows: auto minmax(220px, auto) auto;
+    padding: 12px;
+    border-radius: 20px;
+  }
+
+  .media-label,
+  .media-caption {
+    position: static;
+    width: 100%;
+    max-width: none;
+    transform: none;
+  }
+
+  .media-label {
+    min-height: 42px;
+    padding-inline: 11px;
+  }
+
+  .media-label span {
+    font-size: 9.5px;
+    line-height: 1.35;
+  }
+
+  .media-caption {
+    padding: 10px 12px;
+    font-size: 12px;
+    line-height: 1.4;
+    text-align: center;
+  }
+
+  .feature-media-cat,
+  .reduced-film {
+    position: relative;
+    inset: auto;
+    width: 100%;
+    height: auto;
+    max-height: 76vw;
+    margin: 0 auto;
+    object-fit: contain;
+  }
+
+  .notice-float {
+    position: static;
+    width: 100%;
+    margin-top: 2px;
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+
+  .theatre-copy {
+    display: flex;
+    min-width: 0;
+    padding: 24px 20px;
+    border-radius: 22px;
+  }
+
+  .feature-index {
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  .feature-index > span {
+    width: 50px;
+    height: 44px;
+    flex: 0 0 50px;
+  }
+
+  .feature-index small,
+  .feature-scene {
+    font-size: 12.5px;
+    line-height: 1.45;
+  }
+
+  .feature-scene {
+    margin-bottom: 12px;
+  }
+
+  .theatre-copy h3 {
+    max-width: none;
+    margin-bottom: 18px;
+    font-size: clamp(35px, 10vw, 46px);
+    line-height: 1.04;
+    letter-spacing: -0.04em;
+  }
+
+  .feature-story {
+    max-width: none;
+    margin-bottom: 16px;
+    font-size: 17px;
+    line-height: 1.62;
+  }
+
+  .feature-helps {
+    margin-bottom: 16px;
+    padding: 15px 14px;
+  }
+
+  .feature-helps > small {
+    font-size: 9.5px;
+    line-height: 1.35;
+  }
+
+  .feature-helps > p {
+    font-size: 15.5px;
+    line-height: 1.62;
+  }
+
+  .theatre-copy .feature-detail {
+    margin-bottom: 20px;
+    font-size: 15px;
+    line-height: 1.65;
+  }
+
+  .theatre-copy ul {
+    display: grid;
+    width: 100%;
+    gap: 8px;
+  }
+
+  .theatre-copy li {
+    width: 100%;
+    padding: 10px 11px;
+    font-size: 12.5px;
+    line-height: 1.45;
+  }
+
+  .theatre-controls {
+    display: grid;
+    gap: 8px;
+    grid-template-columns: 54px minmax(0, 1fr) 54px;
+    margin-top: 16px;
+    padding: 10px;
+    border-radius: 20px;
+  }
+
+  .theatre-arrow {
+    position: static;
+    width: 54px;
+    min-width: 54px;
+    height: 54px;
+    padding: 0;
+    border-radius: 50%;
+    transform: none;
+  }
+
+  .theatre-arrow small {
+    display: none;
+  }
+
+  .theatre-arrow span {
+    font-size: 23px;
+  }
+
+  .theatre-counter {
+    gap: 4px;
+  }
+
+  .theatre-counter small {
+    font-size: 9.5px;
+  }
+
+  .theatre-counter strong {
+    overflow: visible;
+    font-size: 16px;
+    line-height: 1.15;
+    text-overflow: clip;
+    white-space: normal;
+  }
+
+  /* A horizontal, readable feature rail replaces the 20 tall blank-looking
+     boxes that previously dominated the phone page. */
+  .theatre-progress {
+    display: flex;
+    overflow-x: auto;
+    gap: 10px;
+    margin: 0;
+    padding: 16px 2px 10px;
+    scroll-padding-inline: 2px;
+    scroll-snap-type: x proximity;
+    scrollbar-width: thin;
+  }
+
+  .theatre-progress button {
+    display: grid;
+    min-width: min(72vw, 240px);
+    min-height: 66px;
+    flex: 0 0 min(72vw, 240px);
+    gap: 10px;
+    grid-template-columns: 40px minmax(0, 1fr);
+    padding: 10px 12px;
+    scroll-snap-align: start;
+  }
+
+  .theatre-progress button > span {
+    width: 40px;
+    height: 40px;
+    font-size: 11px;
+  }
+
+  .theatre-progress small {
+    display: block;
+    max-width: none;
+    overflow: visible;
+    color: #3f4c59;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1.3;
+    text-overflow: clip;
+    white-space: normal;
+  }
+
+  /* Timeline: every moment becomes a full-width reading card. The old three
+     column rail left only half the phone for the actual story. */
+  .day-timeline {
+    display: grid;
+    gap: 18px;
+    grid-template-columns: 1fr;
+  }
+
+  .day-timeline::before {
+    display: none;
+  }
+
+  .day-timeline li {
+    display: block;
+    min-height: 0;
+    padding: 24px 20px 26px;
+    border-radius: 24px;
+    text-align: left;
+  }
+
+  .day-timeline time {
+    display: inline-flex;
+    min-height: 36px;
+    align-items: center;
+    margin: 0 42px 22px 0;
+    font-size: 13px;
+  }
+
+  .timeline-pin {
+    position: absolute;
+    top: 27px;
+    left: 72px;
+    width: 22px;
+    height: 22px;
+    margin: 0;
+  }
+
+  .day-timeline h3 {
+    display: block;
+    min-height: 0;
+    margin-bottom: 12px;
+    justify-content: flex-start;
+    font-size: 27px;
+    line-height: 1.15;
+    text-align: left;
+  }
+
+  .day-timeline p {
+    margin: 0;
+    font-size: 16px;
+    line-height: 1.64;
+    text-align: left;
+  }
+
+  /* Directory, appearance, privacy, account and purchase cards all share the
+     same calm internal gutter. */
+  .directory-groups {
+    gap: 12px;
+  }
+
+  .directory-panel {
+    border-radius: 20px;
+  }
+
+  .directory-panel > h3 > button {
+    min-height: 76px;
+    gap: 10px;
+    grid-template-columns: 40px minmax(0, 1fr) 36px;
+    padding: 12px;
+  }
+
+  .directory-panel > h3 > button > span {
+    width: 40px;
+    height: 40px;
+  }
+
+  .directory-panel > h3 > button strong {
+    font-size: 18px;
+    line-height: 1.2;
+  }
+
+  .directory-panel > h3 > button small {
+    display: none;
+  }
+
+  .directory-grid {
+    grid-template-columns: 1fr;
+    padding: 0 12px 12px;
+  }
+
+  .directory-grid article {
+    min-height: 0;
+    padding: 22px 18px;
+    border-radius: 20px;
+  }
+
+  .directory-grid h4 {
+    margin-top: 28px;
+    font-size: 22px;
+    line-height: 1.15;
+  }
+
+  .directory-grid p,
+  .directory-helps > p {
+    font-size: 15.5px;
+    line-height: 1.64;
+  }
+
+  .directory-grid li {
+    font-size: 13.5px;
+    line-height: 1.55;
+  }
+
+  .studio-preview {
+    min-height: 430px;
+  }
+
+  .studio-titlebar {
+    min-height: 48px;
+    padding-inline: 12px;
+  }
+
+  .studio-titlebar span {
+    max-width: calc(100% - 60px);
+    font-size: 9.5px;
+    line-height: 1.3;
+  }
+
+  .appearance-copy {
+    order: -1;
+  }
+
+  .appearance-specs,
+  .privacy-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .privacy-grid {
+    gap: 12px;
+  }
+
+  .privacy-grid article {
+    min-height: 0;
+    padding: 20px 18px;
+    border-radius: 20px;
+  }
+
+  .store-teaser-card,
+  .pricing-card,
+  .account-panel {
+    padding: 24px 20px;
+  }
+
+  .concept-stack {
+    min-height: 330px;
+  }
+
+  .account-tabs {
+    gap: 6px;
+  }
+
+  .account-tabs button {
+    min-height: 48px;
+    padding-inline: 8px;
+    font-size: 13px;
+  }
+
+  .account-field input,
+  .account-field select {
+    width: 100%;
+    min-height: 52px;
+    font-size: 16px;
+  }
+
+  .pricing-price strong {
+    font-size: clamp(64px, 20vw, 84px);
+  }
+
+  .tip-toggle {
+    padding: 15px 14px;
+  }
+
+  .site-footer .section-shell {
+    display: grid;
+    gap: 18px;
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 390px) {
+  :root {
+    --mobile-gutter: 16px;
+  }
+
+  .hero {
+    padding-top: calc(82px + env(safe-area-inset-top));
+  }
+
+  .hero-cat-peek {
+    height: 236px;
+  }
+
+  .hero-cat-motion {
+    width: 236px;
+    height: 236px;
+  }
+
+  .hero h1 {
+    font-size: clamp(39px, 12vw, 47px);
+  }
+
+  .theatre-console {
+    padding-inline: 10px;
+  }
+
+  .theatre-copy {
+    padding-inline: 17px;
+  }
+
+  .theatre-progress button {
+    min-width: 78vw;
+    flex-basis: 78vw;
+  }
+}
+
