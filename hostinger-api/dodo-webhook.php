@@ -131,6 +131,28 @@ try {
     if (isset($db) && $db instanceof PDO && $db->inTransaction()) {
         $db->rollBack();
     }
+    if (isset($db) && $db instanceof PDO) {
+        try {
+            $diagnostic = $db->prepare(
+                'INSERT INTO webhook_events
+                 (webhook_id, event_type, payload_json, received_at)
+                 VALUES (:webhook_id, :event_type, :payload_json, UTC_TIMESTAMP())
+                 ON DUPLICATE KEY UPDATE
+                   payload_json = VALUES(payload_json),
+                   received_at = UTC_TIMESTAMP()'
+            );
+            $diagnostic->execute([
+                ':webhook_id' => 'error:' . substr(hash('sha256', $webhookId), 0, 48),
+                ':event_type' => 'internal.webhook_error',
+                ':payload_json' => json_encode(
+                    ['exception' => get_class($error), 'message' => $error->getMessage()],
+                    JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR,
+                ),
+            ]);
+        } catch (Throwable) {
+            // The normal PHP error log remains the fallback if database diagnostics fail.
+        }
+    }
     error_log('MewMuze Dodo webhook failed: ' . $error->getMessage());
     json_response(500, ['ok' => false, 'error' => 'Webhook storage failed.']);
 }
