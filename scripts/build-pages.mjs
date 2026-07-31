@@ -1,4 +1,5 @@
 import { spawnSync } from "node:child_process";
+import { cpSync, mkdirSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 
 const repositoryRoot = fileURLToPath(new URL("../", import.meta.url));
@@ -26,4 +27,15 @@ for (const script of [
   if (result.status !== 0) {
     process.exit(result.status ?? 1);
   }
+}
+
+// Hostinger serves the static Next export and the tiny signed-webhook PHP
+// endpoint from the same HTTPS origin. GitHub Pages intentionally receives
+// only the static site, because it cannot execute PHP.
+if (isHostingerBuild) {
+  const apiTarget = fileURLToPath(new URL("../out/api/", import.meta.url));
+  mkdirSync(apiTarget, { recursive: true });
+  cpSync(fileURLToPath(new URL("../hostinger-api/", import.meta.url)), apiTarget, {
+    recursive: true,
+  });
 }

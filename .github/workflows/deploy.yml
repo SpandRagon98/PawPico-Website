@@ -45,6 +45,9 @@ jobs:
           GITHUB_PAGES: "true"
           NEXT_PUBLIC_BASE_PATH: /${{ github.event.repository.name }}
           NEXT_PUBLIC_SITE_URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}
+          NEXT_PUBLIC_DODO_CHECKOUT_URL: ${{ vars.DODO_CHECKOUT_URL }}
+          NEXT_PUBLIC_DODO_SUPPORT_CHECKOUT_URL: ${{ vars.DODO_SUPPORT_CHECKOUT_URL }}
+          NEXT_PUBLIC_DODO_MODE: ${{ vars.DODO_MODE }}
 
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
@@ -86,6 +89,29 @@ jobs:
         env:
           HOSTINGER_BUILD: "true"
           NEXT_PUBLIC_SITE_URL: https://mewmuze.com
+          NEXT_PUBLIC_DODO_CHECKOUT_URL: ${{ vars.DODO_CHECKOUT_URL }}
+          NEXT_PUBLIC_DODO_SUPPORT_CHECKOUT_URL: ${{ vars.DODO_SUPPORT_CHECKOUT_URL }}
+          NEXT_PUBLIC_DODO_MODE: ${{ vars.DODO_MODE }}
+
+      - name: Configure the private Hostinger commerce endpoint
+        env:
+          MEWMUZE_DB_HOST: ${{ secrets.HOSTINGER_DB_HOST }}
+          MEWMUZE_DB_NAME: ${{ secrets.HOSTINGER_DB_NAME }}
+          MEWMUZE_DB_USER: ${{ secrets.HOSTINGER_DB_USER }}
+          MEWMUZE_DB_PASSWORD: ${{ secrets.HOSTINGER_DB_PASSWORD }}
+          MEWMUZE_DODO_WEBHOOK_SECRET: ${{ secrets.DODO_WEBHOOK_SECRET }}
+        run: |
+          if [ -n "$MEWMUZE_DB_HOST" ] && [ -n "$MEWMUZE_DB_NAME" ] && [ -n "$MEWMUZE_DB_USER" ] && [ -n "$MEWMUZE_DB_PASSWORD" ] && [ -n "$MEWMUZE_DODO_WEBHOOK_SECRET" ]; then
+            php -r '$c=["db_host"=>getenv("MEWMUZE_DB_HOST"),"db_name"=>getenv("MEWMUZE_DB_NAME"),"db_user"=>getenv("MEWMUZE_DB_USER"),"db_password"=>getenv("MEWMUZE_DB_PASSWORD"),"dodo_webhook_secret"=>getenv("MEWMUZE_DODO_WEBHOOK_SECRET")]; file_put_contents("out/api/.mewmuze-config.php", "<?php\nreturn ".var_export($c,true).";\n");'
+          else
+            echo "::warning::Commerce database secrets are not configured yet; the storefront will deploy but the webhook health check will return 503."
+          fi
+
+      - name: Validate the Hostinger commerce endpoint
+        run: |
+          php -l out/api/bootstrap.php
+          php -l out/api/dodo-webhook.php
+          php -l out/api/health.php
 
       - name: Deploy to Hostinger over encrypted FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.4.0
@@ -98,6 +124,9 @@ jobs:
           local-dir: ./out/
           server-dir: ./
           log-level: minimal
+
+      - name: Verify the production commerce endpoint
+        run: curl --fail --show-error --retry 4 --retry-delay 5 https://mewmuze.com/api/health.php
 
       - name: Add production URL to the Actions summary
         run: echo "### MewMuze is live at https://mewmuze.com" >> "$GITHUB_STEP_SUMMARY"

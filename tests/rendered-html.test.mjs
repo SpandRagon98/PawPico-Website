@@ -332,18 +332,27 @@ test("presents the accurate Appearance Studio and current Flower Band preset", a
   }
 });
 
-test("adds an honest one-time $5.99 pricing section without a fake checkout", async () => {
+test("adds a Dodo-ready one-time $5.99 purchase section", async () => {
   const response = await render();
   const html = await response.text();
+  const page = await source("../app/page.tsx");
+  const commerce = await source("../lib/commerce.ts");
 
   assert.match(html, /ONE-TIME PRICE/);
   assert.match(html, /\$5\.99/);
   assert.match(html, /Pay once\. No subscription, ever\./);
   assert.match(html, /Personal Windows desktop cat/);
   assert.match(html, /Local-first privacy/);
-  assert.match(html, /Coming Soon/);
-  assert.match(html, /Checkout is not live yet/);
-  assert.doesNotMatch(html, />\s*(?:Buy now|Checkout)\s*</i);
+  assert.match(html, /Dodo Payments/);
+  if (process.env.NEXT_PUBLIC_DODO_CHECKOUT_URL) {
+    assert.match(html, /test\.checkout\.dodopayments\.com\/buy\/pdt_0NkKxv8HzpZgMPTzpIeWT/);
+    assert.doesNotMatch(html, /Checkout configuration pending/);
+  } else {
+    assert.match(html, /Checkout configuration pending/);
+  }
+  assert.match(page, /checkoutUrlFor/);
+  assert.match(page, /Buy MewMuze securely/);
+  assert.match(commerce, /NEXT_PUBLIC_DODO_CHECKOUT_URL/);
   assert.doesNotMatch(html, /Limited-time|refund policy/i);
 });
 
@@ -556,18 +565,21 @@ test("explains in plain English what every feature does for the user", async () 
   }
 });
 
-test("offers a one-time price with an optional $1 developer tip", async () => {
+test("keeps the optional supporter checkout behind its own configured Dodo link", async () => {
   const response = await render();
   const html = await response.text();
-  assert.match(html, /Add \$1 to support the developer/);
   assert.match(html, /\$5\.99/);
-  assert.doesNotMatch(html, /\$6\.99/); // only after the box is ticked
+  assert.doesNotMatch(html, /\$6\.99/);
   assert.match(html, /Pay once\. No subscription, ever\./);
   assert.match(html, /All future updates and costumes included/);
   assert.match(html, /Every future update, free/);
 
   const page = await source("../app/page.tsx");
-  assert.match(page, /supportDeveloper \? "6\.99" : "5\.99"/);
+  const commerce = await source("../lib/commerce.ts");
+  assert.match(page, /commerce\.supporterConfigured/);
+  assert.match(page, /Add \$1 to support the developer/);
+  assert.match(page, /supportSelected \? "6\.99" : "5\.99"/);
+  assert.match(commerce, /NEXT_PUBLIC_DODO_SUPPORT_CHECKOUT_URL/);
 
   const css = await source("../app/globals.css");
   assert.match(css, /\.tip-toggle:has\(input:checked\)/);
@@ -852,24 +864,18 @@ test("shows a welcome curtain with a loading bar before the site appears", async
   assert.match(css, /\.welcome-splash\s*\{[^}]*background: #eef7ff/s);
 });
 
-test("requires an account before the purchase step", async () => {
+test("uses Dodo checkout instead of collecting a local website account", async () => {
   const html = await (await render()).text();
   const page = await source("../app/page.tsx");
 
-  // signed out is the server-rendered default, so the gate is what ships
-  assert.match(html, /Create an account to buy/);
+  assert.match(html, /ONE SAFE PURCHASE FLOW/);
   assert.match(html, /id="account"/);
-  assert.match(html, /Create account/);
-  assert.match(html, /Log in/);
-  assert.doesNotMatch(html, /Signed in as/);
-
-  // the buy control only appears once an account exists
-  assert.match(page, /account \? \(/);
+  assert.match(html, /Secure checkout/);
+  assert.match(html, /Copy your licence/);
+  assert.match(html, /Unlock MewMuze/);
   assert.match(page, /pricing-gate/);
-
-  // honest about the state of it: no backend, and the password is never kept
-  assert.match(page, /setPassword\(""\)/);
-  assert.match(html, /nothing you type here leaves/);
+  assert.doesNotMatch(page, /type="password"|setPassword|localStorage|sessionStorage/);
+  assert.doesNotMatch(html, /Create account|Log in|Signed in as/);
   assert.doesNotMatch(page, /localStorage|sessionStorage/);
 });
 
@@ -917,44 +923,30 @@ test("puts the nav logo in a circle and centres the links", async () => {
   assert.match(css, /\.desktop-nav\s*\{[^}]*align-items: center;[^}]*align-self: center/s);
 });
 
-test("swaps the nav price button for log in and sign up", async () => {
+test("puts purchase and support links in the navigation", async () => {
   const html = await (await render()).text();
   const page = await source("../app/page.tsx");
 
   assert.doesNotMatch(html, /View the price/);
-  assert.match(html, /nav-cta nav-cta-login/);
   assert.match(html, /nav-cta nav-cta-signup/);
-  assert.match(html, />Sign up</);
-
-  // both jump to the account section and open the matching tab, so the mode is
-  // lifted out of the panel to be shared with the nav
-  assert.match(page, /onAuthIntent\("login"\)/);
-  assert.match(page, /onAuthIntent\("signup"\)/);
-  assert.match(page, /const \[authMode, setAuthMode\]/);
-  // signed in, the pair collapses to one account link
-  assert.match(page, /My account/);
+  assert.match(html, />Buy MewMuze</);
+  assert.match(html, />Support</);
+  assert.doesNotMatch(page, /onAuthIntent|authMode|My account/);
 });
 
-test("collects a name, an account type and a confirmed password on sign up", async () => {
-  const html = await (await render()).text();
-  const page = await source("../app/page.tsx");
+test("renders purchase success, cancellation and support routes", async () => {
+  const success = await (await render("/checkout/success")).text();
+  const cancelled = await (await render("/checkout/cancelled")).text();
+  const support = await (await render("/support")).text();
+  const successSource = await source("../app/checkout/success/page.tsx");
 
-  // sign up is the server-rendered default, so these ship in the markup
-  assert.match(html, /Full name/);
-  assert.match(html, /Account type/);
-  assert.match(html, /Confirm password/);
-  // React marks the default option selected, so match loosely
-  assert.match(html, /<option value="individual"[^>]*>Individual</);
-  assert.match(html, /<option value="enterprise"[^>]*>Enterprise</);
-
-  // validated, and the extra fields only apply to sign up
-  assert.match(page, /Those two passwords do not match/);
-  assert.match(page, /Please enter your full name/);
-  assert.match(page, /\{signingUp && \(/);
-
-  // still nothing persisted, and both password fields are cleared on submit
-  assert.match(page, /setConfirm\(""\)/);
-  assert.doesNotMatch(page, /localStorage|sessionStorage/);
+  assert.match(success, /PURCHASE STATUS/);
+  assert.match(successSource, /license_key/);
+  assert.match(successSource, /replaceState/);
+  assert.match(successSource, /Copy licence key/);
+  assert.match(cancelled, /Nothing was charged/);
+  assert.match(support, /support@mewmuze\.com/);
+  assert.match(support, /Never send a card number/);
 });
 
 test("stops clip-path from cropping the cat's ears on phones", async () => {
@@ -1002,8 +994,8 @@ test("keeps the phone nav bar on a single compact row", async () => {
   // second row and doubled the dock height
   assert.match(css, /\.nav-auth \{\s*display: none;/);
   assert.match(css, /\.nav-dock \{\s*min-height: 54px/);
-  // the auth links move into the Menu drawer so they stay reachable
-  assert.match(page, /aria-label="Mobile navigation"[\s\S]{0,400}onAuthIntent\("login"\)/);
+  // the purchase link moves into the Menu drawer so it stays reachable
+  assert.match(page, /aria-label="Mobile navigation"[\s\S]{0,400}Buy MewMuze/);
 });
 
 test("centres the nav logo despite its off-centre source art", async () => {

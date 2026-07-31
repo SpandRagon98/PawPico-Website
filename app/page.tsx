@@ -18,6 +18,7 @@ import {
   type FeatureNotice,
   type FeatureStory,
 } from "../data/features";
+import { checkoutUrlFor, commerce, commerceMode } from "../lib/commerce";
 import { sitePath } from "../lib/site-path";
 
 const CAT_ASSET = "/cat/mewmuze-hero-reference-app.png";
@@ -183,13 +184,7 @@ function SiteBrand() {
   );
 }
 
-function SiteNavigation({
-  account,
-  onAuthIntent,
-}: {
-  account: Account;
-  onAuthIntent: (mode: "signup" | "login") => void;
-}) {
+function SiteNavigation() {
   const links = (
     <>
       <a href="#story" aria-current="page">
@@ -201,6 +196,7 @@ function SiteNavigation({
         Store <span className="coming-pill">Coming Soon</span>
       </a>
       <a href="#privacy">Privacy</a>
+      <a href={sitePath("/support/")}>Support</a>
     </>
   );
 
@@ -214,49 +210,15 @@ function SiteNavigation({
       </nav>
       <details className="mobile-nav">
         <summary aria-label="Open navigation">Menu</summary>
-        {/* The nav bar is too narrow for the auth pair on a phone, so they live
-            in the drawer instead of pushing the dock on to a second row. */}
         <nav aria-label="Mobile navigation">
           {links}
-          {account ? (
-            <a href="#account">My account</a>
-          ) : (
-            <>
-              <a href="#account" onClick={() => onAuthIntent("login")}>
-                Log in
-              </a>
-              <a href="#account" onClick={() => onAuthIntent("signup")}>
-                Sign up
-              </a>
-            </>
-          )}
+          <a href="#pricing">Buy MewMuze</a>
         </nav>
       </details>
       <div className="nav-auth">
-        {account ? (
-          <SkeuoButton href="#account" variant="secondary" className="nav-cta">
-            My account
-          </SkeuoButton>
-        ) : (
-          <>
-            <SkeuoButton
-              href="#account"
-              variant="secondary"
-              className="nav-cta nav-cta-login"
-              onClick={() => onAuthIntent("login")}
-            >
-              Log in
-            </SkeuoButton>
-            <SkeuoButton
-              href="#account"
-              variant="primary"
-              className="nav-cta nav-cta-signup"
-              onClick={() => onAuthIntent("signup")}
-            >
-              Sign up
-            </SkeuoButton>
-          </>
-        )}
+        <SkeuoButton href="#pricing" variant="primary" className="nav-cta nav-cta-signup">
+          Buy MewMuze
+        </SkeuoButton>
       </div>
     </div>
   );
@@ -343,207 +305,6 @@ function WelcomeSplash() {
           <i />
         </span>
       </div>
-    </div>
-  );
-}
-
-type AccountKind = "individual" | "enterprise";
-type Account = { email: string; fullName: string; kind: AccountKind } | null;
-
-/**
- * Account gate for the purchase. Checkout is not live yet and there is no
- * backend on a static export, so this deliberately keeps the password only for
- * the moment the form is submitted and never stores or transmits it. Only the
- * email is held, in memory, to unlock the buy step.
- */
-function AccountPanel({
-  account,
-  mode,
-  onModeChange,
-  onSignIn,
-  onSignOut,
-}: {
-  account: Account;
-  mode: "signup" | "login";
-  onModeChange: (mode: "signup" | "login") => void;
-  onSignIn: (details: { email: string; fullName: string; kind: AccountKind }) => void;
-  onSignOut: () => void;
-}) {
-  const [fullName, setFullName] = useState("");
-  const [kind, setKind] = useState<AccountKind>("individual");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirm, setConfirm] = useState("");
-  const [error, setError] = useState("");
-
-  const switchMode = (next: "signup" | "login") => {
-    onModeChange(next);
-    setError("");
-    setPassword("");
-    setConfirm("");
-  };
-
-  const submit = (event: React.FormEvent) => {
-    event.preventDefault();
-    const signingUp = mode === "signup";
-    const trimmedName = fullName.trim();
-    const trimmed = email.trim();
-
-    if (signingUp && trimmedName.length < 2) {
-      setError("Please enter your full name.");
-      return;
-    }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) {
-      setError("That email address does not look quite right.");
-      return;
-    }
-    if (password.length < 8) {
-      setError("Please use at least 8 characters for your password.");
-      return;
-    }
-    if (signingUp && password !== confirm) {
-      setError("Those two passwords do not match.");
-      return;
-    }
-
-    setError("");
-    setPassword("");
-    setConfirm("");
-    onSignIn({
-      email: trimmed,
-      fullName: signingUp ? trimmedName : "",
-      kind,
-    });
-  };
-
-  if (account) {
-    return (
-      <div className="account-panel is-signed-in">
-        <span className="account-badge" aria-hidden="true">
-          <i />
-        </span>
-        <div className="account-copy">
-          <strong>{account.fullName ? `Hello, ${account.fullName}` : "You are signed in"}</strong>
-          <small>
-            {account.email}
-            {account.kind === "enterprise" ? " · Enterprise" : " · Individual"}
-          </small>
-        </div>
-        <button className="skeuo-button skeuo-button-quiet" type="button" onClick={onSignOut}>
-          Sign out
-        </button>
-      </div>
-    );
-  }
-
-  const signingUp = mode === "signup";
-
-  return (
-    <div className="account-panel">
-      <div className="account-tabs" role="tablist" aria-label="Account">
-        <button
-          type="button"
-          role="tab"
-          aria-selected={signingUp}
-          className={signingUp ? "is-active" : ""}
-          onClick={() => switchMode("signup")}
-        >
-          Create account
-        </button>
-        <button
-          type="button"
-          role="tab"
-          aria-selected={!signingUp}
-          className={!signingUp ? "is-active" : ""}
-          onClick={() => switchMode("login")}
-        >
-          Log in
-        </button>
-      </div>
-
-      <form className="account-form" onSubmit={submit} noValidate>
-        {signingUp && (
-          <>
-            <label className="account-field">
-              <span>Full name</span>
-              <input
-                type="text"
-                name="name"
-                autoComplete="name"
-                placeholder="Your full name"
-                value={fullName}
-                onChange={(event) => setFullName(event.target.value)}
-                required
-              />
-            </label>
-            <label className="account-field">
-              <span>Account type</span>
-              <select
-                name="accountKind"
-                value={kind}
-                onChange={(event) => setKind(event.target.value as AccountKind)}
-              >
-                <option value="individual">Individual</option>
-                <option value="enterprise">Enterprise</option>
-              </select>
-            </label>
-          </>
-        )}
-        <label className="account-field">
-          <span>Email</span>
-          <input
-            type="email"
-            name="email"
-            autoComplete="email"
-            placeholder="you@example.com"
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
-            required
-          />
-        </label>
-        <label className="account-field">
-          <span>Password</span>
-          <input
-            type="password"
-            name="password"
-            autoComplete={signingUp ? "new-password" : "current-password"}
-            placeholder="At least 8 characters"
-            value={password}
-            onChange={(event) => setPassword(event.target.value)}
-            required
-          />
-        </label>
-        {signingUp && (
-          <label className="account-field">
-            <span>Confirm password</span>
-            <input
-              type="password"
-              name="confirmPassword"
-              autoComplete="new-password"
-              placeholder="Type it once more"
-              value={confirm}
-              onChange={(event) => setConfirm(event.target.value)}
-              required
-            />
-          </label>
-        )}
-
-        {error && (
-          <p className="account-error" role="alert">
-            {error}
-          </p>
-        )}
-
-        <button className="skeuo-button skeuo-button-primary account-submit" type="submit">
-          {signingUp ? "Create my account" : "Log in"}
-        </button>
-      </form>
-
-      <p className="account-note">
-        Accounts are not connected to a server yet, so nothing you type here leaves
-        this page and your password is never saved. This is the front door for the
-        real thing, ready for when checkout opens.
-      </p>
     </div>
   );
 }
@@ -1077,10 +838,9 @@ export default function Home() {
   const [experienceUnlocked, setExperienceUnlocked] = useState(true);
   const [heroEmotion, setHeroEmotion] = useState<HeroEmotion>("neutral");
   const [supportDeveloper, setSupportDeveloper] = useState(false);
-  const [account, setAccount] = useState<Account>(null);
-  // Lifted so the nav's Log in / Sign up buttons open the matching tab.
-  const [authMode, setAuthMode] = useState<"signup" | "login">("signup");
-  const priceLabel = supportDeveloper ? "6.99" : "5.99";
+  const supportSelected = supportDeveloper && commerce.supporterConfigured;
+  const priceLabel = supportSelected ? "6.99" : "5.99";
+  const checkoutUrl = checkoutUrlFor(supportSelected);
   const heroRef = useRef<HTMLElement>(null);
   const catMotionRef = useRef<HTMLSpanElement>(null);
   const heroHeadRef = useRef<HTMLSpanElement>(null);
@@ -1211,7 +971,7 @@ export default function Home() {
       </a>
 
       <header className="site-navigation">
-        <SiteNavigation account={account} onAuthIntent={setAuthMode} />
+        <SiteNavigation />
       </header>
 
       <section
@@ -1421,40 +1181,54 @@ export default function Home() {
       <section className="account-section section-pad" id="account" data-reveal>
         <div className="section-shell account-shell">
           <div className="account-copy-block">
-            <Eyebrow>YOUR MEWMUZE ACCOUNT</Eyebrow>
+            <Eyebrow>ONE SAFE PURCHASE FLOW</Eyebrow>
             <h2>
-              One small sign up.
+              Dodo handles the payment.
               <br />
-              <em>Then the cat is yours.</em>
+              <em>MewMuze handles the cat.</em>
             </h2>
             <p>
-              Your account is what keeps your cat yours. It remembers the licence, so
-              a new laptop or a fresh install brings back the same companion, wearing
-              the same coat, with every costume you have collected still in the
-              wardrobe.
+              Checkout stays on Dodo Payments, where local currencies, regional
+              payment methods, tax, receipts and refunds are handled securely. MewMuze
+              never receives or stores your card details.
             </p>
             <ul className="account-perks">
               <li>
-                <strong>Your licence, kept safe</strong>
-                <span>Reinstall any time and sign back in to the same cat.</span>
+                <strong>Pay in the currency Dodo offers you</strong>
+                <span>The hosted checkout localises the final amount and payment methods.</span>
               </li>
               <li>
-                <strong>Your wardrobe travels</strong>
-                <span>Every costume you own follows you to any Windows machine.</span>
+                <strong>Your licence arrives immediately</strong>
+                <span>It appears after payment and is also delivered to your checkout email.</span>
               </li>
               <li>
-                <strong>Free updates, forever</strong>
-                <span>New features and seasonal outfits arrive at no extra cost.</span>
+                <strong>Activation stays private</strong>
+                <span>The app stores the key in your operating system credential vault.</span>
               </li>
             </ul>
           </div>
-          <AccountPanel
-            account={account}
-            mode={authMode}
-            onModeChange={setAuthMode}
-            onSignIn={(details) => setAccount(details)}
-            onSignOut={() => setAccount(null)}
-          />
+          <div className="account-panel purchase-flow-panel">
+            <span className="account-badge" aria-hidden="true">
+              <i />
+            </span>
+            <ol className="purchase-flow-steps">
+              <li>
+                <strong>1. Secure checkout</strong>
+                <span>Complete the one-time payment on Dodo Payments.</span>
+              </li>
+              <li>
+                <strong>2. Copy your licence</strong>
+                <span>The success page and email both contain the same key.</span>
+              </li>
+              <li>
+                <strong>3. Unlock MewMuze</strong>
+                <span>Paste it in Cat Settings. No permanent internet connection is needed.</span>
+              </li>
+            </ol>
+            <a className="skeuo-button skeuo-button-quiet" href={sitePath("/support/")}>
+              Purchase &amp; licence help
+            </a>
+          </div>
         </div>
       </section>
 
@@ -1489,46 +1263,46 @@ export default function Home() {
               <li>Local-first privacy</li>
               <li>All future updates and costumes included</li>
             </ul>
-            <label className="tip-toggle">
-              <input
-                type="checkbox"
-                checked={supportDeveloper}
-                onChange={(event) => setSupportDeveloper(event.target.checked)}
-              />
-              <span className="tip-box" aria-hidden="true" />
-              <span className="tip-copy">
-                <strong>Add $1 to support the developer</strong>
-                <small>
-                  One person builds MewMuze. This buys the coffee behind the next
-                  update.
-                </small>
-              </span>
-            </label>
-            {account ? (
-              <>
-                <button
-                  className="skeuo-button skeuo-button-primary pricing-coming"
-                  type="button"
-                  disabled
-                >
-                  Coming Soon
-                </button>
-                <p>
-                  Signed in as {account.email}. Checkout opens soon and no order or
-                  payment is created here yet.
-                </p>
-              </>
-            ) : (
-              <>
-                <a className="skeuo-button skeuo-button-primary pricing-gate" href="#account">
-                  Create an account to buy
-                </a>
-                <p>
-                  An account is needed before buying. Checkout is not live yet, so no
-                  order or payment is created here.
-                </p>
-              </>
+            {commerce.supporterConfigured && (
+              <label className="tip-toggle">
+                <input
+                  type="checkbox"
+                  checked={supportDeveloper}
+                  onChange={(event) => setSupportDeveloper(event.target.checked)}
+                />
+                <span className="tip-box" aria-hidden="true" />
+                <span className="tip-copy">
+                  <strong>Add $1 to support the developer</strong>
+                  <small>
+                    One person builds MewMuze. This buys the coffee behind the next
+                    update.
+                  </small>
+                </span>
+              </label>
             )}
+            {commerce.configured ? (
+              <a
+                className="skeuo-button skeuo-button-primary pricing-gate"
+                href={checkoutUrl}
+                target="_blank"
+                rel="noreferrer"
+              >
+                {commerceMode === "test" ? "Open secure test checkout" : "Buy MewMuze securely"}
+              </a>
+            ) : (
+              <button
+                className="skeuo-button skeuo-button-primary pricing-coming"
+                type="button"
+                disabled
+              >
+                Checkout configuration pending
+              </button>
+            )}
+            <p>
+              {commerceMode === "test"
+                ? "Test mode uses Dodo's sandbox: no real charge is made."
+                : "Secure checkout is hosted by Dodo Payments. MewMuze never sees your card details."}
+            </p>
           </div>
           <div className="pricing-copy">
             <Eyebrow>ONE CAT. ONE PRICE. ONCE.</Eyebrow>
@@ -1538,8 +1312,8 @@ export default function Home() {
               <em>Then never think about it again.</em>
             </h2>
             <p>
-              No monthly plan. No annual renewal. No account to make and no card left
-              on file waiting to charge you in eleven months. You pay a single time and
+              No monthly plan. No annual renewal. The checkout, receipt, tax and
+              licence delivery are handled by Dodo Payments. You pay a single time and
               the cat is yours.
             </p>
             <ul className="pricing-promises">
@@ -1557,8 +1331,9 @@ export default function Home() {
               </li>
             </ul>
             <p className="pricing-footnote">
-              The planned one-time MewMuze price is clear now, while checkout remains
-              honestly unavailable until the launch path is ready.
+              {commerceMode === "test"
+                ? "The complete purchase and licence flow is connected to Dodo test mode while launch checks are completed."
+                : "The final amount and available methods are shown by Dodo Payments before you confirm."}
             </p>
           </div>
         </div>

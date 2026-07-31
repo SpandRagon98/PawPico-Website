@@ -2386,6 +2386,240 @@ h2 em {
   }
 }
 
+/* ---- commerce, licence delivery and purchase support ------------------ */
+.purchase-flow-panel {
+  align-content: center;
+  min-height: 360px;
+}
+
+.purchase-flow-steps {
+  display: grid;
+  gap: 14px;
+  margin: 10px 0 24px;
+  padding: 0;
+  list-style: none;
+}
+
+.purchase-flow-steps li {
+  display: grid;
+  gap: 4px;
+  padding: 14px 16px;
+  border: 1px solid rgba(45, 77, 104, 0.22);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.52);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.92),
+    0 4px 0 rgba(76, 100, 118, 0.12);
+}
+
+.purchase-flow-steps strong {
+  color: var(--ink);
+  font-family: var(--font-kawaii-display);
+}
+
+.purchase-flow-steps span {
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.commerce-page {
+  min-height: 100vh;
+  padding: clamp(24px, 5vw, 72px);
+  color: var(--ink);
+  background:
+    radial-gradient(circle at 14% 12%, rgba(126, 211, 255, 0.28), transparent 30rem),
+    radial-gradient(circle at 86% 84%, rgba(127, 231, 189, 0.28), transparent 30rem),
+    linear-gradient(145deg, #eff8ff, #f8fcff 48%, #eefaf4);
+}
+
+.commerce-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  color: inherit;
+  text-decoration: none;
+}
+
+.commerce-brand > span {
+  width: 58px;
+  aspect-ratio: 1;
+  padding: 5px;
+  overflow: hidden;
+  border: 1px solid rgba(40, 69, 93, 0.3);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.75);
+  box-shadow:
+    inset 0 2px 0 #fff,
+    0 5px 0 rgba(64, 92, 112, 0.18),
+    0 12px 28px rgba(51, 101, 136, 0.15);
+}
+
+.commerce-brand img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.commerce-brand strong {
+  font: 700 clamp(1.25rem, 2vw, 1.7rem) / 1 var(--font-kawaii-display);
+}
+
+.commerce-card {
+  width: min(780px, 100%);
+  margin: clamp(38px, 8vh, 90px) auto 0;
+  padding: clamp(28px, 6vw, 64px);
+  border: 1px solid rgba(41, 72, 97, 0.28);
+  border-radius: clamp(28px, 5vw, 48px);
+  background: rgba(255, 255, 255, 0.78);
+  box-shadow:
+    inset 0 2px 0 #fff,
+    inset 0 -3px 0 rgba(91, 123, 146, 0.12),
+    0 10px 0 rgba(77, 105, 125, 0.14),
+    0 28px 70px rgba(49, 94, 127, 0.18);
+  backdrop-filter: blur(20px);
+}
+
+.commerce-card h1 {
+  max-width: 650px;
+  margin: 18px 0;
+  font: 700 clamp(2.25rem, 6vw, 4.75rem) / 0.98 var(--font-kawaii-display);
+  letter-spacing: -0.04em;
+}
+
+.commerce-card > p {
+  color: var(--muted);
+  font-size: clamp(1rem, 2vw, 1.18rem);
+  line-height: 1.65;
+}
+
+.license-delivery {
+  display: grid;
+  gap: 12px;
+  margin: 28px 0;
+  padding: clamp(20px, 4vw, 30px);
+  border: 1px solid rgba(39, 126, 94, 0.35);
+  border-radius: 24px;
+  background: rgba(225, 255, 243, 0.78);
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.9),
+    0 6px 0 rgba(50, 139, 105, 0.15);
+}
+
+.license-delivery small,
+.support-options small {
+  color: #287e63;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+}
+
+.license-delivery code {
+  overflow-wrap: anywhere;
+  color: #17382e;
+  font-size: clamp(0.82rem, 2vw, 1.04rem);
+  line-height: 1.55;
+}
+
+.license-delivery .skeuo-button {
+  justify-self: start;
+}
+
+.license-delivery.is-waiting {
+  border-color: rgba(35, 117, 169, 0.28);
+  background: rgba(228, 245, 255, 0.78);
+}
+
+.activation-steps {
+  display: grid;
+  gap: 12px;
+  margin: 30px 0;
+  padding-left: 1.4rem;
+}
+
+.activation-steps li {
+  padding-left: 8px;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.purchase-reference {
+  font-size: 0.92rem !important;
+}
+
+.purchase-reference code {
+  overflow-wrap: anywhere;
+}
+
+.commerce-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 28px;
+}
+
+.support-options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin: 30px 0;
+}
+
+.support-options article {
+  display: grid;
+  gap: 10px;
+  padding: 22px;
+  border: 1px solid rgba(47, 76, 97, 0.22);
+  border-radius: 22px;
+  background: rgba(247, 252, 255, 0.82);
+  box-shadow:
+    inset 0 1px 0 #fff,
+    0 5px 0 rgba(66, 94, 113, 0.12);
+}
+
+.support-options strong {
+  font: 700 1.15rem / 1.2 var(--font-kawaii-display);
+}
+
+.support-options p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.support-options a {
+  color: #1f6fae;
+  font-weight: 800;
+}
+
+@media (max-width: 640px) {
+  .commerce-page {
+    padding: 20px 16px 48px;
+  }
+
+  .commerce-card {
+    margin-top: 34px;
+    padding: 26px 20px 30px;
+    border-radius: 28px;
+  }
+
+  .commerce-card h1 {
+    font-size: clamp(2.15rem, 12vw, 3.25rem);
+  }
+
+  .commerce-actions,
+  .commerce-actions .skeuo-button {
+    width: 100%;
+  }
+
+  .support-options {
+    grid-template-columns: 1fr;
+  }
+
+  .purchase-flow-panel {
+    min-height: auto;
+  }
+}
+
 /* 2026 interaction and tactile-surface refinement */
 
 html {
