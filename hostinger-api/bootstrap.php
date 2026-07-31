@@ -68,10 +68,12 @@ function verify_dodo_webhook(string $body, array $config): string
         json_response(401, ['ok' => false, 'error' => 'Expired webhook timestamp.']);
     }
 
-    $encodedSecret = str_starts_with($secret, 'whsec_') ? substr($secret, 6) : $secret;
-    $key = base64url_decode_strict($encodedSecret);
-    if ($key === false) {
-        $key = $secret;
+    $key = $secret;
+    if (str_starts_with($secret, 'whsec_')) {
+        $decoded = base64url_decode_strict(substr($secret, 6));
+        if ($decoded !== false) {
+            $key = $decoded;
+        }
     }
     $expected = base64_encode(hash_hmac(
         'sha256',
