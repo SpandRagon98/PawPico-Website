@@ -5,7 +5,7 @@
     "platforms":  {
                       "windows-x86_64":  {
                                              "signature":  "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVTcGN4Qy9KbUxjKzRXVXdoQVFLVW9XdjBuRUplYmllSjAvTzdSSW1PYk0zbi96djE5QXA3dnZiMktIb2M5WG9jSERFbFJUN3h3dVFtK05iMW5USG9vNW5hbGwwczJRcEFNPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg1NjA4MzI1CWZpbGU6TWV3TXV6ZV8wLjEuNV94NjQtc2V0dXAuZXhlCk9ua0d5Qm00bGJXVmNidEduby9CeUJHZElmZHRCZmdkTHdzZGxGZENJUlovZCs2S1JIVUtabnl4RUwxVVV1WDdmb2pDTTBhRC9rVHh2anplU01yUENRPT0K",
-                                             "url":  "https://mewmuze.com/downloads/MewMuze_0.1.5_x64-setup.exe"
+                                             "url":  "https://github.com/SpandRagon98/PawPico-Website/releases/download/v0.1.5/MewMuze_0.1.5_x64-setup.exe"
                                          }
                   }
 }

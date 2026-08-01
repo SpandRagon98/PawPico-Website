@@ -18,6 +18,17 @@ const emptyResult: PurchaseResult = {
   licenseKey: "",
 };
 
+/**
+ * The installer lives on GitHub Releases, not in this repository.
+ *
+ * At ~5.7 MB a release it was the whole reason this repo had grown to tens of
+ * megabytes and pushes had started timing out, and git never forgets a blob.
+ * scripts/release.ps1 in the desktop repo rewrites this one line after it
+ * publishes the asset, so the link and the release cannot drift apart.
+ */
+const DOWNLOAD_URL =
+  "https://github.com/SpandRagon98/PawPico-Website/releases/download/v0.1.5/MewMuze_0.1.5_x64-setup.exe";
+
 export default function CheckoutSuccess() {
   const [purchase, setPurchase] = useState<PurchaseResult>(emptyResult);
   const [copied, setCopied] = useState(false);
@@ -119,20 +130,17 @@ export default function CheckoutSuccess() {
 
         {succeeded && (
           <p className="install-note">
-            Windows may say <strong>&ldquo;Windows protected your PC&rdquo;</strong> when
-            you open the installer, because MewMuze is not code signed yet. Choose{" "}
-            <strong>More info</strong>, then <strong>Run anyway</strong>. This page is the
-            only official download.
+            The download is hosted on MewMuze&rsquo;s official GitHub releases page, so
+            the file comes straight from the developer. Windows may still say{" "}
+            <strong>&ldquo;Windows protected your PC&rdquo;</strong> when you open it,
+            because MewMuze is not code signed yet. Choose <strong>More info</strong>,
+            then <strong>Run anyway</strong>.
           </p>
         )}
 
         <div className="commerce-actions">
           {succeeded && (
-            <a
-              className="skeuo-button skeuo-button-primary"
-              href={sitePath("/downloads/MewMuze_0.1.5_x64-setup.exe")}
-              download
-            >
+            <a className="skeuo-button skeuo-button-primary" href={DOWNLOAD_URL}>
               Download MewMuze 0.1.5
             </a>
           )}
