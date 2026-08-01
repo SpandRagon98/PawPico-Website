@@ -1,11 +1,11 @@
 {
-  "version": "0.1.1",
-  "notes": "MewMuze 0.1.1",
-  "pub_date": "2026-07-31T08:31:11.773Z",
+  "version": "0.1.2",
+  "notes": "Fixes activation sometimes showing as trial after a successful unlock, and unlocked features not always taking effect immediately.",
+  "pub_date": "2026-08-01T04:58:30.301Z",
   "platforms": {
     "windows-x86_64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVTcGN4Qy9KbUxjKzhzaVRsRUM1a0dqZnVhcU5kbjhtcnFWbHBxazFyZGtzSTRsUUpsUVVNT0R2YzJIeXhpbC9lUGgzdVQ0ZHpoR0t1UUpuODdEbHhQQWFuaHplUTQyeGdnPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg1NDg2NjQ5CWZpbGU6TWV3TXV6ZV8wLjEuMV94NjQtc2V0dXAuZXhlClN3c2hmb3JQSUxCTmY5aTFCd0ZZNXhCTzlZQWcrekdvTThRRTQrU1F6K0daeWpNSlV1VEpiNHJPRU11L3A2SkJhQmQxTXB6eTF1bzl4S3pNNm9IVUJ3PT0K",
-      "url": "https://mewmuze.com/downloads/MewMuze_0.1.1_x64-setup.exe"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVTcGN4Qy9KbUxjKy9DSlo2QXZ6QllBZjdFWUl5cnlqZ2VCZnFoMUxlOFNxU0FaRlpYanVKU01xZDhGMmk0R3Z0VjIraTZZUk5LNHFud1diaHg5Y21VMmJ6RTJCei81R1FZPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg1NTYwMjc1CWZpbGU6TWV3TXV6ZV8wLjEuMl94NjQtc2V0dXAuZXhlCkdzZHp4QlNqRDE5NUtoUXQwN1RxMWpiV0tmZFBKM2t1eGJXbS80UkNlbTk4U05QTHpsWnJLV1lUdzROc2dpZFhMdmMwNFVvb3lwY3lZcEs4d1ZYV0NBPT0K",
+      "url": "https://mewmuze.com/downloads/MewMuze_0.1.2_x64-setup.exe"
     }
   }
 }
