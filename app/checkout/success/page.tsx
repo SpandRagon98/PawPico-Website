@@ -130,10 +130,10 @@ export default function CheckoutSuccess() {
           {succeeded && (
             <a
               className="skeuo-button skeuo-button-primary"
-              href={sitePath("/downloads/MewMuze_0.1.4_x64-setup.exe")}
+              href={sitePath("/downloads/MewMuze_0.1.5_x64-setup.exe")}
               download
             >
-              Download MewMuze 0.1.4
+              Download MewMuze 0.1.5
             </a>
           )}
           <a className="skeuo-button skeuo-button-secondary" href={sitePath("/")}>
