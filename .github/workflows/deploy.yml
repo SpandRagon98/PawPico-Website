@@ -103,10 +103,13 @@ jobs:
           MEWMUZE_DODO_API_KEY: ${{ secrets.DODO_API_KEY }}
           MEWMUZE_DODO_MODE: live_mode
         run: |
-          if [ -n "$MEWMUZE_DB_HOST" ] && [ -n "$MEWMUZE_DB_NAME" ] && [ -n "$MEWMUZE_DB_USER" ] && [ -n "$MEWMUZE_DB_PASSWORD" ] && [ -n "$MEWMUZE_DODO_WEBHOOK_SECRET" ] && [ -n "$MEWMUZE_DODO_API_KEY" ]; then
+          if [ -n "$MEWMUZE_DB_HOST" ] && [ -n "$MEWMUZE_DB_NAME" ] && [ -n "$MEWMUZE_DB_USER" ] && [ -n "$MEWMUZE_DB_PASSWORD" ] && [ -n "$MEWMUZE_DODO_WEBHOOK_SECRET" ]; then
             php -r '$c=["db_host"=>getenv("MEWMUZE_DB_HOST"),"db_name"=>getenv("MEWMUZE_DB_NAME"),"db_user"=>getenv("MEWMUZE_DB_USER"),"db_password"=>getenv("MEWMUZE_DB_PASSWORD"),"dodo_webhook_secret"=>getenv("MEWMUZE_DODO_WEBHOOK_SECRET"),"dodo_api_key"=>getenv("MEWMUZE_DODO_API_KEY"),"dodo_mode"=>getenv("MEWMUZE_DODO_MODE") ?: "test_mode"]; file_put_contents("out/api/.mewmuze-config.php", "<?php\nreturn ".var_export($c,true).";\n");'
+            if [ -z "$MEWMUZE_DODO_API_KEY" ]; then
+              echo "::warning::DODO_API_KEY is not set; licence activation still works, but the optional device-count display will be unavailable."
+            fi
           else
-            echo "::error::Production commerce secrets are incomplete. Refusing to publish a checkout that cannot fulfil licences."
+            echo "::error::Production payment, webhook, or database secrets are incomplete. Refusing to publish a checkout that cannot fulfil licences."
             exit 1
           fi
 
