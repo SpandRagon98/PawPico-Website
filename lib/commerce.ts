@@ -1,6 +1,7 @@
 export type CommerceMode = "test" | "live";
 
 export const LIVE_DODO_PRODUCT_ID = "pdt_0NkWDKYYlGSBLf59iNa4q";
+export const CHECKOUT_SUCCESS_URL = "https://mewmuze.com/checkout/success/";
 const liveCheckoutUrl = `https://checkout.dodopayments.com/buy/${LIVE_DODO_PRODUCT_ID}`;
 const configuredCheckoutUrl = process.env.NEXT_PUBLIC_DODO_CHECKOUT_URL?.trim() ?? "";
 const supporterCheckoutUrl =
@@ -9,21 +10,38 @@ const supporterCheckoutUrl =
 const isLiveCheckout = (url: string) =>
   /^https:\/\/checkout\.dodopayments\.com\//i.test(url);
 
+/**
+ * Dodo's static product links only return to the merchant when redirect_url is
+ * supplied. Keep it on every checkout link, including links supplied through
+ * GitHub variables, so a completed purchase always comes back to MewMuze.
+ */
+const withCheckoutReturn = (checkoutUrl: string): string => {
+  if (!isLiveCheckout(checkoutUrl)) return checkoutUrl;
+  const url = new URL(checkoutUrl);
+  url.searchParams.set("quantity", "1");
+  url.searchParams.set("redirect_url", CHECKOUT_SUCCESS_URL);
+  return url.toString();
+};
+
 // The public product ID is safe to ship. Falling back to the canonical live
 // link also prevents an old GitHub variable from sending buyers to a sandbox
 // product after the production switch.
 const normalCheckoutUrl =
   isLiveCheckout(configuredCheckoutUrl) && configuredCheckoutUrl.includes(LIVE_DODO_PRODUCT_ID)
-    ? configuredCheckoutUrl
-    : liveCheckoutUrl;
+    ? withCheckoutReturn(configuredCheckoutUrl)
+    : withCheckoutReturn(liveCheckoutUrl);
+
+const configuredSupporterCheckoutUrl = isLiveCheckout(supporterCheckoutUrl)
+  ? withCheckoutReturn(supporterCheckoutUrl)
+  : supporterCheckoutUrl;
 
 export const commerceMode: CommerceMode = "live";
 
 export const commerce = {
   checkoutUrl: normalCheckoutUrl,
-  supporterCheckoutUrl,
+  supporterCheckoutUrl: configuredSupporterCheckoutUrl,
   configured: /^https:\/\/.+/i.test(normalCheckoutUrl),
-  supporterConfigured: isLiveCheckout(supporterCheckoutUrl),
+  supporterConfigured: isLiveCheckout(configuredSupporterCheckoutUrl),
 } as const;
 
 export function checkoutUrlFor(supportDeveloper: boolean): string {
