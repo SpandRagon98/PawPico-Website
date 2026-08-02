@@ -106,8 +106,8 @@ export default function CheckoutSuccess() {
                 : "Dodo is confirming payment and generating your key."}
           </strong>
           <p>
-            A browser redirect is never accepted as proof of payment. This page unlocks the
-            download only after the signed Dodo webhook is recorded by MewMuze.
+            Your installer is available below while Dodo finishes confirming the purchase.
+            The unique licence key is delivered separately to your purchase email.
           </p>
         </div>
 
@@ -123,22 +123,18 @@ export default function CheckoutSuccess() {
           </p>
         )}
 
-        {succeeded && (
-          <p className="install-note">
-            The download is hosted on MewMuze&rsquo;s official GitHub releases page, so
-            the file comes straight from the developer. Windows may still say{" "}
-            <strong>&ldquo;Windows protected your PC&rdquo;</strong> when you open it,
-            because MewMuze is not code signed yet. Choose <strong>More info</strong>,
-            then <strong>Run anyway</strong>.
-          </p>
-        )}
+        <p className="install-note">
+          The download is hosted on MewMuze&rsquo;s official GitHub releases page, so
+          the file comes straight from the developer. Windows may still say{" "}
+          <strong>&ldquo;Windows protected your PC&rdquo;</strong> when you open it,
+          because MewMuze is not code signed yet. Choose <strong>More info</strong>,
+          then <strong>Run anyway</strong>.
+        </p>
 
         <div className="commerce-actions">
-          {succeeded && (
-            <a className="skeuo-button skeuo-button-primary" href={DOWNLOAD_URL}>
-              Download MewMuze 0.1.6
-            </a>
-          )}
+          <a className="skeuo-button skeuo-button-primary" href={DOWNLOAD_URL}>
+            Download MewMuze 0.1.6
+          </a>
           <a className="skeuo-button skeuo-button-secondary" href={sitePath("/")}>
             Back to MewMuze
           </a>
