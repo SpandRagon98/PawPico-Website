@@ -17,10 +17,24 @@ $payload = json_decode($body, true);
 if (!is_array($payload)) {
     json_response(400, ['ok' => false, 'error' => 'Invalid JSON.']);
 }
+$storedPayload = $payload;
+if (isset($storedPayload['data']['license_key']['key'])) {
+    $storedPayload['data']['license_key']['key'] = '[redacted]';
+}
+if (isset($storedPayload['data']['license_key']) && is_string($storedPayload['data']['license_key'])) {
+    $storedPayload['data']['license_key'] = '[redacted]';
+}
+if (isset($storedPayload['data']['key'])) {
+    $storedPayload['data']['key'] = '[redacted]';
+}
+$storedPayloadJson = json_encode($storedPayload, JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR);
 
 $type = first_text($payload, [['type']]);
 $data = is_array($payload['data'] ?? null) ? $payload['data'] : [];
-$paymentId = first_text($data, [['payment_id'], ['id']]);
+$paymentId = first_text($data, [['payment_id']]);
+if ($paymentId === '' && str_starts_with($type, 'payment.')) {
+    $paymentId = first_text($data, [['id']]);
+}
 $customerId = first_text($data, [['customer', 'customer_id'], ['customer', 'id'], ['customer_id']]);
 $email = first_text($data, [['customer', 'email'], ['email']]);
 $name = first_text($data, [['customer', 'name'], ['name']]);
@@ -28,8 +42,8 @@ $country = first_text($data, [['billing', 'country'], ['customer', 'country'], [
 $currency = strtoupper(first_text($data, [['currency']]));
 $amount = first_text($data, [['total_amount'], ['amount']]);
 $status = first_text($data, [['status']]);
-$licenseId = first_text($data, [['license_key_id'], ['entitlement_id'], ['id']]);
-$licenseKey = first_text($data, [['license_key'], ['key']]);
+$licenseId = first_text($data, [['id'], ['license_key_id']]);
+$licenseKey = first_text($data, [['license_key', 'key'], ['key']]);
 $licenseLastFour = $licenseKey === '' ? '' : substr($licenseKey, -4);
 $nullable = static fn(string $value): ?string => $value === '' ? null : $value;
 
@@ -45,7 +59,7 @@ try {
     $event->execute([
         ':webhook_id' => $webhookId,
         ':event_type' => $type,
-        ':payload_json' => $body,
+        ':payload_json' => $storedPayloadJson,
     ]);
     if ($event->rowCount() === 0) {
         $db->rollBack();
@@ -72,7 +86,10 @@ try {
         ]);
     }
 
-    if ($paymentId !== '') {
+    $isPaymentLifecycle = str_starts_with($type, 'payment.')
+        || str_starts_with($type, 'refund.')
+        || str_starts_with($type, 'dispute.');
+    if ($paymentId !== '' && $isPaymentLifecycle) {
         $payment = $db->prepare(
             'INSERT INTO payments
              (dodo_payment_id, dodo_customer_id, customer_email, amount_minor, currency,
@@ -99,7 +116,7 @@ try {
         ]);
     }
 
-    if (str_starts_with($type, 'entitlement_grant.') || $licenseId !== '' || $licenseKey !== '') {
+    if (str_starts_with($type, 'entitlement_grant.') && ($licenseId !== '' || $licenseKey !== '')) {
         $licence = $db->prepare(
             'INSERT INTO licences
              (dodo_licence_id, dodo_payment_id, customer_email, key_last_four,

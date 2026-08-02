@@ -1,17 +1,29 @@
 export type CommerceMode = "test" | "live";
 
-const normalCheckoutUrl = process.env.NEXT_PUBLIC_DODO_CHECKOUT_URL?.trim() ?? "";
+export const LIVE_DODO_PRODUCT_ID = "pdt_0NkWDKYYlGSBLf59iNa4q";
+const liveCheckoutUrl = `https://checkout.dodopayments.com/buy/${LIVE_DODO_PRODUCT_ID}`;
+const configuredCheckoutUrl = process.env.NEXT_PUBLIC_DODO_CHECKOUT_URL?.trim() ?? "";
 const supporterCheckoutUrl =
   process.env.NEXT_PUBLIC_DODO_SUPPORT_CHECKOUT_URL?.trim() ?? "";
 
-export const commerceMode: CommerceMode =
-  process.env.NEXT_PUBLIC_DODO_MODE === "live" ? "live" : "test";
+const isLiveCheckout = (url: string) =>
+  /^https:\/\/checkout\.dodopayments\.com\//i.test(url);
+
+// The public product ID is safe to ship. Falling back to the canonical live
+// link also prevents an old GitHub variable from sending buyers to a sandbox
+// product after the production switch.
+const normalCheckoutUrl =
+  isLiveCheckout(configuredCheckoutUrl) && configuredCheckoutUrl.includes(LIVE_DODO_PRODUCT_ID)
+    ? configuredCheckoutUrl
+    : liveCheckoutUrl;
+
+export const commerceMode: CommerceMode = "live";
 
 export const commerce = {
   checkoutUrl: normalCheckoutUrl,
   supporterCheckoutUrl,
   configured: /^https:\/\/.+/i.test(normalCheckoutUrl),
-  supporterConfigured: /^https:\/\/.+/i.test(supporterCheckoutUrl),
+  supporterConfigured: isLiveCheckout(supporterCheckoutUrl),
 } as const;
 
 export function checkoutUrlFor(supportDeveloper: boolean): string {
@@ -25,7 +37,7 @@ export function checkoutUrlFor(supportDeveloper: boolean): string {
  * Whether to advertise the price in rupees.
  *
  * Dodo localises the real amount at checkout either way; this only stops an
- * Indian visitor reading "$5.99" and then being charged in rupees. India is a
+ * Indian visitor reading "$7.99" and then being charged in rupees. India is a
  * single timezone, so this is a cheap, offline, no-dependency check.
  *
  * ponytail: timezone heuristic, so a VPN or a travelling buyer reads as the
@@ -43,6 +55,6 @@ export function prefersRupees(): boolean {
 
 /** Displayed price. Must stay in step with the Dodo product's own pricing. */
 export function priceLabelFor(rupees: boolean, supportDeveloper: boolean): string {
-  if (rupees) return supportDeveloper ? "₹599" : "₹499";
-  return supportDeveloper ? "$6.99" : "$5.99";
+  if (rupees) return supportDeveloper ? "₹649" : "₹549";
+  return supportDeveloper ? "$8.99" : "$7.99";
 }

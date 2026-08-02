@@ -4,18 +4,13 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import { sitePath } from "../../../lib/site-path";
 
-type PurchaseResult = {
-  status: string;
-  email: string;
-  paymentId: string;
-  licenseKey: string;
-};
+type PurchaseState = "pending" | "processing" | "fulfilled" | "revoked" | "error";
+
+type PurchaseResult = { state: PurchaseState; paymentId: string };
 
 const emptyResult: PurchaseResult = {
-  status: "",
-  email: "",
+  state: "pending",
   paymentId: "",
-  licenseKey: "",
 };
 
 /**
@@ -27,48 +22,54 @@ const emptyResult: PurchaseResult = {
  * publishes the asset, so the link and the release cannot drift apart.
  */
 const DOWNLOAD_URL =
-  "https://github.com/SpandRagon98/PawPico-Website/releases/download/v0.1.5/MewMuze_0.1.5_x64-setup.exe";
+  "https://github.com/SpandRagon98/PawPico-Website/releases/download/v0.1.6/MewMuze_0.1.6_x64-setup.exe";
 
 export default function CheckoutSuccess() {
   const [purchase, setPurchase] = useState<PurchaseResult>(emptyResult);
-  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     let active = true;
+    let timer: number | undefined;
     const params = new URLSearchParams(window.location.search);
-    const licenseKey = (params.get("license_key") ?? "").split(",")[0].trim().slice(0, 400);
-    const result = {
-      status: (params.get("status") ?? "").slice(0, 40),
-      email: (params.get("email") ?? "").slice(0, 200),
-      paymentId: (params.get("payment_id") ?? "").slice(0, 100),
-      licenseKey,
-    };
+    const paymentId = (params.get("payment_id") ?? "").trim().slice(0, 120);
+    window.history.replaceState({}, "", window.location.pathname);
 
-    queueMicrotask(() => {
-      if (active) setPurchase(result);
-    });
-
-    // Keep the key out of copied URLs and browser history after it has been read.
-    if (licenseKey) {
-      window.history.replaceState({}, "", window.location.pathname);
+    if (!paymentId) {
+      queueMicrotask(() => active && setPurchase({ state: "pending", paymentId: "" }));
+      return () => {
+        active = false;
+      };
     }
+
+    let attempts = 0;
+    const verify = async () => {
+      attempts += 1;
+      try {
+        const response = await fetch(
+          sitePath(`/api/purchase-status.php?payment_id=${encodeURIComponent(paymentId)}`),
+          { cache: "no-store" },
+        );
+        if (!response.ok) throw new Error("status unavailable");
+        const body = (await response.json()) as { state?: PurchaseState; fulfilled?: boolean };
+        const state: PurchaseState = body.fulfilled ? "fulfilled" : body.state ?? "pending";
+        if (active) setPurchase({ state, paymentId });
+        if (state !== "fulfilled" && state !== "revoked" && attempts < 10) {
+          timer = window.setTimeout(() => void verify(), 3000);
+        }
+      } catch {
+        if (active) setPurchase({ state: attempts < 10 ? "processing" : "error", paymentId });
+        if (attempts < 10) timer = window.setTimeout(() => void verify(), 3000);
+      }
+    };
+    void verify();
 
     return () => {
       active = false;
+      if (timer) clearTimeout(timer);
     };
   }, []);
 
-  const copyKey = async () => {
-    if (!purchase.licenseKey) return;
-    await navigator.clipboard.writeText(purchase.licenseKey);
-    setCopied(true);
-    window.setTimeout(() => setCopied(false), 1800);
-  };
-
-  const succeeded =
-    purchase.status === "succeeded" ||
-    purchase.status === "active" ||
-    Boolean(purchase.licenseKey);
+  const succeeded = purchase.state === "fulfilled";
 
   return (
     <main className="commerce-page">
@@ -92,29 +93,23 @@ export default function CheckoutSuccess() {
         </p>
         <h1>{succeeded ? "Your cat is ready to come home." : "We are checking your purchase."}</h1>
         <p>
-          {purchase.email
-            ? `Dodo Payments is also sending the receipt and licence to ${purchase.email}.`
-            : "Dodo Payments sends the receipt and licence to the email used at checkout."}
+          Dodo Payments sends the receipt and unique licence key to the email used at checkout.
         </p>
 
-        {purchase.licenseKey ? (
-          <div className="license-delivery">
-            <small>YOUR MEWMUZE LICENCE KEY</small>
-            <code>{purchase.licenseKey}</code>
-            <button className="skeuo-button skeuo-button-primary" type="button" onClick={copyKey}>
-              {copied ? "Copied!" : "Copy licence key"}
-            </button>
-          </div>
-        ) : (
-          <div className="license-delivery is-waiting">
-            <small>LICENCE DELIVERY</small>
-            <strong>Check your purchase email.</strong>
-            <p>
-              If the payment succeeded but the key is not shown here, the email is the
-              authoritative copy. Keep the receipt and payment ID for support.
-            </p>
-          </div>
-        )}
+        <div className="license-delivery is-waiting">
+          <small>{succeeded ? "LICENCE DELIVERED" : "VERIFIED FULFILMENT"}</small>
+          <strong>
+            {succeeded
+              ? "Payment verified — check your purchase email for the key."
+              : purchase.state === "revoked"
+                ? "This purchase is no longer active."
+                : "Dodo is confirming payment and generating your key."}
+          </strong>
+          <p>
+            A browser redirect is never accepted as proof of payment. This page unlocks the
+            download only after the signed Dodo webhook is recorded by MewMuze.
+          </p>
+        </div>
 
         <ol className="activation-steps">
           <li>Open MewMuze on the computer you want to activate.</li>
@@ -141,7 +136,7 @@ export default function CheckoutSuccess() {
         <div className="commerce-actions">
           {succeeded && (
             <a className="skeuo-button skeuo-button-primary" href={DOWNLOAD_URL}>
-              Download MewMuze 0.1.5
+              Download MewMuze 0.1.6
             </a>
           )}
           <a className="skeuo-button skeuo-button-secondary" href={sitePath("/")}>

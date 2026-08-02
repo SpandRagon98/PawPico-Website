@@ -67,6 +67,33 @@ test("scrolls freely from the first paint instead of locking until a button is p
   assert.match(css, /\.hero \{[\s\S]*height: 100dvh/);
 });
 
+test("never trusts checkout redirect fields as proof of payment", async () => {
+  const successPage = await source("../app/checkout/success/page.tsx");
+  assert.doesNotMatch(successPage, /params\.get\("status"\)/);
+  assert.doesNotMatch(successPage, /params\.get\("license_key"\)/);
+  assert.match(successPage, /purchase-status\.php\?payment_id=/);
+  assert.match(successPage, /body\.fulfilled \? "fulfilled"/);
+});
+
+test("records Dodo entitlement grants using the grant ID and nested generated key", async () => {
+  const webhook = await source("../hostinger-api/dodo-webhook.php");
+  assert.match(webhook, /\['license_key', 'key'\]/);
+  assert.match(webhook, /str_starts_with\(\$type, 'entitlement_grant\.'\)/);
+  assert.doesNotMatch(webhook, /\['entitlement_id'\], \['id'\]/);
+  assert.match(webhook, /\['data'\]\['license_key'\]\['key'\] = '\[redacted\]'/);
+  assert.doesNotMatch(webhook, /':payload_json' => \$body/);
+});
+
+test("keeps the Dodo seller secret on Hostinger and validates an instance before device lookup", async () => {
+  const endpoint = await source("../hostinger-api/license-status.php");
+  const workflow = await source("../.github/workflows/deploy.yml");
+  assert.match(endpoint, /\/licenses\/validate/);
+  assert.match(endpoint, /Authorization: Bearer/);
+  assert.ok(endpoint.indexOf("/licenses/validate") < endpoint.indexOf("/license_keys/"));
+  assert.match(workflow, /secrets\.DODO_API_KEY/);
+  assert.doesNotMatch(workflow, /NEXT_PUBLIC_DODO_API_KEY/);
+});
+
 test("uses a large, seated app-density pixel cat with independent head and eye layers", async () => {
   const page = await source("../app/page.tsx");
   const css = await source("../app/globals.css");
@@ -332,24 +359,24 @@ test("presents the accurate Appearance Studio and current Flower Band preset", a
   }
 });
 
-test("adds a Dodo-ready one-time $5.99 purchase section", async () => {
+test("adds the live Dodo one-time $7.99 purchase section", async () => {
   const response = await render();
   const html = await response.text();
   const page = await source("../app/page.tsx");
   const commerce = await source("../lib/commerce.ts");
 
   assert.match(html, /ONE-TIME PRICE/);
-  assert.match(html, /\$5\.99/);
+  assert.match(html, /\$7\.99/);
   assert.match(html, /Pay once\. No subscription, ever\./);
   assert.match(html, /Personal Windows desktop cat/);
   assert.match(html, /Local-first privacy/);
   assert.match(html, /Dodo Payments/);
-  if (process.env.NEXT_PUBLIC_DODO_CHECKOUT_URL) {
-    assert.match(html, /test\.checkout\.dodopayments\.com\/buy\/pdt_0NkKxv8HzpZgMPTzpIeWT/);
-    assert.doesNotMatch(html, /Checkout configuration pending/);
-  } else {
-    assert.match(html, /Checkout configuration pending/);
-  }
+  assert.match(
+    html,
+    /checkout\.dodopayments\.com\/buy\/pdt_0NkWDKYYlGSBLf59iNa4q/,
+  );
+  assert.doesNotMatch(html, /Checkout configuration pending/);
+  assert.doesNotMatch(html, /pdt_0NkKxv8HzpZgMPTzpIeWT/);
   assert.match(page, /checkoutUrlFor/);
   assert.match(page, /Buy MewMuze securely/);
   assert.match(commerce, /NEXT_PUBLIC_DODO_CHECKOUT_URL/);
@@ -360,13 +387,13 @@ test("shows rupees to Indian visitors and dollars to everyone else", async () =>
   const { prefersRupees, priceLabelFor } = await import("../lib/commerce.ts");
   const html = await (await render()).text();
 
-  assert.equal(priceLabelFor(false, false), "$5.99");
-  assert.equal(priceLabelFor(true, false), "₹499");
-  assert.equal(priceLabelFor(true, true), "₹599");
+  assert.equal(priceLabelFor(false, false), "$7.99");
+  assert.equal(priceLabelFor(true, false), "₹549");
+  assert.equal(priceLabelFor(true, true), "₹649");
 
   // Server-rendered HTML must stay in dollars: the export is one static file
   // served worldwide, so rupees are only ever swapped in after mount.
-  assert.match(html, /\$5\.99/);
+  assert.match(html, /\$7\.99/);
   assert.doesNotMatch(html, /₹/);
 
   const withZone = (zone) => {
@@ -597,8 +624,8 @@ test("explains in plain English what every feature does for the user", async () 
 test("keeps the optional supporter checkout behind its own configured Dodo link", async () => {
   const response = await render();
   const html = await response.text();
-  assert.match(html, /\$5\.99/);
-  assert.doesNotMatch(html, /\$6\.99/);
+  assert.match(html, /\$7\.99/);
+  assert.doesNotMatch(html, /\$8\.99/);
   assert.match(html, /Pay once\. No subscription, ever\./);
   assert.match(html, /All future updates and costumes included/);
   assert.match(html, /Every future update, free/);
@@ -608,7 +635,7 @@ test("keeps the optional supporter checkout behind its own configured Dodo link"
   assert.match(page, /commerce\.supporterConfigured/);
   assert.match(page, /Add \$1 to support the developer/);
   assert.match(page, /priceLabelFor\(rupees, supportSelected\)/);
-  assert.match(commerce, /supportDeveloper \? "\$6\.99" : "\$5\.99"/);
+  assert.match(commerce, /supportDeveloper \? "\$8\.99" : "\$7\.99"/);
   assert.match(commerce, /NEXT_PUBLIC_DODO_SUPPORT_CHECKOUT_URL/);
 
   const css = await source("../app/globals.css");
@@ -971,9 +998,11 @@ test("renders purchase success, cancellation and support routes", async () => {
   const successSource = await source("../app/checkout/success/page.tsx");
 
   assert.match(success, /PURCHASE STATUS/);
-  assert.match(successSource, /license_key/);
+  assert.match(successSource, /payment_id/);
+  assert.match(successSource, /purchase-status\.php/);
+  assert.doesNotMatch(successSource, /params\.get\("license_key"\)/);
   assert.match(successSource, /replaceState/);
-  assert.match(successSource, /Copy licence key/);
+  assert.match(successSource, /check your purchase email for the key/i);
   assert.match(cancelled, /Nothing was charged/);
   assert.match(support, /support@mewmuze\.com/);
   assert.match(support, /Never send a card number/);

@@ -1,11 +1,11 @@
 {
-    "version":  "0.1.5",
-    "notes":  "Your licence now survives restarts and updates - no need to re-enter the key. Update checks retry automatically instead of needing repeated clicks.",
-    "pub_date":  "2026-08-01T18:18:45.884Z",
-    "platforms":  {
-                      "windows-x86_64":  {
-                                             "signature":  "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVTcGN4Qy9KbUxjKzRXVXdoQVFLVW9XdjBuRUplYmllSjAvTzdSSW1PYk0zbi96djE5QXA3dnZiMktIb2M5WG9jSERFbFJUN3h3dVFtK05iMW5USG9vNW5hbGwwczJRcEFNPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg1NjA4MzI1CWZpbGU6TWV3TXV6ZV8wLjEuNV94NjQtc2V0dXAuZXhlCk9ua0d5Qm00bGJXVmNidEduby9CeUJHZElmZHRCZmdkTHdzZGxGZENJUlovZCs2S1JIVUtabnl4RUwxVVV1WDdmb2pDTTBhRC9rVHh2anplU01yUENRPT0K",
-                                             "url":  "https://github.com/SpandRagon98/PawPico-Website/releases/download/v0.1.5/MewMuze_0.1.5_x64-setup.exe"
-                                         }
-                  }
+  "version": "0.1.6",
+  "notes": "Live Dodo Payments licensing, persistent activation, and production installer defaults.",
+  "pub_date": "2026-08-02T12:32:36.756Z",
+  "platforms": {
+    "windows-x86_64": {
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVTcGN4Qy9KbUxjKzBMUEhDbG94UE1POW9ScnBEMGRCV3RDUDNLZ21WVGZpRnhMaitvcmY4SlhVNnZIVCtMeFJTem15dDFVWXhRWFNQQWhDa3hEOG5tbHZWVkw5bzVMSnc0PQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg1NjczODY2CWZpbGU6TWV3TXV6ZV8wLjEuNl94NjQtc2V0dXAuZXhlCkNxUEY5UHY2UDU5bEpwY2t3bVhlSHA5TVJXb01XSHY5eisrMTR2NlZOQk82U0lReEZxMm0rVlcyTFBxdUZBK3hKWGozWVJ6b0ZVeWlXd1pTOFl6eUNRPT0K",
+      "url": "https://github.com/SpandRagon98/PawPico-Website/releases/download/v0.1.6/MewMuze_0.1.6_x64-setup.exe"
+    }
+  }
 }
