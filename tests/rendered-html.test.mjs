@@ -1005,7 +1005,7 @@ test("renders purchase success, cancellation and support routes", async () => {
   assert.doesNotMatch(successSource, /params\.get\("license_key"\)/);
   assert.match(successSource, /replaceState/);
   assert.match(successSource, /check your purchase email for the key/i);
-  assert.match(success, /Download MewMuze 0\.1\.7/);
+  assert.match(success, /Download MewMuze 0\.1\.8/);
   assert.match(successSource, /href=\{DOWNLOAD_URL\}/);
   assert.doesNotMatch(successSource, /\{succeeded && \(\s*<a[^>]+href=\{DOWNLOAD_URL\}/);
   assert.match(cancelled, /Nothing was charged/);

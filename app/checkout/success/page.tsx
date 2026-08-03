@@ -22,7 +22,7 @@ const emptyResult: PurchaseResult = {
  * publishes the asset, so the link and the release cannot drift apart.
  */
 const DOWNLOAD_URL =
-  "https://github.com/SpandRagon98/PawPico-Website/releases/download/v0.1.7/MewMuze_0.1.7_x64-setup.exe";
+  "https://github.com/SpandRagon98/PawPico-Website/releases/download/v0.1.8/MewMuze_0.1.8_x64-setup.exe";
 
 export default function CheckoutSuccess() {
   const [purchase, setPurchase] = useState<PurchaseResult>(emptyResult);
@@ -133,7 +133,7 @@ export default function CheckoutSuccess() {
 
         <div className="commerce-actions">
           <a className="skeuo-button skeuo-button-primary" href={DOWNLOAD_URL}>
-            Download MewMuze 0.1.7
+            Download MewMuze 0.1.8
           </a>
           <a className="skeuo-button skeuo-button-secondary" href={sitePath("/")}>
             Back to MewMuze
