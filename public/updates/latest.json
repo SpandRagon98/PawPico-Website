@@ -1,11 +1,11 @@
 {
-  "version": "0.1.6",
-  "notes": "Live Dodo Payments licensing, persistent activation, and production installer defaults.",
-  "pub_date": "2026-08-02T12:32:36.756Z",
+  "version": "0.1.7",
+  "notes": "Clear Dodo licence-email guidance, activation-window controls, and temporary taskbar access while activation is required.",
+  "pub_date": "2026-08-03T06:57:45Z",
   "platforms": {
     "windows-x86_64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVTcGN4Qy9KbUxjKzBMUEhDbG94UE1POW9ScnBEMGRCV3RDUDNLZ21WVGZpRnhMaitvcmY4SlhVNnZIVCtMeFJTem15dDFVWXhRWFNQQWhDa3hEOG5tbHZWVkw5bzVMSnc0PQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg1NjczODY2CWZpbGU6TWV3TXV6ZV8wLjEuNl94NjQtc2V0dXAuZXhlCkNxUEY5UHY2UDU5bEpwY2t3bVhlSHA5TVJXb01XSHY5eisrMTR2NlZOQk82U0lReEZxMm0rVlcyTFBxdUZBK3hKWGozWVJ6b0ZVeWlXd1pTOFl6eUNRPT0K",
-      "url": "https://github.com/SpandRagon98/PawPico-Website/releases/download/v0.1.6/MewMuze_0.1.6_x64-setup.exe"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVTcGN4Qy9KbUxjKzJRMytYQWVjcEROVVhpMDEwV3VyYTVoeTlNdFhZMjM3azdvekhMSGZ2NTdoM3QvOTVwNXYvK2J1L0VxNStrMmRHMWwwTGZRekduTW1kTEtFeWdOTVF3PQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg1NzM5OTA3CWZpbGU6TWV3TXV6ZV8wLjEuN194NjQtc2V0dXAuZXhlCkp4c1FTUTV2bDhZUzUwMEw2UDVBeVpVbHN6aFJVV2t3b3Z0eE51V2pDcmczQmRGSitOb084RE1NZmZ4MzBZSldNUDMzODRFQ2R2YWplai9vZk9MOEFBPT0K",
+      "url": "https://github.com/SpandRagon98/PawPico-Website/releases/download/v0.1.7/MewMuze_0.1.7_x64-setup.exe"
     }
   }
 }
