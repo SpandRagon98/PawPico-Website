@@ -28,6 +28,38 @@ import {
 } from "../lib/commerce";
 import { sitePath } from "../lib/site-path";
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://mewmuze.com";
+
+// The purchasable app, described for search engines.
+//
+// Price is the USD list price only. Indian visitors are shown ₹549 and Dodo owns
+// the final localized amount at checkout. Structured data carries a single offer,
+// so it advertises the global list price rather than a region specific one.
+//
+// No aggregateRating or review: there are no real reviews to cite, and inventing
+// them is a spam policy violation.
+const appStructuredData = {
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "@id": `${SITE_URL}/#app`,
+  name: "MewMuze",
+  description:
+    "Meet MewMuze, a playful Windows desktop companion with focus tools, smart reminders, local utilities, expressive animations and a customizable personality.",
+  url: `${SITE_URL}/`,
+  image: `${SITE_URL}/og-mewmuze.png`,
+  applicationCategory: "UtilitiesApplication",
+  operatingSystem: "Windows 10, Windows 11",
+  softwareVersion: "0.1.8",
+  publisher: { "@id": `${SITE_URL}/#organization` },
+  offers: {
+    "@type": "Offer",
+    price: "7.99",
+    priceCurrency: "USD",
+    availability: "https://schema.org/InStock",
+    url: `${SITE_URL}/`,
+  },
+};
+
 const CAT_ASSET = "/cat/mewmuze-hero-reference-app.png";
 const HERO_CAT_BODY_ASSET = "/cat/mewmuze-hero-front-body-app.png";
 const HERO_CAT_BODY_ALIVE_ASSET = "/cat/mewmuze-hero-front-body-alive.webp";
@@ -970,6 +1002,10 @@ export default function Home() {
       id="top"
       className={`experience-${experienceUnlocked ? "unlocked" : "locked"}`}
     >
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(appStructuredData) }}
+      />
       <WelcomeSplash />
       <a
         className="skip-link"

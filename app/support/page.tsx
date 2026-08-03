@@ -1,5 +1,25 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import { sitePath } from "../../lib/site-path";
+
+const siteUrl =
+  process.env.NEXT_PUBLIC_SITE_URL ?? "https://spandragon98.github.io/PawPico-Website";
+
+// Without its own canonical this page inherits the root layout's, which points at
+// "/" — telling search engines to index the homepage instead of this one. That
+// would make its sitemap entry contradict the page itself.
+export const metadata: Metadata = {
+  title: "MewMuze Support — Purchase and Licence Help",
+  description:
+    "Help with a MewMuze purchase, a licence key that did not arrive, activation limits and refunds. Keep your Dodo Payments receipt and payment ID nearby.",
+  alternates: { canonical: `${siteUrl}/support/` },
+  openGraph: {
+    title: "MewMuze Support — Purchase and Licence Help",
+    description:
+      "Help with a MewMuze purchase, a licence key that did not arrive, activation limits and refunds.",
+    url: `${siteUrl}/support/`,
+  },
+};
 
 export default function Support() {
   return (

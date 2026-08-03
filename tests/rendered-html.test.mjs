@@ -1082,3 +1082,92 @@ test("keeps the neutral pupil the same round shape as the painted ones", async (
   assert.doesNotMatch(css, /\.hero-pupil \{[^}]*clip-path/s);
   assert.match(css, /\.hero-pupil::before,\s*\n\.hero-pupil::after \{[\s\S]*?border-radius: 48%/);
 });
+
+test("ships a production robots.txt that advertises the canonical sitemap", async () => {
+  const robots = await source("../public/robots.txt");
+
+  assert.match(robots, /^User-agent: \*$/m);
+  assert.match(robots, /^Allow: \/$/m);
+  assert.match(robots, /^Sitemap: https:\/\/mewmuze\.com\/sitemap\.xml$/m);
+
+  // Transactional pages, commerce endpoints, the signed updater manifest and
+  // installer binaries must stay out of search.
+  for (const path of ["/checkout/", "/api/", "/updates/", "/downloads/"]) {
+    assert.match(robots, new RegExp(`^Disallow: ${path.replace(/\//g, "\/")}$`, "m"));
+  }
+});
+
+test("ships a sitemap of canonical production URLs only", async () => {
+  const sitemap = await source("../public/sitemap.xml");
+
+  assert.match(sitemap, /^<\?xml version="1\.0" encoding="UTF-8"\?>/);
+  assert.match(sitemap, /<urlset xmlns="http:\/\/www\.sitemaps\.org\/schemas\/sitemap\/0\.9">/);
+
+  const locations = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((match) => match[1]);
+
+  assert.deepEqual(locations, [
+    "https://mewmuze.com/",
+    "https://mewmuze.com/support/",
+    "https://mewmuze.com/store/",
+  ]);
+  assert.equal(new Set(locations).size, locations.length, "sitemap has duplicate URLs");
+
+  // The ten concept routes are canonicalised to /store/ by app/store/layout.tsx,
+  // so advertising them would contradict their own canonical tag.
+  assert.doesNotMatch(sitemap, /\/store\/[a-z-]+\//);
+
+  for (const forbidden of [
+    "/checkout/",
+    "/api/",
+    "/updates/",
+    "/downloads/",
+    "localhost",
+    "github.io",
+    ".exe",
+  ]) {
+    assert.ok(!sitemap.includes(forbidden), `sitemap must not contain ${forbidden}`);
+  }
+});
+
+test("describes the purchasable app with structured data at the USD list price", async () => {
+  const response = await render();
+  const html = await response.text();
+
+  const blocks = [...html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)]
+    .map((match) => JSON.parse(match[1]));
+  assert.ok(blocks.length >= 2, "expected site-wide and app structured data");
+
+  const app = blocks.find((block) => block["@type"] === "SoftwareApplication");
+  assert.ok(app, "homepage is missing SoftwareApplication structured data");
+  assert.equal(app.name, "MewMuze");
+  assert.equal(app.operatingSystem, "Windows 10, Windows 11");
+  assert.equal(app.offers.price, "7.99");
+  assert.equal(app.offers.priceCurrency, "USD");
+
+  // No real reviews exist, so rating markup would be fabricated.
+  assert.ok(!("aggregateRating" in app), "must not claim ratings");
+  assert.ok(!("review" in app), "must not claim reviews");
+
+  const graph = blocks.find((block) => Array.isArray(block["@graph"]));
+  assert.ok(graph, "site-wide structured data is missing");
+  const types = graph["@graph"].map((node) => node["@type"]);
+  assert.ok(types.includes("Organization"));
+  assert.ok(types.includes("WebSite"));
+});
+
+test("keeps pricing structured data off the Coming Soon store pages", async () => {
+  const response = await render("/store/mecha-hero");
+  const html = await response.text();
+
+  assert.doesNotMatch(html, /SoftwareApplication|priceCurrency|"price"/);
+});
+
+test("gives the support page its own canonical instead of inheriting the homepage's", async () => {
+  const response = await render("/support");
+  assert.equal(response.status, 200);
+  const html = await response.text();
+
+  assert.match(html, /<title>MewMuze Support — Purchase and Licence Help<\/title>/);
+  assert.match(html, /<link rel="canonical" href="[^"]*\/support\/"\/?>/);
+  assert.doesNotMatch(html, /<link rel="canonical" href="[^"]*\.com\/"\/?>/);
+});

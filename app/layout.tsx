@@ -68,12 +68,41 @@ export const viewport: Viewport = {
   colorScheme: "light",
 };
 
+// Site-wide identity only. The purchasable SoftwareApplication node lives on the
+// homepage instead: this layout wraps the store, which states plainly that
+// nothing is for sale yet, and pricing markup must never appear there.
+const siteStructuredData = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": `${siteUrl}/#organization`,
+      name: "MewMuze",
+      url: `${siteUrl}/`,
+      logo: catIcon,
+    },
+    {
+      "@type": "WebSite",
+      "@id": `${siteUrl}/#website`,
+      name: "MewMuze",
+      url: `${siteUrl}/`,
+      description,
+      publisher: { "@id": `${siteUrl}/#organization` },
+      inLanguage: "en",
+    },
+  ],
+};
+
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
       <body
         className={`${montserrat.variable} ${geistMono.variable} ${baloo.variable} ${quicksand.variable}`}
       >
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(siteStructuredData) }}
+        />
         {children}
       </body>
     </html>

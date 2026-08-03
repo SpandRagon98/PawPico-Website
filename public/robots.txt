@@ -1,0 +1,12 @@
+User-agent: *
+Allow: /
+
+# Transactional pages: never useful search landing pages.
+Disallow: /checkout/
+
+# Machine endpoints: commerce API, signed updater manifest, binaries.
+Disallow: /api/
+Disallow: /updates/
+Disallow: /downloads/
+
+Sitemap: https://mewmuze.com/sitemap.xml

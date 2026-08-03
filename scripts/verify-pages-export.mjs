@@ -71,4 +71,64 @@ for (const file of [
 await assert.rejects(access(new URL("../out/store/products", import.meta.url)));
 await assert.rejects(access(new URL("../out/store/samples", import.meta.url)));
 
-console.log(`GitHub Pages export verified for ${basePath}`);
+// --- SEO contract -----------------------------------------------------------
+// robots.txt and sitemap.xml must ship with every build. They are generated into
+// public/ by scripts/generate-seo-files.mjs, so a broken prebuild hook would
+// otherwise fail silently and only be noticed as a 404 in production.
+const isHostingerBuild = process.env.HOSTINGER_BUILD === "true";
+const robotsTxt = await readFile(new URL("../out/robots.txt", import.meta.url), "utf8");
+const sitemapXml = await readFile(new URL("../out/sitemap.xml", import.meta.url), "utf8");
+
+assert.ok(robotsTxt.trim().length > 0, "out/robots.txt is empty");
+assert.ok(sitemapXml.trim().length > 0, "out/sitemap.xml is empty");
+
+if (isHostingerBuild) {
+  assert.match(
+    robotsTxt,
+    /^Sitemap: https:\/\/mewmuze\.com\/sitemap\.xml$/m,
+    "Production robots.txt must advertise the canonical sitemap",
+  );
+  for (const disallowed of ["/checkout/", "/api/", "/updates/", "/downloads/"]) {
+    assert.ok(
+      robotsTxt.includes(`Disallow: ${disallowed}`),
+      `Production robots.txt must disallow ${disallowed}`,
+    );
+  }
+
+  assert.match(sitemapXml, /^<\?xml version="1\.0" encoding="UTF-8"\?>/);
+  assert.match(sitemapXml, /<urlset xmlns="http:\/\/www\.sitemaps\.org\/schemas\/sitemap\/0\.9">/);
+
+  const locations = [...sitemapXml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]);
+  assert.ok(locations.length > 0, "Sitemap contains no URLs");
+  assert.equal(
+    new Set(locations).size,
+    locations.length,
+    "Sitemap contains duplicate URLs",
+  );
+
+  for (const loc of locations) {
+    assert.ok(
+      loc.startsWith("https://mewmuze.com/"),
+      `Sitemap URL is not a canonical production URL: ${loc}`,
+    );
+    // Transactional routes, machine endpoints, binaries and dev hosts must never
+    // be advertised for indexing.
+    assert.doesNotMatch(
+      loc,
+      /\/checkout\/|\/api\/|\/updates\/|\/downloads\/|localhost|127\.0\.0\.1|github\.io|\.exe$|\.sig$|\.json$/i,
+      `Sitemap URL must not be advertised for indexing: ${loc}`,
+    );
+  }
+} else {
+  // The GitHub Pages mirror serves the same content on a second host. Letting it
+  // be indexed would split ranking credit with mewmuze.com.
+  assert.match(
+    robotsTxt,
+    /User-agent: \*\s*\nDisallow: \/\s*$/m,
+    "The GitHub Pages mirror must block indexing entirely",
+  );
+}
+
+console.log(
+  `GitHub Pages export verified for ${basePath || "/"} (SEO contract: robots.txt + sitemap.xml OK)`,
+);
