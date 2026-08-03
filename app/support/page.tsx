@@ -2,8 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import { sitePath } from "../../lib/site-path";
 
-const siteUrl =
-  process.env.NEXT_PUBLIC_SITE_URL ?? "https://spandragon98.github.io/PawPico-Website";
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://mewmuze.com";
 
 // Without its own canonical this page inherits the root layout's, which points at
 // "/" — telling search engines to index the homepage instead of this one. That

@@ -1,11 +1,52 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { CostumeArtwork } from "../../../components/store/CostumeArtwork";
 import { StoreHeader } from "../../../components/store/StoreHeader";
 import { productBySlug, storeCatalog } from "../../../data/store/catalog";
 import { sitePath } from "../../../lib/site-path";
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://mewmuze.com";
+
 export function generateStaticParams() {
   return storeCatalog.map((concept) => ({ slug: concept.slug }));
+}
+
+/**
+ * These are pre-release concept studies with no purchasable product behind them,
+ * so they are deliberately kept out of search while remaining fully readable for
+ * visitors who follow a link from the store.
+ *
+ * Previously they were excluded only as a side effect of app/store/layout.tsx
+ * canonicalising every child route to /store/. That was accidental rather than
+ * chosen, and it left the pages self-contradictory. The noindex below is the
+ * explicit decision; the self-referencing canonical replaces the inherited one so
+ * the two signals no longer disagree. "follow" is kept so the links out of these
+ * pages still pass value back to /store/ and the homepage.
+ *
+ * Revisit per concept once one has genuinely original content worth ranking.
+ */
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const concept = productBySlug(slug);
+  if (!concept) return {};
+
+  const url = `${siteUrl}/store/${concept.slug}/`;
+
+  return {
+    title: `${concept.name} — MewMuze Costume Concept`,
+    description: concept.description,
+    alternates: { canonical: url },
+    robots: { index: false, follow: true },
+    openGraph: {
+      title: `${concept.name} — MewMuze Costume Concept`,
+      description: concept.description,
+      url,
+    },
+  };
 }
 
 export default async function ConceptDetailPage({

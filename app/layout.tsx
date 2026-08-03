@@ -19,8 +19,9 @@ const quicksand = Quicksand({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
 });
-const siteUrl =
-  process.env.NEXT_PUBLIC_SITE_URL ?? "https://spandragon98.github.io/PawPico-Website";
+// mewmuze.com is the only production and canonical public website. The former
+// GitHub Pages mirror is no longer deployed, so it must not be a fallback.
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://mewmuze.com";
 const catIcon = `${siteUrl}/cat/mewmuze-face-logo-192.png`;
 const shortcutIcon = `${siteUrl}/cat/mewmuze-face-logo-32.png`;
 const appleIcon = `${siteUrl}/cat/mewmuze-face-logo-180.png`;

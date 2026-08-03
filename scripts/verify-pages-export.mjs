@@ -79,6 +79,26 @@ const isHostingerBuild = process.env.HOSTINGER_BUILD === "true";
 const robotsTxt = await readFile(new URL("../out/robots.txt", import.meta.url), "utf8");
 const sitemapXml = await readFile(new URL("../out/sitemap.xml", import.meta.url), "utf8");
 
+// Costume concepts are pre-release studies with nothing purchasable behind them.
+// They stay readable for visitors but are deliberately kept out of search, so the
+// exported HTML must carry a real noindex rather than relying on the store layout
+// canonicalising every child route to /store/.
+assert.match(
+  detailHtml,
+  /<meta name="robots" content="[^"]*noindex[^"]*"/,
+  "Concept detail pages must carry an explicit noindex",
+);
+assert.match(
+  detailHtml,
+  /<link rel="canonical" href="[^"]*\/store\/mecha-hero\/"/,
+  "Concept detail pages must canonicalise to themselves, not to /store/",
+);
+assert.doesNotMatch(
+  storeHtml,
+  /<meta name="robots" content="[^"]*noindex/,
+  "The store index itself must stay indexable",
+);
+
 assert.ok(robotsTxt.trim().length > 0, "out/robots.txt is empty");
 assert.ok(sitemapXml.trim().length > 0, "out/sitemap.xml is empty");
 

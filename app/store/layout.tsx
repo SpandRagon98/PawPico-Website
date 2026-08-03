@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import "./store.css";
 
-const siteUrl =
-  process.env.NEXT_PUBLIC_SITE_URL ?? "https://spandragon98.github.io/PawPico-Website";
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://mewmuze.com";
 
 export const metadata: Metadata = {
   title: "MewMuze Store — Coming Soon",

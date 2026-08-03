@@ -1171,3 +1171,59 @@ test("gives the support page its own canonical instead of inheriting the homepag
   assert.match(html, /<link rel="canonical" href="[^"]*\/support\/"\/?>/);
   assert.doesNotMatch(html, /<link rel="canonical" href="[^"]*\.com\/"\/?>/);
 });
+
+test("keeps the costume concepts readable but explicitly out of search", async () => {
+  const response = await render("/store/mecha-hero");
+  assert.equal(response.status, 200);
+  const html = await response.text();
+
+  // Still a real page for anyone who follows the link from the store.
+  assert.match(html, /Mecha Hero/);
+  assert.match(html, /Nothing can be ordered/);
+
+  // The exclusion is now a decision, not a side effect of the store layout
+  // canonicalising every child route to /store/.
+  assert.match(html, /<meta name="robots" content="[^"]*noindex[^"]*"/);
+  assert.match(html, /<meta name="robots" content="[^"]*follow[^"]*"/);
+  assert.match(html, /<link rel="canonical" href="[^"]*\/store\/mecha-hero\/"/);
+  assert.doesNotMatch(html, /<link rel="canonical" href="[^"]*\/store\/"\/?>/);
+
+  const source_ = await source("../app/store/[slug]/page.tsx");
+  assert.match(source_, /robots: \{ index: false, follow: true \}/);
+});
+
+test("keeps the store index itself indexable", async () => {
+  const response = await render("/store");
+  const html = await response.text();
+
+  assert.doesNotMatch(html, /<meta name="robots" content="[^"]*noindex/);
+  assert.match(html, /<link rel="canonical" href="[^"]*\/store\/"/);
+});
+
+test("publishes only to mewmuze.com and no longer to a public github.io copy", async () => {
+  const workflow = await source("../.github/workflows/deploy.yml");
+
+  // The duplicate public deployment is gone.
+  assert.doesNotMatch(workflow, /actions\/deploy-pages/);
+  assert.doesNotMatch(workflow, /actions\/upload-pages-artifact/);
+  assert.doesNotMatch(workflow, /github\.io/);
+
+  // ...but source control, the workflow and the Hostinger deployment remain.
+  assert.match(workflow, /on:\s*\n\s*push:/);
+  assert.match(workflow, /npm run build:pages/);
+  assert.match(workflow, /HOSTINGER_BUILD: "true"/);
+  assert.match(workflow, /FTP-Deploy-Action/);
+  assert.match(workflow, /api\/health\.php/);
+  // Production deploys stay gated on the test suite.
+  assert.match(workflow, /run: npm test/);
+
+  // No code should fall back to the retired mirror domain.
+  for (const file of [
+    "../app/layout.tsx",
+    "../app/store/layout.tsx",
+    "../app/support/page.tsx",
+    "../app/store/[slug]/page.tsx",
+  ]) {
+    assert.doesNotMatch(await source(file), /github\.io/, `${file} still falls back to github.io`);
+  }
+});
