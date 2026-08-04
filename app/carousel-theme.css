@@ -1223,3 +1223,179 @@ h4 {
       0 18px 34px rgba(20, 25, 34, 0.16);
   }
 }
+
+/* Compact phone rhythm: preserve the desktop design while keeping the complete
+   hero and dense feature copy readable inside a real mobile viewport. */
+@media (max-width: 760px) {
+  .section-pad,
+  .feature-theatre,
+  .feature-theatre.section-shell {
+    padding-block: 54px;
+  }
+
+  h2 {
+    margin-bottom: 16px;
+    font-size: clamp(31px, 9.2vw, 39px);
+    line-height: 1.04;
+  }
+
+  .section-heading {
+    gap: 12px;
+    margin-bottom: 30px;
+  }
+
+  .section-heading > p,
+  .monotony-copy > p,
+  .appearance-copy > p,
+  .privacy-copy > p,
+  .pricing-copy > p,
+  .final-cta > div:last-child > p {
+    font-size: 14px;
+    line-height: 1.55;
+  }
+
+  .nav-dock {
+    min-height: 56px;
+    padding: 7px 9px;
+  }
+
+  .brand-link {
+    min-height: 38px;
+  }
+
+  .brand-medallion {
+    width: 36px;
+    height: 36px;
+    flex-basis: 36px;
+  }
+
+  .site-brand strong {
+    font-size: 16px;
+  }
+
+  .mobile-nav > summary {
+    min-width: 66px;
+    height: 38px;
+    padding-inline: 13px;
+    font-size: 11px;
+  }
+
+  .hero {
+    gap: 8px;
+    padding:
+      calc(76px + env(safe-area-inset-top))
+      var(--mobile-gutter)
+      38px;
+  }
+
+  .hero-cat-peek {
+    height: clamp(190px, 54vw, 220px);
+  }
+
+  .hero-cat-motion {
+    width: clamp(188px, 53vw, 216px);
+    height: clamp(188px, 53vw, 216px);
+  }
+
+  .hero-copy > .eyebrow {
+    margin-bottom: 12px;
+    font-size: 9.5px;
+    line-height: 1.35;
+  }
+
+  .hero h1 {
+    max-width: 12ch;
+    margin-bottom: 14px;
+    font-size: clamp(34px, 10vw, 42px);
+    line-height: 1.01;
+  }
+
+  .hero-support {
+    margin-bottom: 16px;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  .hero-actions {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 9px;
+  }
+
+  .hero-actions .skeuo-button {
+    min-height: 46px;
+    padding: 10px 9px;
+    border-radius: 15px;
+    font-size: 11.5px;
+    line-height: 1.15;
+  }
+
+  .hero-actions .skeuo-button-quiet {
+    width: max-content;
+    min-height: 38px;
+    grid-column: 1 / -1;
+    padding: 7px 12px;
+  }
+
+  .privacy-note {
+    margin-top: 12px;
+    font-size: 11.5px;
+    line-height: 1.45;
+  }
+
+  .monotony,
+  .appearance-shell,
+  .privacy-shell,
+  .account-shell,
+  .pricing-shell,
+  .store-teaser-card,
+  .final-cta {
+    gap: 28px;
+  }
+
+  .theatre-copy h3 {
+    font-size: clamp(29px, 8.8vw, 36px);
+  }
+
+  .feature-story {
+    font-size: 14px;
+    line-height: 1.55;
+  }
+
+  .feature-helps > p,
+  .theatre-copy .feature-detail {
+    font-size: 13.5px;
+    line-height: 1.55;
+  }
+
+  .theatre-copy li {
+    font-size: 11.5px;
+  }
+
+  .directory-panel > h3 > button strong {
+    font-size: 15.5px;
+  }
+
+  .directory-grid h4 {
+    font-size: 19px;
+  }
+
+  .directory-grid p,
+  .directory-helps > p {
+    font-size: 13.5px;
+    line-height: 1.55;
+  }
+
+  .directory-grid li {
+    font-size: 12px;
+  }
+
+  .faq-list summary strong {
+    font-size: 15px;
+    line-height: 1.25;
+  }
+
+  .faq-answer p {
+    font-size: 13.5px;
+    line-height: 1.55;
+  }
+}
