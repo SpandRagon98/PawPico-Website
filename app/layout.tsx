@@ -1,24 +1,9 @@
 import type { Metadata, Viewport } from "next";
-import { Baloo_2, Geist_Mono, Montserrat, Quicksand } from "next/font/google";
+import "@fontsource-variable/baloo-2";
+import "@fontsource-variable/montserrat";
+import "@fontsource-variable/quicksand";
 import "./globals.css";
-
-const montserrat = Montserrat({
-  variable: "--font-montserrat",
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800"],
-});
-const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
-// Kawaii type: a soft rounded display face, and a friendly rounded UI face.
-const baloo = Baloo_2({
-  variable: "--font-kawaii-display",
-  subsets: ["latin"],
-  weight: ["500", "600", "700", "800"],
-});
-const quicksand = Quicksand({
-  variable: "--font-kawaii-ui",
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-});
+import "./carousel-theme.css";
 // mewmuze.com is the only production and canonical public website. The former
 // GitHub Pages mirror is no longer deployed, so it must not be a fallback.
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://mewmuze.com";
@@ -97,9 +82,7 @@ const siteStructuredData = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
-      <body
-        className={`${montserrat.variable} ${geistMono.variable} ${baloo.variable} ${quicksand.variable}`}
-      >
+      <body>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(siteStructuredData) }}

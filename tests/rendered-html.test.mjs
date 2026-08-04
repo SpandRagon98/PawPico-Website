@@ -788,11 +788,14 @@ test("dresses the site in the kawaii system without touching the cat", async () 
   const layout = await source("../app/layout.tsx");
   const css = await source("../app/globals.css");
 
-  // rounded display + UI faces
-  assert.match(layout, /Baloo_2/);
-  assert.match(layout, /Quicksand/);
-  assert.match(layout, /variable: "--font-kawaii-display"/);
-  assert.match(css, /--font-kawaii-display/);
+  // Rounded display + UI faces are bundled with the site. This avoids
+  // environment-specific next/font URLs that browsers cannot load.
+  assert.match(layout, /@fontsource-variable\/baloo-2/);
+  assert.match(layout, /@fontsource-variable\/quicksand/);
+  assert.match(layout, /@fontsource-variable\/montserrat/);
+  assert.doesNotMatch(layout, /next\/font/);
+  assert.match(css, /--font-kawaii-display: "Baloo 2 Variable"/);
+  assert.match(css, /--font-kawaii-ui: "Quicksand Variable"/);
 
   // the palette is applied by repainting the existing tokens, so the whole
   // site follows from one place rather than per-component overrides
@@ -993,7 +996,7 @@ test("puts purchase and support links in the navigation", async () => {
   assert.doesNotMatch(page, /onAuthIntent|authMode|My account/);
 });
 
-test("renders purchase success, cancellation and support routes", async () => {
+test("renders purchase success, cancellation and support routes with navigation", async () => {
   const success = await (await render("/checkout/success")).text();
   const cancelled = await (await render("/checkout/cancelled")).text();
   const support = await (await render("/support")).text();
@@ -1011,6 +1014,47 @@ test("renders purchase success, cancellation and support routes", async () => {
   assert.match(cancelled, /Nothing was charged/);
   assert.match(support, /support@mewmuze\.com/);
   assert.match(support, /Never send a card number/);
+  assert.match(success, /aria-label="Primary navigation"/);
+  assert.match(support, /aria-label="Primary navigation"/);
+  assert.match(success, />FAQ</);
+  assert.match(support, />FAQ</);
+});
+
+test("ships the ten-question FAQ using the site-wide MewMuze typography", async () => {
+  const html = await (await render()).text();
+  const page = await source("../app/page.tsx");
+  const faq = await source("../data/faq.ts");
+  const css = await source("../app/globals.css");
+
+  assert.match(html, /QUESTIONS BEFORE THE CAT MOVES IN/);
+  assert.equal((faq.match(/^    question:/gm) ?? []).length, 10);
+  assert.match(page, /"@type": "FAQPage"/);
+  assert.doesNotMatch(css, /\.faq-answer p\s*\{[^}]*font-family:/s);
+  assert.doesNotMatch(css, /\.public-navigation \.desktop-nav > a\s*\{[^}]*font-size:/s);
+  assert.match(
+    css,
+    /\.faq-list summary strong\s*\{[\s\S]*?font-family: var\(--font-kawaii-display\), var\(--font-kawaii-ui\), sans-serif;[\s\S]*?font-weight: 720;/,
+  );
+});
+
+test("uses the MewMuze Baloo and Quicksand typography contract on every route", async () => {
+  const css = await source("../app/globals.css");
+  const success = await (await render("/checkout/success")).text();
+
+  assert.match(
+    css,
+    /\.commerce-card h1,[\s\S]*?font-family: var\(--font-kawaii-display\), var\(--font-kawaii-ui\), sans-serif;[\s\S]*?font-weight: 720;/,
+  );
+  assert.match(
+    css,
+    /button,[\s\S]*?\.skeuo-button\s*\{[\s\S]*?font-family: var\(--font-kawaii-display\), var\(--font-kawaii-ui\), sans-serif;[\s\S]*?font-weight: 700;/,
+  );
+  assert.match(
+    css,
+    /\.site-brand,[\s\S]*?\.eyebrow\s*\{[\s\S]*?font-family: var\(--font-kawaii-ui\), var\(--font-montserrat\), system-ui, sans-serif;/,
+  );
+  assert.match(success, /We are checking your purchase/);
+  assert.match(success, /Download MewMuze 0\.1\.8/);
 });
 
 test("stops clip-path from cropping the cat's ears on phones", async () => {

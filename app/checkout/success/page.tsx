@@ -1,7 +1,7 @@
 "use client";
 
-import Image from "next/image";
 import { useEffect, useState } from "react";
+import { PublicHeader } from "../../../components/PublicHeader";
 import { sitePath } from "../../../lib/site-path";
 
 type PurchaseState = "pending" | "processing" | "fulfilled" | "revoked" | "error";
@@ -72,20 +72,9 @@ export default function CheckoutSuccess() {
   const succeeded = purchase.state === "fulfilled";
 
   return (
-    <main className="commerce-page">
-      <a className="commerce-brand" href={sitePath("/")} aria-label="MewMuze home">
-        <span>
-          <Image
-            src={sitePath("/cat/mewmuze-face-logo-hd.png")}
-            alt=""
-            width={512}
-            height={512}
-            unoptimized
-          />
-        </span>
-        <strong>MewMuze</strong>
-      </a>
-
+    <>
+      <PublicHeader />
+      <main className="commerce-page commerce-page-with-navigation">
       <section className="commerce-card" aria-live="polite">
         <p className="eyebrow">
           <span aria-hidden="true" />
@@ -143,6 +132,7 @@ export default function CheckoutSuccess() {
           </a>
         </div>
       </section>
-    </main>
+      </main>
+    </>
   );
 }

@@ -19,6 +19,7 @@ import {
   type FeatureNotice,
   type FeatureStory,
 } from "../data/features";
+import { faqItems } from "../data/faq";
 import {
   checkoutUrlFor,
   commerce,
@@ -58,6 +59,16 @@ const appStructuredData = {
     availability: "https://schema.org/InStock",
     url: `${SITE_URL}/`,
   },
+};
+
+const faqStructuredData = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: faqItems.map((item) => ({
+    "@type": "Question",
+    name: item.question,
+    acceptedAnswer: { "@type": "Answer", text: item.answer },
+  })),
 };
 
 const CAT_ASSET = "/cat/mewmuze-hero-reference-app.png";
@@ -238,6 +249,7 @@ function SiteNavigation() {
       <a href={sitePath("/store/")}>
         Store <span className="coming-pill">Coming Soon</span>
       </a>
+      <a href="#faq">FAQ</a>
       <a href="#privacy">Privacy</a>
       <a href={sitePath("/support/")}>Support</a>
     </>
@@ -835,6 +847,58 @@ function AppearanceStudio() {
   );
 }
 
+function FaqSection() {
+  return (
+    <section className="faq section-pad" id="faq" aria-labelledby="faq-title" data-reveal>
+      <div className="section-shell faq-shell">
+        <div className="faq-heading">
+          <Eyebrow>QUESTIONS BEFORE THE CAT MOVES IN</Eyebrow>
+          <h2 id="faq-title">
+            The useful answers.
+            <br />
+            <em>No tiny fine-print maze.</em>
+          </h2>
+          <p>
+            Speed, privacy, devices, offline use and the classic “where did my licence
+            email go?” situation.
+          </p>
+        </div>
+        <div className="faq-list">
+          {faqItems.map((item, index) => (
+            <details key={item.question} name="mewmuze-faq">
+              <summary>
+                <span>{String(index + 1).padStart(2, "0")}</span>
+                <strong>{item.question}</strong>
+                <i aria-hidden="true">+</i>
+              </summary>
+              <div className="faq-answer">
+                <p>{item.answer}</p>
+                {item.links?.length ? (
+                  <div className="faq-links">
+                    {item.links.map((link) => {
+                      const external = link.href.startsWith("http");
+                      return (
+                        <a
+                          key={link.href}
+                          href={external ? link.href : sitePath(link.href)}
+                          target={external ? "_blank" : undefined}
+                          rel={external ? "noreferrer" : undefined}
+                        >
+                          {link.label}{external ? " ↗" : " →"}
+                        </a>
+                      );
+                    })}
+                  </div>
+                ) : null}
+              </div>
+            </details>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 const dayMoments = [
   {
     time: "8:47",
@@ -1005,6 +1069,10 @@ export default function Home() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(appStructuredData) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqStructuredData) }}
       />
       <WelcomeSplash />
       <a
@@ -1389,6 +1457,8 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      <FaqSection />
 
       <section className="final-cta section-shell section-pad" id="download" data-reveal>
         <div className="cta-cat">

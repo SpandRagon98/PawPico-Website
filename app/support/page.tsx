@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Image from "next/image";
+import { PublicHeader } from "../../components/PublicHeader";
 import { sitePath } from "../../lib/site-path";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://mewmuze.com";
@@ -22,19 +22,9 @@ export const metadata: Metadata = {
 
 export default function Support() {
   return (
-    <main className="commerce-page">
-      <a className="commerce-brand" href={sitePath("/")} aria-label="MewMuze home">
-        <span>
-          <Image
-            src={sitePath("/cat/mewmuze-face-logo-hd.png")}
-            alt=""
-            width={512}
-            height={512}
-            unoptimized
-          />
-        </span>
-        <strong>MewMuze</strong>
-      </a>
+    <>
+      <PublicHeader current="support" />
+      <main className="commerce-page commerce-page-with-navigation">
       <section className="commerce-card">
         <p className="eyebrow">
           <span aria-hidden="true" />
@@ -70,6 +60,7 @@ export default function Support() {
           </a>
         </div>
       </section>
-    </main>
+      </main>
+    </>
   );
 }
