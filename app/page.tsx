@@ -232,7 +232,7 @@ function SiteBrand() {
       </span>
       <span>
         <strong>MewMuze</strong>
-        <small>personal desktop cat</small>
+        <small>personal desktop pet</small>
       </span>
     </span>
   );
@@ -355,7 +355,7 @@ function WelcomeSplash() {
           <i className="splash-sparkle splash-sparkle-3" />
         </span>
         <p className="splash-title">Welcome to MewMuze</p>
-        <p className="splash-sub">Waking up your desktop cat</p>
+        <p className="splash-sub">Waking up your desktop pet</p>
         <span className="splash-bar" aria-hidden="true">
           <i />
         </span>
@@ -397,7 +397,7 @@ function FeatureFilm({
   return (
     <Image
       key={feature.id}
-      className="feature-media-cat"
+      className={`feature-media-cat feature-media-${feature.id}`}
       src={sitePath(`/cat/features/${feature.id}.webp`)}
       alt={`Authentic MewMuze animation for ${feature.title}`}
       width={128}
@@ -763,7 +763,7 @@ function AppearanceStudio() {
               key={asset}
               className="studio-cat-media"
               src={sitePath(asset)}
-              alt={`Animated ${bodyLabel} MewMuze cat with the ${patternLabel} coat pattern`}
+              alt={`Animated ${bodyLabel} MewMuze pet with the ${patternLabel} coat pattern`}
               width={128}
               height={128}
               unoptimized
@@ -790,11 +790,11 @@ function AppearanceStudio() {
         <h2>
           Same personality.
           <br />
-          <em>A cat that looks like yours.</em>
+          <em>A pet that looks like yours.</em>
         </h2>
         <p>
           Choose a body and coat pattern to see the real MewMuze renderer update
-          the animated cat immediately.
+          the animated pet immediately.
         </p>
         <div className="choice-block">
           <span>Body</span>
@@ -852,7 +852,7 @@ function FaqSection() {
     <section className="faq section-pad" id="faq" aria-labelledby="faq-title" data-reveal>
       <div className="section-shell faq-shell">
         <div className="faq-heading">
-          <Eyebrow>QUESTIONS BEFORE THE CAT MOVES IN</Eyebrow>
+          <Eyebrow>QUESTIONS BEFORE THE PET MOVES IN</Eyebrow>
           <h2 id="faq-title">
             The useful answers.
             <br />
@@ -909,7 +909,7 @@ const dayMoments = [
   {
     time: "10:30",
     title: "It sits down when you do",
-    copy: "You start the timer and brace for the long stretch. The cat pads over, folds its paws, and settles beside it. No nudging, no badges, no advice. Just a small warm shape working alongside you, the way a real one would.",
+    copy: "You start the timer and brace for the long stretch. Your pet pads over, folds its paws, and settles beside it. No nudging, no badges, no advice. Just a small warm shape working alongside you, the way a real one would.",
     tone: "blue",
   },
   {
@@ -1115,7 +1115,7 @@ export default function Home() {
         </div>
 
         <div className="hero-copy">
-          <Eyebrow>A PERSONAL DESKTOP CAT FOR WINDOWS</Eyebrow>
+          <Eyebrow>A PERSONAL DESKTOP PET FOR WINDOWS</Eyebrow>
           <h1 id="hero-title">Your screen could use a little more life.</h1>
           <p className="hero-support">
             MewMuze lives quietly on your desktop, keeping you company, helping with the
@@ -1213,7 +1213,7 @@ export default function Home() {
           <div>
             <Eyebrow>THE COMPLETE FEATURE DIRECTORY</Eyebrow>
             <h2>
-              Everything the cat can do.
+              Everything your pet can do.
               <br />
               <em>Grouped the way a day feels.</em>
             </h2>
@@ -1303,7 +1303,7 @@ export default function Home() {
             <h2>
               Dodo handles the payment.
               <br />
-              <em>MewMuze handles the cat.</em>
+              <em>MewMuze handles your pet.</em>
             </h2>
             <p>
               Checkout stays on Dodo Payments, where local currencies, regional
@@ -1340,7 +1340,7 @@ export default function Home() {
               </li>
               <li>
                 <strong>3. Unlock MewMuze</strong>
-                <span>Paste it in Cat Settings. No permanent internet connection is needed.</span>
+                <span>Paste it in MewMuze Settings. No permanent internet connection is needed.</span>
               </li>
             </ol>
             <a className="skeuo-button skeuo-button-quiet" href={sitePath("/support/")}>
@@ -1372,7 +1372,7 @@ export default function Home() {
               <span>Pay once. No subscription, ever.</span>
             </div>
             <ul>
-              <li>Personal Windows desktop cat</li>
+              <li>Personal Windows desktop pet</li>
               <li>Expressive authentic animations</li>
               <li>Focus and reminder tools</li>
               <li>Local Quick Tools</li>
@@ -1424,7 +1424,7 @@ export default function Home() {
             </p>
           </div>
           <div className="pricing-copy">
-            <Eyebrow>ONE CAT. ONE PRICE. ONCE.</Eyebrow>
+            <Eyebrow>ONE PET. ONE PRICE. ONCE.</Eyebrow>
             <h2>
               Buy it once.
               <br />
@@ -1433,7 +1433,7 @@ export default function Home() {
             <p>
               No monthly plan. No annual renewal. The checkout, receipt, tax and
               licence delivery are handled by Dodo Payments. You pay a single time and
-              the cat is yours.
+              the pet is yours.
             </p>
             <ul className="pricing-promises">
               <li>
@@ -1446,7 +1446,7 @@ export default function Home() {
               </li>
               <li>
                 <strong>The wardrobe keeps growing</strong>
-                <span>Costumes added after you buy are included, so you never buy your cat twice.</span>
+                <span>Costumes added after you buy are included, so you never buy your pet twice.</span>
               </li>
             </ul>
             <p className="pricing-footnote">
@@ -1489,7 +1489,7 @@ export default function Home() {
           <a href="#top" aria-label="Back to the top">
             <SiteBrand />
           </a>
-          <p>Personal desktop cat for Windows. Local-first by design.</p>
+          <p>Personal desktop pet for Windows. Local-first by design.</p>
           <nav aria-label="Footer navigation">
             <a href="#features">Features</a>
             <a href="#appearance">Appearance</a>

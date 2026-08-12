@@ -10,6 +10,12 @@ export default function StorePage() {
         Skip to costume concepts
       </a>
       <StoreHeader />
+      <div className="store-coming-soon-overlay" role="status">
+        <small>THE WARDROBE IS IN THE WORKSHOP</small>
+        <strong>Coming Soon</strong>
+        <span>You can peek and scroll, but the store is not open yet.</span>
+      </div>
+      <div className="store-preview-content">
 
       <section className="store-hero">
         <div className="store-hero-copy">
@@ -45,7 +51,7 @@ export default function StorePage() {
             <CostumeArtwork
               concept={storeCatalog[0]}
               size="hero"
-              label="The current flower-band MewMuze cat beside an original Mecha Hero concept study"
+              label="The current flower-band MewMuze pet beside an original Mecha Hero concept study"
             />
           </div>
           <span className="workbench-note">
@@ -69,7 +75,7 @@ export default function StorePage() {
             </h2>
           </div>
           <p>
-            Every concept begins with a readable cat-sized silhouette. Names, shapes
+            Every concept begins with a readable pet-sized silhouette. Names, shapes
             and themes are original to MewMuze.
           </p>
         </div>
@@ -135,8 +141,8 @@ export default function StorePage() {
           <li>
             <span>02</span>
             <div>
-              <h3>Authentic cat fit</h3>
-              <p>The final outfit must preserve the cat&apos;s face, eyes, ears and personality.</p>
+              <h3>Authentic pet fit</h3>
+              <p>The final outfit must preserve your pet&apos;s face, eyes, ears and personality.</p>
             </div>
           </li>
           <li>
@@ -156,6 +162,7 @@ export default function StorePage() {
         <span>THE WARDROBE · COMING SOON</span>
         <a href="#top">Back to top ↑</a>
       </footer>
+      </div>
     </main>
   );
 }

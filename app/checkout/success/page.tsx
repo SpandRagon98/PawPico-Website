@@ -83,11 +83,11 @@ export default function CheckoutSuccess() {
                 {succeeded ? "PURCHASE COMPLETE" : "PURCHASE STATUS"}
               </p>
               <h1>
-                {succeeded ? "Your cat is ready to come home." : "We are checking your purchase."}
+                {succeeded ? "Your pet is ready to come home." : "We are checking your purchase."}
               </h1>
               <p>
                 You are three small steps away from meeting MewMuze. Keep this page open while
-                you download, install and activate your desktop cat.
+                you download, install and activate your desktop pet.
               </p>
             </div>
 
@@ -170,7 +170,7 @@ export default function CheckoutSuccess() {
                     MewMuze is just getting started as a tiny independent project. A trusted
                     Windows signing certificate has a real recurring cost that we cannot cover
                     yet. Your support helps us keep building—and gets us closer to removing this
-                    extra screen from future releases. Thank you for believing in our little cat.
+                    extra screen from future releases. Thank you for believing in our little pet.
                   </p>
                 </aside>
               </div>

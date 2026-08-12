@@ -19,7 +19,7 @@ export const storeCatalog: StoreConcept[] = [
     name: "Mecha Hero",
     description: "Rounded rescue armor with a warm reactor light and room for whiskers.",
     longDescription:
-      "An original friendly machine-hero study built around broad ceramic plates, a soft mint light and an open cat face.",
+      "An original friendly machine-hero study built around broad ceramic plates, a soft mint light and an open pet face.",
     category: "Hero systems",
     stage: "Silhouette study",
     visual: "mecha",

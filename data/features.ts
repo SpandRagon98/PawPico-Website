@@ -56,7 +56,7 @@ const stories: Omit<FeatureStory, "helps" | "notice">[] = [
     group: "Reacts to my day",
     scene: "A gentle stroke becomes a tiny ritual.",
     story:
-      "Move back and forth across MewMuze and the cat softens from a curious glance into closed eyes, purrs and a few shy hearts.",
+      "Move back and forth across MewMuze and your pet softens from a curious glance into closed eyes, purrs and a few shy hearts.",
     detail:
       "Plain hovering never counts as petting; the gesture needs deliberate, gentle movement.",
     demoLabel: "look → soften → loaf → purr",
@@ -72,9 +72,9 @@ const stories: Omit<FeatureStory, "helps" | "notice">[] = [
     group: "Reacts to my day",
     scene: "The cursor rests. MewMuze finally yawns.",
     story:
-      "After the chosen period of real inactivity, MewMuze opens into a full yawn, curls down and sleeps until nearby movement wakes the cat.",
+      "After the chosen period of real inactivity, MewMuze opens into a full yawn, curls down and sleeps until nearby movement wakes your pet.",
     detail:
-      "A merely parked pointer does not wake the cat. Nearby movement does.",
+      "A merely parked pointer does not wake your pet. Nearby movement does.",
     demoLabel: "idle → yawn → curl → dream",
     video: "/videos/yawn-and-sleep.mp4",
     accent: "lavender",
@@ -86,11 +86,11 @@ const stories: Omit<FeatureStory, "helps" | "notice">[] = [
     title: "Work Mode",
     shortTitle: "Work",
     group: "Helps me work",
-    scene: "The desk gets busy. The cat gets a laptop.",
+    scene: "The desk gets busy. Your pet gets a laptop.",
     story:
       "Work Mode parks MewMuze neatly beside a compact Quick Tools panel for local image and PDF conversion.",
     detail:
-      "The panel tries the clearest side of the cat and stays inside the monitor work area.",
+      "The panel tries the clearest side of your pet and stays inside the monitor work area.",
     demoLabel: "park → lightning → local tools",
     video: "/videos/work-mode.mp4",
     accent: "yellow",
@@ -104,7 +104,7 @@ const stories: Omit<FeatureStory, "helps" | "notice">[] = [
     group: "Helps me work",
     scene: "A copied snippet needs somewhere calmer to land.",
     story:
-      "The clipboard assistant keeps the text you explicitly copy close at hand, with a small cat-sized surface instead of another sprawling utility window.",
+      "The clipboard assistant keeps the text you explicitly copy close at hand, with a small pet-sized surface instead of another sprawling utility window.",
     detail:
       "It responds to clipboard content you choose to copy; it does not read the screen behind it.",
     demoLabel: "copy → notice → use",
@@ -118,7 +118,7 @@ const stories: Omit<FeatureStory, "helps" | "notice">[] = [
     title: "Focus Mode",
     shortTitle: "Focus",
     group: "Keeps me on track",
-    scene: "One task. One timer. One very serious cat.",
+    scene: "One task. One timer. One very serious pet.",
     story:
       "Focus Mode settles MewMuze front-facing, suppresses chasing and quietly counts a steady work session upward.",
     detail:
@@ -152,7 +152,7 @@ const stories: Omit<FeatureStory, "helps" | "notice">[] = [
     group: "Keeps me on track",
     scene: "A small paw interrupts the fourth hour.",
     story:
-      "Stretch and water nudges arrive as restrained notebook notices with matching cat reactions.",
+      "Stretch and water nudges arrive as restrained notebook notices with matching pet reactions.",
     detail:
       "Work-rest checks count active use rather than simple wall-clock time.",
     demoLabel: "active use → nudge → snooze",
@@ -166,7 +166,7 @@ const stories: Omit<FeatureStory, "helps" | "notice">[] = [
     title: "Custom reminders",
     shortTitle: "Reminders",
     group: "Keeps me on track",
-    scene: "The thing you meant to remember appears beside a cat.",
+    scene: "The thing you meant to remember appears beside your pet.",
     story:
       "Create one-off appointments or repeating personal nudges with your own message.",
     detail:
@@ -182,7 +182,7 @@ const stories: Omit<FeatureStory, "helps" | "notice">[] = [
     title: "Gmail",
     shortTitle: "Gmail",
     group: "Helps me work",
-    scene: "New mail, delivered by cat.",
+    scene: "New mail, delivered by your pet.",
     story:
       "When you opt in, MewMuze checks Gmail once per minute and surfaces only the newest sender and subject.",
     detail:
@@ -266,7 +266,7 @@ const stories: Omit<FeatureStory, "helps" | "notice">[] = [
     story:
       "When another application is actively using a microphone, MewMuze sings along and bows when capture ends.",
     detail:
-      "The cat detects capture-active state only. It never opens, records or transcribes the microphone stream.",
+      "Your pet detects capture-active state only. It never opens, records or transcribes the microphone stream.",
     demoLabel: "capture on → sing → bow",
     video: "/videos/music-and-singing.mp4",
     accent: "peach",
@@ -298,7 +298,7 @@ const stories: Omit<FeatureStory, "helps" | "notice">[] = [
     story:
       "Energy, curiosity, recent interaction and weighted choices create slow blinks, grooming, play, sleepiness and the occasional sulk.",
     detail:
-      "Calm, balanced and playful profiles change the rhythm without changing the cat you chose.",
+      "Calm, balanced and playful profiles change the rhythm without changing the pet you chose.",
     demoLabel: "calm ↔ curious ↔ playful ↔ sleepy",
     video: "/videos/rest-and-emotion.mp4",
     accent: "lavender",
@@ -326,9 +326,9 @@ const stories: Omit<FeatureStory, "helps" | "notice">[] = [
     title: "Local Agent Status",
     shortTitle: "Agent",
     group: "Respects my privacy",
-    scene: "A local task changes state. The cat understands the signal.",
+    scene: "A local task changes state. Your pet understands the signal.",
     story:
-      "Point MewMuze at one explicit local JSON status file and the cat can think, run, wait, celebrate or ask for attention.",
+      "Point MewMuze at one explicit local JSON status file and your pet can think, run, wait, celebrate or ask for attention.",
     detail:
       "The integration is off until you supply an absolute path; it never scans outside that exact file.",
     demoLabel: "idle → thinking → running → success",
@@ -346,7 +346,7 @@ const stories: Omit<FeatureStory, "helps" | "notice">[] = [
     story:
       "A transparent Windows overlay adapts its frame rate and detail to interaction, rest, hidden and full-screen states.",
     detail:
-      "Dynamic click-through keeps the desktop usable everywhere outside the cat, its menus and panels.",
+      "Dynamic click-through keeps the desktop usable everywhere outside your pet, its menus and panels.",
     demoLabel: "interact → settle → near-zero hidden",
     video: "/mewmuze-idle-reel.mp4",
     accent: "blue",
@@ -360,39 +360,39 @@ const helps: Record<string, string> = {
   petting:
     "Thirty seconds of stroking a warm little animal is a genuinely better reset after a hard message than another lap around social media. It costs nothing and it is always within reach.",
   sleep:
-    "The cat winds down when you do, so your desktop stops shouting at the end of the day. Watching something curl up and go quiet is a surprisingly strong signal that you are allowed to stop too.",
+    "Your pet winds down when you do, so your desktop stops shouting at the end of the day. Watching something curl up and go quiet is a surprisingly strong signal that you are allowed to stop too.",
   work:
     "You stop handing private documents to a free converter website. The two file jobs you actually do, images into a PDF and a PDF back into images, happen on your own machine in seconds.",
   clipboard:
     "The thing you copied is still there when you need it two steps later, so you stop re-finding the same link, code or address for the third time in ten minutes.",
   focus:
-    "A focus timer you do not resent. The cat sits down and works alongside you instead of a progress bar shaming you from a browser tab, which turns out to be a far better reason to keep going.",
+    "A focus timer you do not resent. Your pet sits down and works alongside you instead of a progress bar shaming you from a browser tab, which turns out to be a far better reason to keep going.",
   pomodoro:
     "Structure without rigidity. The cycle keeps its shape whether you are deep in it or stepping away, so a broken session never becomes a reason to abandon the whole afternoon.",
   breaks:
-    "You actually stand up. A break you watch a cat take with you is much harder to dismiss than a notification you have already learned to click away without reading.",
+    "You actually stand up. A break you watch your pet take with you is much harder to dismiss than a notification you have already learned to click away without reading.",
   reminders:
     "The small things that fall through, the tablet, the callback, the water, arrive in your own words from something you like looking at, so they land instead of blending into the noise.",
   gmail:
-    "You close the inbox tab that has been eating your afternoon. When something genuinely new lands, the cat waves and tells you who it is and what it is about. One line, no red badge, no falling back into the inbox.",
+    "You close the inbox tab that has been eating your afternoon. When something genuinely new lands, your pet waves and tells you who it is and what it is about. One line, no red badge, no falling back into the inbox.",
   calendar:
     "You stop joining calls four minutes late because a browser notification appeared behind a full-screen window. The warning comes from something always on top, with enough lead time to actually get ready.",
   physics:
-    "This is the part that makes people call a colleague over. Your real windows are the world. The cat walks your taskbar, hops between the apps you have open, and hangs off the edge of whatever you are typing in.",
+    "This is the part that makes people call a colleague over. Your real windows are the world. Your pet walks your taskbar, hops between the apps you have open, and hangs off the edge of whatever you are typing in.",
   context:
-    "The cat reads the room without reading your screen. Open an editor and glasses appear; type hard for ten minutes and it starts steaming. You feel accompanied at work, from nothing more sensitive than an app name.",
+    "Your pet reads the room without reading your screen. Open an editor and glasses appear; type hard for ten minutes and it starts steaming. You feel accompanied at work, from nothing more sensitive than an app name.",
   music:
     "Your music gets a tiny dancing audience. It costs you nothing, because MewMuze never learns the artist or the track, only that something is playing.",
   microphone:
-    "Every call ends with a small bow. The cat knows the mic went live and nothing else. No stream is opened, recorded or transcribed.",
+    "Every call ends with a small bow. Your pet knows the mic went live and nothing else. No stream is opened, recorded or transcribed.",
   appearance:
-    "The cat becomes yours rather than a stock mascot. People rebuild a cat they have lost, match a partner's tabby, or invent something that never existed, and it greets them in that form every single morning.",
+    "The pet becomes yours rather than a stock mascot. People can honour a pet they have lost, match a familiar coat, or invent something that never existed, and it greets them in that form every single morning.",
   personality:
-    "This is why it does not get old in week three. Energy drains and recovers, moods carry over, affection is remembered, so the cat you have in March behaves like one you have lived with rather than a looping GIF.",
+    "This is why it does not get old in week three. Energy drains and recovers, moods carry over, affection is remembered, so the pet you have in March behaves like one you have lived with rather than a looping GIF.",
   peek:
-    "It never costs you a meeting. When you present or go full screen, the cat steps aside on its own, so you get a companion without a single embarrassing moment.",
+    "It never costs you a meeting. When you present or go full screen, your pet steps aside on its own, so you get a companion without a single embarrassing moment.",
   agent:
-    "Stop babysitting a long build. The cat works while the job runs and celebrates from across the screen when it lands, so you can go make tea and still know the moment it finishes.",
+    "Stop babysitting a long build. Your pet works while the job runs and celebrates from across the screen when it lands, so you can go make tea and still know the moment it finishes.",
   lightweight:
     "It behaves itself. No taskbar clutter, clicks pass through to whatever is underneath, and it goes near idle when hidden, so company never costs you a battery or a frame rate.",
 };

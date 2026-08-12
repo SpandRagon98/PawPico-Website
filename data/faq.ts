@@ -18,17 +18,17 @@ export const faqItems: FaqItem[] = [
   {
     question: "Does it work with more than one monitor?",
     answer:
-      "Yes. MewMuze understands multiple Windows work areas and mixed display scaling, so the cat can move around without yeeting itself into the digital void.",
+      "Yes. MewMuze understands multiple Windows work areas and mixed display scaling, so your pet can move around without yeeting itself into the digital void.",
   },
   {
-    question: "Will the cat interrupt presentations?",
+    question: "Will the pet interrupt presentations?",
     answer:
       "Peek Mode can automatically tuck MewMuze into a restrained corner during full-screen work and presentations. You can also control Peek Mode manually.",
   },
   {
     question: "Do I need to make an account?",
     answer:
-      "No MewMuze account is required. Pay once, receive your licence key by email and activate the app on your PC. Very little ceremony. Maximum cat.",
+      "No MewMuze account is required. Pay once, receive your licence key by email and activate the app on your PC. Very little ceremony. Maximum personality.",
   },
   {
     question: "What happens if I reinstall it or get a new PC?",
@@ -49,7 +49,7 @@ export const faqItems: FaqItem[] = [
   {
     question: "Does MewMuze work offline?",
     answer:
-      "Core companion animations, reminders and local tools work offline after activation. Gmail, Calendar, checkout and update checks naturally need internet. Licence validation includes an offline grace period, so a temporary outage does not evict your cat.",
+      "Core companion animations, reminders and local tools work offline after activation. Gmail, Calendar, checkout and update checks naturally need internet. Licence validation includes an offline grace period, so a temporary outage does not evict your pet.",
   },
   {
     question: "What does the one-time $7.99 include?",

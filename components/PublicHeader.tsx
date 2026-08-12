@@ -48,7 +48,7 @@ export function PublicHeader({ current }: PublicHeaderProps) {
             </span>
             <span>
               <strong>MewMuze</strong>
-              <small>personal desktop cat</small>
+              <small>personal desktop pet</small>
             </span>
           </span>
         </a>

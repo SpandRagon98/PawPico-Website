@@ -6,12 +6,12 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://mewmuze.com";
 export const metadata: Metadata = {
   title: "MewMuze Store — Coming Soon",
   description:
-    "Preview upcoming original costume concepts for MewMuze, your personal desktop cat.",
+    "Preview upcoming original costume concepts for MewMuze, your personal desktop pet.",
   alternates: { canonical: `${siteUrl}/store/` },
   openGraph: {
     title: "MewMuze Store — Coming Soon",
     description:
-      "Preview upcoming original costume concepts for MewMuze, your personal desktop cat.",
+      "Preview upcoming original costume concepts for MewMuze, your personal desktop pet.",
     url: `${siteUrl}/store/`,
   },
 };

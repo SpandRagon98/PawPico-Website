@@ -11,7 +11,7 @@ const catIcon = `${siteUrl}/cat/mewmuze-face-logo-192.png`;
 const shortcutIcon = `${siteUrl}/cat/mewmuze-face-logo-32.png`;
 const appleIcon = `${siteUrl}/cat/mewmuze-face-logo-180.png`;
 const socialImage = `${siteUrl}/og-mewmuze.png`;
-const title = "MewMuze — Your Personal Desktop Cat";
+const title = "MewMuze — Your Personal Desktop Pet";
 const description =
   "Meet MewMuze, a playful Windows desktop companion with focus tools, smart reminders, local utilities, expressive animations and a customizable personality.";
 
@@ -37,7 +37,7 @@ export const metadata: Metadata = {
         url: socialImage,
         width: 1200,
         height: 630,
-        alt: "MewMuze, the flower-band pixel cat peeking into a quiet Windows desktop",
+        alt: "MewMuze, the flower-band pixel pet peeking into a quiet Windows desktop",
       },
     ],
   },

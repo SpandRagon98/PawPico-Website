@@ -24,13 +24,13 @@ export default function Support() {
   return (
     <>
       <PublicHeader current="support" />
-      <main className="commerce-page commerce-page-with-navigation">
-      <section className="commerce-card">
+      <main className="commerce-page commerce-page-with-navigation support-page">
+      <section className="commerce-card support-card">
         <p className="eyebrow">
           <span aria-hidden="true" />
           PURCHASE &amp; LICENCE HELP
         </p>
-        <h1>We will help you bring your cat home.</h1>
+        <h1>We will help you bring your pet home.</h1>
         <p>
           Keep your Dodo Payments receipt nearby. For a missing email, mistyped
           address, activation-limit issue, refund, or licence problem, include the

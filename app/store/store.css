@@ -1161,3 +1161,63 @@
 .concept-figure {
   background: #f2f9ff;
 }
+
+/* The catalogue remains an honest preview: visitors may scroll through its
+   silhouettes, but the workbench stays deliberately out of focus until the
+   wardrobe opens. Navigation and the status banner remain crisp. */
+.store-coming-soon-overlay {
+  position: sticky;
+  z-index: 60;
+  top: 108px;
+  display: grid;
+  width: min(620px, calc(100% - 32px));
+  min-height: 138px;
+  place-content: center;
+  gap: 4px;
+  margin: 108px auto -246px;
+  padding: 22px 30px;
+  border: 2px solid var(--genz-ink, #141922);
+  border-radius: 28px;
+  color: var(--genz-ink, #141922);
+  background: var(--genz-yellow, #ffd84d);
+  box-shadow: inset 0 3px 0 rgba(255, 255, 255, 0.55), 0 6px 0 var(--genz-ink, #141922), 9px 10px 0 var(--genz-pink, #ff4f87);
+  text-align: center;
+  pointer-events: none;
+}
+
+.store-coming-soon-overlay small {
+  font-weight: 800;
+  letter-spacing: 0.12em;
+}
+
+.store-coming-soon-overlay strong {
+  font-family: var(--font-kawaii-display), var(--font-kawaii-ui), sans-serif;
+  font-size: clamp(2rem, 5vw, 4.25rem);
+  line-height: 1;
+}
+
+.store-coming-soon-overlay span {
+  font-weight: 650;
+}
+
+.store-preview-content {
+  filter: blur(5px);
+  opacity: 0.72;
+  pointer-events: none;
+  user-select: none;
+}
+
+@media (max-width: 760px) {
+  .store-coming-soon-overlay {
+    top: 86px;
+    min-height: 122px;
+    margin-top: 88px;
+    margin-bottom: -210px;
+    padding: 18px 20px;
+    border-radius: 22px;
+  }
+
+  .store-coming-soon-overlay span {
+    font-size: 13px;
+  }
+}

@@ -23,8 +23,8 @@ test("renders the exact full-screen MewMuze opening story", async () => {
   assert.match(response.headers.get("content-type") ?? "", /^text\/html\b/i);
   const html = await response.text();
 
-  assert.match(html, /<title>MewMuze — Your Personal Desktop Cat<\/title>/);
-  assert.match(html, /A PERSONAL DESKTOP CAT FOR WINDOWS/);
+  assert.match(html, /<title>MewMuze — Your Personal Desktop Pet<\/title>/);
+  assert.match(html, /A PERSONAL DESKTOP PET FOR WINDOWS/);
   assert.match(html, /Your screen could use a little more life\./);
   assert.match(html, /MewMuze lives quietly on your desktop/);
   assert.match(html, /Hi\. I live here now\./);
@@ -371,7 +371,7 @@ test("routes every purchase through the configured Dodo test product", async () 
   assert.match(html, /ONE-TIME PRICE/);
   assert.match(html, /\$7\.99/);
   assert.match(html, /Pay once\. No subscription, ever\./);
-  assert.match(html, /Personal Windows desktop cat/);
+  assert.match(html, /Personal Windows desktop pet/);
   assert.match(html, /Local-first privacy/);
   assert.match(html, /Dodo Payments/);
   assert.match(
@@ -1037,7 +1037,7 @@ test("ships the ten-question FAQ using the site-wide MewMuze typography", async 
   const faq = await source("../data/faq.ts");
   const css = await source("../app/globals.css");
 
-  assert.match(html, /QUESTIONS BEFORE THE CAT MOVES IN/);
+  assert.match(html, /QUESTIONS BEFORE THE PET MOVES IN/);
   assert.equal((faq.match(/^    question:/gm) ?? []).length, 10);
   assert.match(page, /"@type": "FAQPage"/);
   assert.doesNotMatch(css, /\.faq-answer p\s*\{[^}]*font-family:/s);
