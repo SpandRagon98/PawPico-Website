@@ -90,7 +90,10 @@ test("keeps the Dodo seller secret on Hostinger and validates an instance before
   assert.match(endpoint, /\/licenses\/validate/);
   assert.match(endpoint, /Authorization: Bearer/);
   assert.ok(endpoint.indexOf("/licenses/validate") < endpoint.indexOf("/license_keys/"));
-  assert.match(workflow, /secrets\.DODO_API_KEY/);
+  assert.match(workflow, /secrets\.DODO_TEST_API_KEY/);
+  assert.match(workflow, /secrets\.DODO_TEST_WEBHOOK_SECRET/);
+  assert.match(workflow, /MEWMUZE_DODO_MODE: test_mode/);
+  assert.doesNotMatch(workflow, /secrets\.DODO_API_KEY/);
   assert.doesNotMatch(workflow, /NEXT_PUBLIC_DODO_API_KEY/);
 });
 
@@ -359,7 +362,7 @@ test("presents the accurate Appearance Studio and current Flower Band preset", a
   }
 });
 
-test("adds the live Dodo one-time $7.99 purchase section", async () => {
+test("routes every purchase through the configured Dodo test product", async () => {
   const response = await render();
   const html = await response.text();
   const page = await source("../app/page.tsx");
@@ -373,12 +376,12 @@ test("adds the live Dodo one-time $7.99 purchase section", async () => {
   assert.match(html, /Dodo Payments/);
   assert.match(
     html,
-    /checkout\.dodopayments\.com\/buy\/pdt_0NkWDKYYlGSBLf59iNa4q/,
+    /checkout\.dodopayments\.com\/buy\/pdt_0NkKxv8HzpZgMPTzpIeWT/,
   );
   assert.match(html, /redirect_url=https%3A%2F%2Fmewmuze\.com%2Fcheckout%2Fsuccess%2F/);
   assert.match(commerce, /url\.searchParams\.set\("redirect_url", CHECKOUT_SUCCESS_URL\)/);
   assert.doesNotMatch(html, /Checkout configuration pending/);
-  assert.doesNotMatch(html, /pdt_0NkKxv8HzpZgMPTzpIeWT/);
+  assert.doesNotMatch(html, /pdt_0NkWDKYYlGSBLf59iNa4q/);
   assert.match(page, /checkoutUrlFor/);
   assert.match(page, /Buy MewMuze securely/);
   assert.match(commerce, /NEXT_PUBLIC_DODO_CHECKOUT_URL/);
@@ -623,7 +626,7 @@ test("explains in plain English what every feature does for the user", async () 
   }
 });
 
-test("keeps the optional supporter checkout behind its own configured Dodo link", async () => {
+test("disables the optional supporter checkout while payment testing is active", async () => {
   const response = await render();
   const html = await response.text();
   assert.match(html, /\$7\.99/);
@@ -638,7 +641,8 @@ test("keeps the optional supporter checkout behind its own configured Dodo link"
   assert.match(page, /Add \$1 to support the developer/);
   assert.match(page, /priceLabelFor\(rupees, supportSelected\)/);
   assert.match(commerce, /supportDeveloper \? "\$8\.99" : "\$7\.99"/);
-  assert.match(commerce, /NEXT_PUBLIC_DODO_SUPPORT_CHECKOUT_URL/);
+  assert.match(commerce, /supporterCheckoutUrl: ""/);
+  assert.match(commerce, /supporterConfigured: false/);
 
   const css = await source("../app/globals.css");
   assert.match(css, /\.tip-toggle:has\(input:checked\)/);

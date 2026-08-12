@@ -1,14 +1,12 @@
 export type CommerceMode = "test" | "live";
 
-export const LIVE_DODO_PRODUCT_ID = "pdt_0NkWDKYYlGSBLf59iNa4q";
+export const TEST_DODO_PRODUCT_ID = "pdt_0NkKxv8HzpZgMPTzpIeWT";
 export const CHECKOUT_SUCCESS_URL = "https://mewmuze.com/checkout/success/";
-const liveCheckoutUrl = `https://checkout.dodopayments.com/buy/${LIVE_DODO_PRODUCT_ID}`;
+const testCheckoutUrl = `https://checkout.dodopayments.com/buy/${TEST_DODO_PRODUCT_ID}`;
 const configuredCheckoutUrl = process.env.NEXT_PUBLIC_DODO_CHECKOUT_URL?.trim() ?? "";
-const supporterCheckoutUrl =
-  process.env.NEXT_PUBLIC_DODO_SUPPORT_CHECKOUT_URL?.trim() ?? "";
 
-const isLiveCheckout = (url: string) =>
-  /^https:\/\/checkout\.dodopayments\.com\//i.test(url);
+const isDodoCheckout = (url: string) =>
+  /^https:\/\/(?:test\.)?checkout\.dodopayments\.com\//i.test(url);
 
 /**
  * Dodo's static product links only return to the merchant when redirect_url is
@@ -16,32 +14,29 @@ const isLiveCheckout = (url: string) =>
  * GitHub variables, so a completed purchase always comes back to MewMuze.
  */
 const withCheckoutReturn = (checkoutUrl: string): string => {
-  if (!isLiveCheckout(checkoutUrl)) return checkoutUrl;
+  if (!isDodoCheckout(checkoutUrl)) return checkoutUrl;
   const url = new URL(checkoutUrl);
   url.searchParams.set("quantity", "1");
   url.searchParams.set("redirect_url", CHECKOUT_SUCCESS_URL);
   return url.toString();
 };
 
-// The public product ID is safe to ship. Falling back to the canonical live
-// link also prevents an old GitHub variable from sending buyers to a sandbox
-// product after the production switch.
+// Test mode is intentionally fail-safe: even a stale deployment variable that
+// still points at the live product is rejected in favour of this test product.
 const normalCheckoutUrl =
-  isLiveCheckout(configuredCheckoutUrl) && configuredCheckoutUrl.includes(LIVE_DODO_PRODUCT_ID)
+  isDodoCheckout(configuredCheckoutUrl) && configuredCheckoutUrl.includes(TEST_DODO_PRODUCT_ID)
     ? withCheckoutReturn(configuredCheckoutUrl)
-    : withCheckoutReturn(liveCheckoutUrl);
+    : withCheckoutReturn(testCheckoutUrl);
 
-const configuredSupporterCheckoutUrl = isLiveCheckout(supporterCheckoutUrl)
-  ? withCheckoutReturn(supporterCheckoutUrl)
-  : supporterCheckoutUrl;
-
-export const commerceMode: CommerceMode = "live";
+export const commerceMode: CommerceMode = "test";
 
 export const commerce = {
   checkoutUrl: normalCheckoutUrl,
-  supporterCheckoutUrl: configuredSupporterCheckoutUrl,
+  // The optional supporter product is deliberately disabled in test mode. It
+  // previously came from a deployment variable that could contain a live link.
+  supporterCheckoutUrl: "",
   configured: /^https:\/\/.+/i.test(normalCheckoutUrl),
-  supporterConfigured: isLiveCheckout(configuredSupporterCheckoutUrl),
+  supporterConfigured: false,
 } as const;
 
 export function checkoutUrlFor(supportDeveloper: boolean): string {
