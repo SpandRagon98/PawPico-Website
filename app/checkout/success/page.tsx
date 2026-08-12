@@ -74,64 +74,146 @@ export default function CheckoutSuccess() {
   return (
     <>
       <PublicHeader />
-      <main className="commerce-page commerce-page-with-navigation">
-      <section className="commerce-card" aria-live="polite">
-        <p className="eyebrow">
-          <span aria-hidden="true" />
-          {succeeded ? "PURCHASE COMPLETE" : "PURCHASE STATUS"}
-        </p>
-        <h1>{succeeded ? "Your cat is ready to come home." : "We are checking your purchase."}</h1>
-        <p>
-          Dodo Payments sends the receipt and unique licence key to the email used at checkout.
-        </p>
+      <main className="commerce-page commerce-page-with-navigation commerce-success-page">
+        <section className="commerce-card commerce-success-card" aria-live="polite">
+          <header className="purchase-welcome">
+            <div>
+              <p className="eyebrow">
+                <span aria-hidden="true" />
+                {succeeded ? "PURCHASE COMPLETE" : "PURCHASE STATUS"}
+              </p>
+              <h1>
+                {succeeded ? "Your cat is ready to come home." : "We are checking your purchase."}
+              </h1>
+              <p>
+                You are three small steps away from meeting MewMuze. Keep this page open while
+                you download, install and activate your desktop cat.
+              </p>
+            </div>
 
-        <div className="license-delivery is-waiting">
-          <small>{succeeded ? "LICENCE DELIVERED" : "VERIFIED FULFILMENT"}</small>
-          <strong>
-            {succeeded
-              ? "Payment verified — check your purchase email for the key."
-              : purchase.state === "revoked"
-                ? "This purchase is no longer active."
-                : "Dodo is confirming payment and generating your key."}
-          </strong>
-          <p>
-            Your installer is available below while Dodo finishes confirming the purchase.
-            The unique licence key is delivered separately to your purchase email.
-          </p>
-        </div>
+            <div className="license-delivery is-waiting">
+              <small>{succeeded ? "LICENCE DELIVERED" : "VERIFIED FULFILMENT"}</small>
+              <strong>
+                {succeeded
+                  ? "Payment verified — your key is in your Dodo Payments email."
+                  : purchase.state === "revoked"
+                    ? "This purchase is no longer active."
+                    : "Dodo is confirming payment and generating your key."}
+              </strong>
+              <p>
+                The installer is ready below. Your unique licence key arrives separately at the
+                email address you used during checkout.
+              </p>
+            </div>
+          </header>
 
-        <ol className="activation-steps">
-          <li>Open MewMuze on the computer you want to activate.</li>
-          <li>Open Cat Settings and paste the key into the licence box.</li>
-          <li>Select Unlock. The key is then kept in your system credential vault.</li>
-        </ol>
+          <div className="purchase-journey">
+            <article className="purchase-step purchase-step-download">
+              <span className="purchase-step-number" aria-hidden="true">01</span>
+              <div className="purchase-step-copy">
+                <p className="purchase-step-label">STEP 1</p>
+                <h2>Download the MewMuze app</h2>
+                <p>
+                  Use the button below to download the official Windows installer. When the
+                  download finishes, open <strong>MewMuze_0.1.8_x64-setup.exe</strong> to begin.
+                </p>
+                <a className="skeuo-button skeuo-button-primary" href={DOWNLOAD_URL}>
+                  Download MewMuze 0.1.8
+                </a>
+                <small>For Windows 10 and 11 · downloaded from the official MewMuze release</small>
+              </div>
+            </article>
 
-        {purchase.paymentId && (
-          <p className="purchase-reference">
-            Purchase reference: <code>{purchase.paymentId}</code>
-          </p>
-        )}
+            <article className="purchase-step purchase-step-defender">
+              <span className="purchase-step-number" aria-hidden="true">02</span>
+              <div className="purchase-step-copy">
+                <p className="purchase-step-label">STEP 2</p>
+                <h2>Let Windows know you trust this download</h2>
+                <p>
+                  Windows Defender SmartScreen may show <strong>&ldquo;Windows protected your
+                  PC&rdquo;</strong> because this young independent app does not have a paid
+                  code-signing certificate yet. This is expected for the installer downloaded
+                  from this page.
+                </p>
 
-        <p className="install-note">
-          The download is hosted on MewMuze&rsquo;s official GitHub releases page, so
-          the file comes straight from the developer. Windows may still say{" "}
-          <strong>&ldquo;Windows protected your PC&rdquo;</strong> when you open it,
-          because MewMuze is not code signed yet. Choose <strong>More info</strong>,
-          then <strong>Run anyway</strong>.
-        </p>
+                <div className="defender-walkthrough" aria-label="Windows Defender installation walkthrough">
+                  <figure>
+                    <div className="defender-shot defender-shot-pink">
+                      <img
+                        src={sitePath("/checkout/windows-defender-more-info.png")}
+                        alt="Windows Defender SmartScreen warning with the More info link visible"
+                        width="525"
+                        height="495"
+                      />
+                    </div>
+                    <figcaption><strong>First:</strong> select <em>More info</em>.</figcaption>
+                  </figure>
+                  <span className="walkthrough-arrow" aria-hidden="true">→</span>
+                  <figure>
+                    <div className="defender-shot defender-shot-yellow">
+                      <img
+                        src={sitePath("/checkout/windows-defender-run-anyway.png")}
+                        alt="Expanded Windows Defender warning showing the MewMuze installer and Run anyway button"
+                        width="525"
+                        height="495"
+                      />
+                    </div>
+                    <figcaption>
+                      <strong>Then:</strong> confirm the app name and select <em>Run anyway</em>.
+                    </figcaption>
+                  </figure>
+                </div>
 
-        <div className="commerce-actions">
-          <a className="skeuo-button skeuo-button-primary" href={DOWNLOAD_URL}>
-            Download MewMuze 0.1.8
-          </a>
-          <a className="skeuo-button skeuo-button-secondary" href={sitePath("/")}>
-            Back to MewMuze
-          </a>
-          <a className="skeuo-button skeuo-button-quiet" href={sitePath("/support/")}>
-            Purchase help
-          </a>
-        </div>
-      </section>
+                <aside className="founder-signing-note">
+                  <span aria-hidden="true">♥</span>
+                  <p>
+                    MewMuze is just getting started as a tiny independent project. A trusted
+                    Windows signing certificate has a real recurring cost that we cannot cover
+                    yet. Your support helps us keep building—and gets us closer to removing this
+                    extra screen from future releases. Thank you for believing in our little cat.
+                  </p>
+                </aside>
+              </div>
+            </article>
+
+            <article className="purchase-step purchase-step-activate">
+              <span className="purchase-step-number" aria-hidden="true">03</span>
+              <div className="purchase-step-copy">
+                <p className="purchase-step-label">STEP 3</p>
+                <h2>Bring your licence key home</h2>
+                <p>
+                  After installation, MewMuze opens its activation window. You can minimize that
+                  window, open your email, and look for a message from <strong>Dodo Payments</strong>.
+                  Copy the unique licence key from that email, return to MewMuze, paste it into
+                  the licence field and select <strong>Activate</strong>.
+                </p>
+                <ol className="activation-checklist">
+                  <li><span>1</span> Minimize the activation window.</li>
+                  <li><span>2</span> Open the Dodo Payments email and copy your licence key.</li>
+                  <li><span>3</span> Return to MewMuze, paste the key and select Activate.</li>
+                </ol>
+                <p className="activation-help-note">
+                  No email yet? Check Spam or Promotions first, then visit Purchase help below.
+                </p>
+              </div>
+            </article>
+          </div>
+
+          {purchase.paymentId && (
+            <p className="purchase-reference">
+              Purchase reference: <code>{purchase.paymentId}</code>
+            </p>
+          )}
+
+          <footer className="commerce-actions purchase-footer-actions">
+            <a className="skeuo-button skeuo-button-secondary" href={sitePath("/")}>
+              Back to MewMuze
+            </a>
+            <a className="skeuo-button skeuo-button-quiet" href={sitePath("/support/")}>
+              Purchase help
+            </a>
+          </footer>
+        </section>
       </main>
     </>
   );

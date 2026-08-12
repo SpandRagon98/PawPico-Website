@@ -1011,10 +1011,17 @@ test("renders purchase success, cancellation and support routes with navigation"
   assert.match(successSource, /purchase-status\.php/);
   assert.doesNotMatch(successSource, /params\.get\("license_key"\)/);
   assert.match(successSource, /replaceState/);
-  assert.match(successSource, /check your purchase email for the key/i);
+  assert.match(successSource, /your key is in your Dodo Payments email/i);
   assert.match(success, /Download MewMuze 0\.1\.8/);
   assert.match(successSource, /href=\{DOWNLOAD_URL\}/);
   assert.doesNotMatch(successSource, /\{succeeded && \(\s*<a[^>]+href=\{DOWNLOAD_URL\}/);
+  assert.match(success, /Download the MewMuze app/);
+  assert.match(success, /Let Windows know you trust this download/);
+  assert.match(success, /Bring your licence key home/);
+  assert.match(success, /windows-defender-more-info\.png/);
+  assert.match(success, /windows-defender-run-anyway\.png/);
+  assert.match(success, /message from <strong>Dodo Payments<\/strong>/);
+  assert.match(success, /minimize that window/i);
   assert.match(cancelled, /Nothing was charged/);
   assert.match(support, /support@mewmuze\.com/);
   assert.match(support, /Never send a card number/);
