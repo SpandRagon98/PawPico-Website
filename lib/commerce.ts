@@ -2,7 +2,7 @@ export type CommerceMode = "test" | "live";
 
 export const TEST_DODO_PRODUCT_ID = "pdt_0NkKxv8HzpZgMPTzpIeWT";
 export const CHECKOUT_SUCCESS_URL = "https://mewmuze.com/checkout/success/";
-const testCheckoutUrl = `https://checkout.dodopayments.com/buy/${TEST_DODO_PRODUCT_ID}`;
+const testCheckoutUrl = `https://test.checkout.dodopayments.com/buy/${TEST_DODO_PRODUCT_ID}`;
 const configuredCheckoutUrl = process.env.NEXT_PUBLIC_DODO_CHECKOUT_URL?.trim() ?? "";
 
 const isDodoCheckout = (url: string) =>
@@ -24,7 +24,8 @@ const withCheckoutReturn = (checkoutUrl: string): string => {
 // Test mode is intentionally fail-safe: even a stale deployment variable that
 // still points at the live product is rejected in favour of this test product.
 const normalCheckoutUrl =
-  isDodoCheckout(configuredCheckoutUrl) && configuredCheckoutUrl.includes(TEST_DODO_PRODUCT_ID)
+  /^https:\/\/test\.checkout\.dodopayments\.com\//i.test(configuredCheckoutUrl) &&
+  configuredCheckoutUrl.includes(TEST_DODO_PRODUCT_ID)
     ? withCheckoutReturn(configuredCheckoutUrl)
     : withCheckoutReturn(testCheckoutUrl);
 

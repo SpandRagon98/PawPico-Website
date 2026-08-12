@@ -376,7 +376,7 @@ test("routes every purchase through the configured Dodo test product", async () 
   assert.match(html, /Dodo Payments/);
   assert.match(
     html,
-    /checkout\.dodopayments\.com\/buy\/pdt_0NkKxv8HzpZgMPTzpIeWT/,
+    /test\.checkout\.dodopayments\.com\/buy\/pdt_0NkKxv8HzpZgMPTzpIeWT/,
   );
   assert.match(html, /redirect_url=https%3A%2F%2Fmewmuze\.com%2Fcheckout%2Fsuccess%2F/);
   assert.match(commerce, /url\.searchParams\.set\("redirect_url", CHECKOUT_SUCCESS_URL\)/);
