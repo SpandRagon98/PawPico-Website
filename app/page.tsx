@@ -20,13 +20,7 @@ import {
   type FeatureStory,
 } from "../data/features";
 import { faqItems } from "../data/faq";
-import {
-  checkoutUrlFor,
-  commerce,
-  commerceMode,
-  prefersRupees,
-  priceLabelFor,
-} from "../lib/commerce";
+import { commerce, prefersRupees, priceLabelFor } from "../lib/commerce";
 import { sitePath } from "../lib/site-path";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://mewmuze.com";
@@ -950,7 +944,6 @@ export default function Home() {
   // snapshot is what makes one static file safe to serve worldwide.
   const rupees = useSyncExternalStore(noSubscribe, prefersRupees, serverPrefersRupees);
   const priceLabel = priceLabelFor(rupees, supportSelected);
-  const checkoutUrl = checkoutUrlFor(supportSelected);
   const heroRef = useRef<HTMLElement>(null);
   const catMotionRef = useRef<HTMLSpanElement>(null);
   const heroHeadRef = useRef<HTMLSpanElement>(null);
@@ -1398,30 +1391,14 @@ export default function Home() {
                 </span>
               </label>
             )}
-            {commerce.configured ? (
-              <a
-                className="skeuo-button skeuo-button-primary pricing-gate"
-                href={checkoutUrl}
-                target="_blank"
-                rel="noreferrer"
-              >
-                {commerceMode === "test" ? "Open secure test checkout" : "Buy MewMuze securely"}
-              </a>
-            ) : (
-              <button
-                className="skeuo-button skeuo-button-primary pricing-coming"
-                type="button"
-                disabled
-              >
-                Checkout configuration pending
-              </button>
-            )}
-            <p>
-              {commerceMode === "test"
-                ? "Test mode uses Dodo's sandbox: no real charge is made."
-                : "Secure checkout is hosted by Dodo Payments. MewMuze never sees your card details."}
-              {rupees ? " Dodo confirms the exact amount before you pay." : ""}
-            </p>
+            <button
+              className="skeuo-button skeuo-button-primary pricing-coming"
+              type="button"
+              disabled
+            >
+              Available after 15 August 2026
+            </button>
+            <p>Checkout will be available after 15 August 2026, following the official release.</p>
           </div>
           <div className="pricing-copy">
             <Eyebrow>ONE PET. ONE PRICE. ONCE.</Eyebrow>
@@ -1450,9 +1427,7 @@ export default function Home() {
               </li>
             </ul>
             <p className="pricing-footnote">
-              {commerceMode === "test"
-                ? "The complete purchase and licence flow is connected to Dodo test mode while launch checks are completed."
-                : "The final amount and available methods are shown by Dodo Payments before you confirm."}
+              Purchasing opens after the official release on 15 August 2026.
             </p>
           </div>
         </div>

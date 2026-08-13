@@ -362,7 +362,7 @@ test("presents the accurate Appearance Studio and current Flower Band preset", a
   }
 });
 
-test("routes every purchase through the configured Dodo test product", async () => {
+test("keeps Dodo test configuration ready while checkout remains disabled until release", async () => {
   const response = await render();
   const html = await response.text();
   const page = await source("../app/page.tsx");
@@ -374,16 +374,12 @@ test("routes every purchase through the configured Dodo test product", async () 
   assert.match(html, /Personal Windows desktop pet/);
   assert.match(html, /Local-first privacy/);
   assert.match(html, /Dodo Payments/);
-  assert.match(
-    html,
-    /test\.checkout\.dodopayments\.com\/buy\/pdt_0NkKxv8HzpZgMPTzpIeWT/,
-  );
-  assert.match(html, /redirect_url=https%3A%2F%2Fmewmuze\.com%2Fcheckout%2Fsuccess%2F/);
+  assert.doesNotMatch(html, /test\.checkout\.dodopayments\.com/);
+  assert.match(html, /Available after 15 August 2026/);
+  assert.match(html, /following the official release/);
+  assert.match(page, /disabled/);
   assert.match(commerce, /url\.searchParams\.set\("redirect_url", CHECKOUT_SUCCESS_URL\)/);
-  assert.doesNotMatch(html, /Checkout configuration pending/);
   assert.doesNotMatch(html, /pdt_0NkWDKYYlGSBLf59iNa4q/);
-  assert.match(page, /checkoutUrlFor/);
-  assert.match(page, /Buy MewMuze securely/);
   assert.match(commerce, /NEXT_PUBLIC_DODO_CHECKOUT_URL/);
   assert.doesNotMatch(html, /Limited-time|refund policy/i);
 });
@@ -939,7 +935,8 @@ test("uses Dodo checkout instead of collecting a local website account", async (
   assert.match(html, /Secure checkout/);
   assert.match(html, /Copy your licence/);
   assert.match(html, /Unlock MewMuze/);
-  assert.match(page, /pricing-gate/);
+  assert.doesNotMatch(page, /pricing-gate/);
+  assert.match(page, /pricing-coming/);
   assert.doesNotMatch(page, /type="password"|setPassword|localStorage|sessionStorage/);
   assert.doesNotMatch(html, /Create account|Log in|Signed in as/);
   assert.doesNotMatch(page, /localStorage|sessionStorage/);
