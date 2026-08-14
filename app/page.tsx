@@ -119,8 +119,17 @@ function HeroCat({
   emotion: HeroEmotion;
   reducedMotion: boolean;
 }) {
+  const [loadedEmotions, setLoadedEmotions] = useState<
+    Partial<Record<Exclude<HeroEmotion, "neutral">, true>>
+  >({});
+  const displayedEmotion =
+    emotion === "neutral" || loadedEmotions[emotion] ? emotion : "neutral";
+
   return (
-    <span className={`hero-cat-art emotion-${emotion}`} aria-hidden="true">
+    <span
+      className={`hero-cat-art emotion-${displayedEmotion}`}
+      aria-hidden="true"
+    >
       <Image
         className="hero-cat-layer hero-cat-body"
         src={sitePath(
@@ -173,8 +182,18 @@ function HeroCat({
           alt=""
           width={128}
           height={128}
-          loading="eager"
           unoptimized
+          priority
+          onLoad={() =>
+            setLoadedEmotions((current) =>
+              current[name as Exclude<HeroEmotion, "neutral">]
+                ? current
+                : {
+                    ...current,
+                    [name]: true,
+                  },
+            )
+          }
         />
       ))}
     </span>
