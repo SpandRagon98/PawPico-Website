@@ -206,15 +206,17 @@ function SkeuoButton({
   variant = "primary",
   onClick,
   className = "",
+  disabled = false,
 }: {
   href?: string;
   children: ReactNode;
   variant?: "primary" | "secondary" | "quiet";
   onClick?: () => void;
   className?: string;
+  disabled?: boolean;
 }) {
   const classes = `skeuo-button skeuo-button-${variant} ${className}`.trim();
-  if (href) {
+  if (href && !disabled) {
     return (
       <a className={classes} href={href} onClick={onClick}>
         {children}
@@ -222,7 +224,7 @@ function SkeuoButton({
     );
   }
   return (
-    <button className={classes} type="button" onClick={onClick}>
+    <button className={classes} type="button" onClick={onClick} disabled={disabled}>
       {children}
     </button>
   );
@@ -258,6 +260,7 @@ function SiteNavigation() {
         Story
       </a>
       <a href="#features">Features</a>
+      <a href="#editions">Free vs Pro</a>
       <a href="#appearance">Appearance</a>
       <a href={sitePath("/store/")}>
         Store <span className="coming-pill">Coming Soon</span>
@@ -280,12 +283,12 @@ function SiteNavigation() {
         <summary aria-label="Open navigation">Menu</summary>
         <nav aria-label="Mobile navigation">
           {links}
-          <a href="#pricing">Buy MewMuze</a>
+          <a href="#pricing">Buy MewMuze Pro</a>
         </nav>
       </details>
       <div className="nav-auth">
         <SkeuoButton href="#pricing" variant="primary" className="nav-cta nav-cta-signup">
-          Buy MewMuze
+          Buy MewMuze Pro
         </SkeuoButton>
       </div>
     </div>
@@ -391,6 +394,101 @@ function AppNotice({ notice, className = "" }: { notice: FeatureNotice; classNam
   );
 }
 
+const quickToolFeatureIds = [
+  "calculator",
+  "unit-converter",
+  "time-converter",
+] as const;
+
+type QuickToolFeatureId = (typeof quickToolFeatureIds)[number];
+
+function isQuickToolFeature(id: string): id is QuickToolFeatureId {
+  return quickToolFeatureIds.includes(id as QuickToolFeatureId);
+}
+
+function QuickToolFilm({ feature }: { feature: FeatureStory }) {
+  const toolId = feature.id as QuickToolFeatureId;
+
+  return (
+    <div
+      className={`quick-tool-film quick-tool-film-${toolId}`}
+      role="img"
+      aria-label={`MewMuze demonstrating ${feature.title}`}
+    >
+      <CatFigure className="quick-tool-cat" />
+
+      {toolId === "calculator" && (
+        <div className="quick-tool-panel quick-tool-calculator" aria-hidden="true">
+          <span className="quick-tool-panel-label">CALCULATOR</span>
+          <div className="calculator-display">
+            <small>2450 + 785</small>
+            <strong>3,235</strong>
+          </div>
+          <div className="calculator-keys">
+            {["7", "8", "9", "+", "4", "5", "6", "="].map((key) => (
+              <span key={key}>{key}</span>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {toolId === "unit-converter" && (
+        <div className="quick-tool-panel quick-tool-converter" aria-hidden="true">
+          <span className="quick-tool-panel-label">UNIT CONVERTER</span>
+          <div className="converter-card converter-card-from">
+            <small>KILOMETRES</small>
+            <strong>5 km</strong>
+          </div>
+          <span className="converter-swap">↔</span>
+          <div className="converter-card converter-card-to">
+            <small>MILES</small>
+            <strong>3.11 mi</strong>
+          </div>
+        </div>
+      )}
+
+      {toolId === "time-converter" && (
+        <div className="quick-tool-panel quick-tool-time" aria-hidden="true">
+          <span className="quick-tool-panel-label">TIME ZONE CONVERTER</span>
+          <div className="time-card time-card-india">
+            <i />
+            <small>INDIA</small>
+            <strong>10:30 PM</strong>
+          </div>
+          <span className="time-card-arrow">→</span>
+          <div className="time-card time-card-new-york">
+            <i />
+            <small>NEW YORK</small>
+            <strong>1:00 PM</strong>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function FeatureAvailability({ feature }: { feature: FeatureStory }) {
+  if (!feature.availability) return null;
+
+  const availabilityLabel = feature.availability.free
+    ? "Available in the Free and Pro editions"
+    : "Available in the Pro edition";
+
+  return (
+    <div
+      className="feature-availability"
+      aria-label={availabilityLabel}
+    >
+      {feature.availability.free && (
+        <span className="availability-free">FREE <i aria-hidden="true">✓</i></span>
+      )}
+      {feature.availability.pro && (
+        <span className="availability-pro">PRO <i aria-hidden="true">✓</i></span>
+      )}
+    </div>
+  );
+}
+
 function FeatureFilm({
   feature,
   reducedMotion,
@@ -405,6 +503,10 @@ function FeatureFilm({
         <span>{feature.demoLabel}</span>
       </div>
     );
+  }
+
+  if (isQuickToolFeature(feature.id)) {
+    return <QuickToolFilm feature={feature} />;
   }
 
   return (
@@ -599,6 +701,7 @@ function FeatureTheatre({ reducedMotion }: { reducedMotion: boolean }) {
               <span>{feature.number}</span>
               <small>{feature.group}</small>
             </div>
+            <FeatureAvailability feature={feature} />
             <p className="feature-scene">{feature.scene}</p>
             <h3>{feature.title}</h3>
             <p className="feature-story">{feature.story}</p>
@@ -727,6 +830,7 @@ function FeatureDirectory() {
                     />
                     <small>{feature.number}</small>
                     <h4>{feature.title}</h4>
+                    <FeatureAvailability feature={feature} />
                     <p>{feature.story}</p>
                     <div className="directory-helps">
                       <small>HOW IT HELPS</small>
@@ -748,6 +852,248 @@ function FeatureDirectory() {
         );
       })}
     </div>
+  );
+}
+
+type EditionValue =
+  | { kind: "included"; label?: string }
+  | { kind: "limited"; label: string }
+  | { kind: "unavailable" }
+  | { kind: "text"; label: string };
+
+type EditionRow = {
+  feature: string;
+  free: EditionValue;
+  pro: EditionValue;
+};
+
+type EditionGroup = {
+  name: string;
+  rows: EditionRow[];
+};
+
+const included = (label?: string): EditionValue => ({ kind: "included", label });
+const limited = (label: string): EditionValue => ({ kind: "limited", label });
+const unavailable: EditionValue = { kind: "unavailable" };
+const editionText = (label: string): EditionValue => ({ kind: "text", label });
+
+const editionGroups: EditionGroup[] = [
+  {
+    name: "Appearance",
+    rows: [
+      {
+        feature: "Pet breeds",
+        free: editionText("Classic"),
+        pro: editionText("Classic + Chonk, Fluffy, Siamese, Kitten"),
+      },
+      {
+        feature: "Coat patterns",
+        free: editionText("Solid, Tuxedo"),
+        pro: editionText("All 7, including Tabby, Socks, Spotted, Calico, Bicolour"),
+      },
+      {
+        feature: "Fur colour",
+        free: limited("3 preset coats"),
+        pro: included("Any colour"),
+      },
+      {
+        feature: "Eye & inner-ear colour",
+        free: unavailable,
+        pro: included("Full control"),
+      },
+      {
+        feature: "Outline / stroke",
+        free: unavailable,
+        pro: included("On, any colour"),
+      },
+      {
+        feature: "Accessories",
+        free: editionText("Flower Band"),
+        pro: editionText("Flower Band + Bandana, Sunglasses, Headphones, Glasses"),
+      },
+    ],
+  },
+  {
+    name: "Companion",
+    rows: [
+      { feature: "Walking / roaming", free: included(), pro: included() },
+      { feature: "Cursor, eye & head tracking", free: included(), pro: included() },
+      { feature: "Petting", free: included(), pro: included() },
+      { feature: "Climbing & window physics", free: included(), pro: included() },
+      { feature: "Edge peek", free: included(), pro: included() },
+      { feature: "Full-screen hide / return", free: included(), pro: included() },
+      { feature: "Personality & idle animations", free: included(), pro: included() },
+      { feature: "Music reaction", free: included(), pro: included() },
+      { feature: "Microphone reaction", free: included(), pro: included() },
+      {
+        feature: "Mochi drag / stretch",
+        free: limited("Basic drag"),
+        pro: included("Full elastic stretch physics"),
+      },
+    ],
+  },
+  {
+    name: "Productivity",
+    rows: [
+      {
+        feature: "Pomodoro",
+        free: limited("Fixed 25 / 5"),
+        pro: included("Fully customizable"),
+      },
+      {
+        feature: "Custom reminders",
+        free: limited("1 active"),
+        pro: included("Unlimited"),
+      },
+      { feature: "Water & stretch reminders", free: included(), pro: included() },
+    ],
+  },
+  {
+    name: "Calculator & converters",
+    rows: [
+      { feature: "Calculator", free: included(), pro: included() },
+      { feature: "Unit Converter", free: included(), pro: included() },
+      { feature: "Time Zone Converter", free: included(), pro: included() },
+    ],
+  },
+  {
+    name: "Pro productivity",
+    rows: [
+      {
+        feature: "Gmail notifications",
+        free: unavailable,
+        pro: included("Stacked cards + Open in Gmail"),
+      },
+      {
+        feature: "Google Calendar",
+        free: unavailable,
+        pro: included("Meeting warnings"),
+      },
+      {
+        feature: "Clipboard Assistant",
+        free: unavailable,
+        pro: included("Full local helper"),
+      },
+      {
+        feature: "PDF Tools",
+        free: unavailable,
+        pro: included("Existing PDF tool set"),
+      },
+      {
+        feature: "Spreadsheet Tools",
+        free: unavailable,
+        pro: included("CSV ↔ XLSX, merge, split workbook"),
+      },
+      { feature: "Complete Work Mode", free: unavailable, pro: included() },
+    ],
+  },
+];
+
+function EditionCell({ value }: { value: EditionValue }) {
+  if (value.kind === "unavailable") {
+    return (
+      <span className="edition-value edition-value-unavailable" aria-label="Not included">
+        <i aria-hidden="true">×</i>
+        <small>Not included</small>
+      </span>
+    );
+  }
+
+  if (value.kind === "limited") {
+    return (
+      <span className="edition-value edition-value-limited">
+        <i aria-hidden="true">◐</i>
+        <small>{value.label}</small>
+      </span>
+    );
+  }
+
+  if (value.kind === "text") {
+    return <span className="edition-value edition-value-text">{value.label}</span>;
+  }
+
+  return (
+    <span className="edition-value edition-value-included">
+      <i aria-hidden="true">✓</i>
+      <small>{value.label ?? "Included"}</small>
+    </span>
+  );
+}
+
+function EditionsComparison({ proPrice }: { proPrice: string }) {
+  return (
+    <section
+      className="editions section-pad"
+      id="editions"
+      aria-labelledby="editions-title"
+      data-reveal
+    >
+      <div className="section-shell editions-shell">
+        <div className="section-heading editions-heading">
+          <div>
+            <Eyebrow>FREE OR PRO</Eyebrow>
+            <h2 id="editions-title">
+              Start with the companion.
+              <br />
+              <em>Upgrade when the tools fit.</em>
+            </h2>
+          </div>
+          <p>
+            Free is yours to keep. Pro adds deeper customization and the complete
+            productivity toolkit with one payment, not a subscription.
+          </p>
+        </div>
+
+        <div className="edition-table-wrap">
+          <table className="edition-table">
+            <thead>
+              <tr>
+                <th scope="col">Feature</th>
+                <th scope="col">
+                  <span className="edition-name">Free</span>
+                  <strong>₹0 / $0</strong>
+                  <small>Free to keep · no activation</small>
+                  <button className="edition-download-button" type="button" disabled>
+                    Download Free <span aria-hidden="true">↓</span>
+                  </button>
+                  <small className="free-release-note">
+                    Available after 15 August 2026
+                  </small>
+                </th>
+                <th scope="col" className="edition-pro-column">
+                  <span className="pro-badge">PRO</span>
+                  <strong>{proPrice}</strong>
+                  <small>One-time activation</small>
+                  <a className="edition-pro-button" href="#pricing">View Pro</a>
+                </th>
+              </tr>
+            </thead>
+            {editionGroups.map((group) => (
+              <tbody key={group.name}>
+                <tr className="edition-group-row">
+                  <th colSpan={3} scope="colgroup">{group.name}</th>
+                </tr>
+                {group.rows.map((row) => (
+                  <tr key={`${group.name}-${row.feature}`}>
+                    <th scope="row">{row.feature}</th>
+                    <td data-edition="Free"><EditionCell value={row.free} /></td>
+                    <td data-edition="Pro" className="edition-pro-column">
+                      <EditionCell value={row.pro} />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            ))}
+          </table>
+        </div>
+
+        <p className="editions-note">
+          <span className="pro-badge">PRO</span>
+          Every Pro feature remains visible inside MewMuze Free with a PRO badge, so
+          you can see what the upgrade adds before purchasing.
+        </p>
+      </div>
+    </section>
   );
 }
 
@@ -962,6 +1308,7 @@ export default function Home() {
   // Dollars on the server, rupees after mount for Indian visitors. The server
   // snapshot is what makes one static file safe to serve worldwide.
   const rupees = useSyncExternalStore(noSubscribe, prefersRupees, serverPrefersRupees);
+  const basePriceLabel = priceLabelFor(rupees, false);
   const priceLabel = priceLabelFor(rupees, supportSelected);
   const heroRef = useRef<HTMLElement>(null);
   const catMotionRef = useRef<HTMLSpanElement>(null);
@@ -1134,22 +1481,34 @@ export default function Home() {
             little things, and making an ordinary workday feel a little less ordinary.
           </p>
           <div className="hero-actions">
-            <SkeuoButton
-              onClick={() => unlockAndScroll("#pricing")}
-              className="hero-buy"
-            >
-              {`Get MewMuze · ${priceLabel}`}
-            </SkeuoButton>
-            <SkeuoButton
-              onClick={() => unlockAndScroll("#story")}
-              variant="secondary"
-              className="hero-explore"
-            >
-              Explore Now <span aria-hidden="true">↓</span>
-            </SkeuoButton>
-            <SkeuoButton onClick={() => unlockAndScroll("#features")} variant="quiet">
-              See every feature
-            </SkeuoButton>
+            <div className="hero-primary-actions">
+              <SkeuoButton
+                variant="secondary"
+                className="hero-free-download"
+                disabled
+              >
+                Download Free <span aria-hidden="true">↓</span>
+              </SkeuoButton>
+              <SkeuoButton
+                onClick={() => unlockAndScroll("#pricing")}
+                className="hero-buy"
+              >
+                {`Get MewMuze Pro · ${priceLabel}`}
+              </SkeuoButton>
+              <SkeuoButton
+                onClick={() => unlockAndScroll("#story")}
+                variant="secondary"
+                className="hero-explore"
+              >
+                Explore Now <span aria-hidden="true">↓</span>
+              </SkeuoButton>
+            </div>
+            <div className="hero-secondary-actions">
+              <SkeuoButton onClick={() => unlockAndScroll("#features")} variant="quiet">
+                See every feature
+              </SkeuoButton>
+            </div>
+            <p className="free-release-note">Free download available after 15 August 2026.</p>
           </div>
           <p className="privacy-note">
             <span aria-hidden="true">●</span> Cute companion. Real desktop utility.
@@ -1308,6 +1667,8 @@ export default function Home() {
         </div>
       </section>
 
+      <EditionsComparison proPrice={basePriceLabel} />
+
       <section className="account-section section-pad" id="account" data-reveal>
         <div className="section-shell account-shell">
           <div className="account-copy-block">
@@ -1374,8 +1735,8 @@ export default function Home() {
                 unoptimized
               />
               <span>
-                <small>MEWMUZE FOR WINDOWS</small>
-                <strong>MewMuze</strong>
+                <small>MEWMUZE PRO FOR WINDOWS</small>
+                <strong>MewMuze Pro</strong>
               </span>
             </div>
             <div className="pricing-price">
@@ -1467,11 +1828,19 @@ export default function Home() {
             ordinary minutes in between.
           </p>
           <div className="hero-actions">
-            <SkeuoButton href="#pricing">{`View the ${priceLabel} price`}</SkeuoButton>
+            <SkeuoButton
+              variant="secondary"
+              className="final-free-download"
+              disabled
+            >
+              Download Free <span aria-hidden="true">↓</span>
+            </SkeuoButton>
+            <SkeuoButton href="#pricing">{`View MewMuze Pro · ${priceLabel}`}</SkeuoButton>
             <SkeuoButton href="#directory" variant="quiet">
               See every feature
             </SkeuoButton>
           </div>
+          <p className="free-release-note">Free download available after 15 August 2026.</p>
           <small>
             One-time payment · no subscription · future updates and costumes included.
           </small>
@@ -1486,6 +1855,7 @@ export default function Home() {
           <p>Personal desktop pet for Windows. Local-first by design.</p>
           <nav aria-label="Footer navigation">
             <a href="#features">Features</a>
+            <a href="#editions">Free vs Pro</a>
             <a href="#appearance">Appearance</a>
             <a href={sitePath("/store/")}>Store · Coming Soon</a>
             <a href="#privacy">Privacy</a>

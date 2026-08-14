@@ -29,6 +29,11 @@ export type FeatureStory = {
   /** Plain-English payoff: what this actually changes for the person using it. */
   helps: string;
   notice?: FeatureNotice;
+  /** Shown only when a feature's Free/Pro availability is explicitly known. */
+  availability?: {
+    free: boolean;
+    pro: boolean;
+  };
 };
 
 const stories: Omit<FeatureStory, "helps" | "notice">[] = [
@@ -95,6 +100,7 @@ const stories: Omit<FeatureStory, "helps" | "notice">[] = [
     video: "/videos/work-mode.mp4",
     accent: "yellow",
     facts: ["Images to PDF", "PDF to PNG or JPG", "Local processing"],
+    availability: { free: false, pro: true },
   },
   {
     id: "clipboard",
@@ -111,6 +117,7 @@ const stories: Omit<FeatureStory, "helps" | "notice">[] = [
     video: "/videos/context-companion.mp4",
     accent: "blue",
     facts: ["Explicit copied content", "No hidden screen reading", "Compact desktop placement"],
+    availability: { free: false, pro: true },
   },
   {
     id: "focus",
@@ -191,6 +198,7 @@ const stories: Omit<FeatureStory, "helps" | "notice">[] = [
     video: "/videos/gmail-connector.mp4",
     accent: "mint",
     facts: ["IMAP over TLS", "Email body is never read", "Revocable app password"],
+    availability: { free: false, pro: true },
   },
   {
     id: "calendar",
@@ -207,6 +215,7 @@ const stories: Omit<FeatureStory, "helps" | "notice">[] = [
     video: "/videos/calendar-connector.mp4",
     accent: "yellow",
     facts: ["Private iCal address", "0 to 120 minute warning", "Five-minute snooze"],
+    availability: { free: false, pro: true },
   },
   {
     id: "physics",
@@ -352,6 +361,57 @@ const stories: Omit<FeatureStory, "helps" | "notice">[] = [
     accent: "blue",
     facts: ["Adaptive rendering", "Dynamic click-through", "Windows 10 and 11"],
   },
+  {
+    id: "calculator",
+    number: "21",
+    title: "Calculator",
+    shortTitle: "Calculator",
+    group: "Helps me work",
+    scene: "A tiny calculation interrupts the actual work.",
+    story:
+      "MewMuze opens a compact calculator for the everyday arithmetic that would otherwise send you hunting for another tab.",
+    detail:
+      "The calculation resolves locally on your desktop, without an account, a cloud request or a permanent internet connection.",
+    demoLabel: "2450 + 785 → 3,235",
+    video: "/videos/work-mode.mp4",
+    accent: "yellow",
+    facts: ["Everyday calculations", "Instant local results", "No browser detour"],
+    availability: { free: true, pro: true },
+  },
+  {
+    id: "unit-converter",
+    number: "22",
+    title: "Unit Converter",
+    shortTitle: "Units",
+    group: "Helps me work",
+    scene: "Two measurements need to mean the same thing.",
+    story:
+      "Choose the values and units you have, and MewMuze swaps them into the format you need in one small desktop panel.",
+    detail:
+      "Common unit conversions stay local and close to the task that prompted them, rather than opening another website.",
+    demoLabel: "5 km ↔ 3.11 mi",
+    video: "/videos/work-mode.mp4",
+    accent: "mint",
+    facts: ["Everyday unit conversion", "Two-card comparison", "Local processing"],
+    availability: { free: true, pro: true },
+  },
+  {
+    id: "time-converter",
+    number: "23",
+    title: "Time Zone Converter",
+    shortTitle: "Time zones",
+    group: "Helps me work",
+    scene: "The meeting time makes sense somewhere else.",
+    story:
+      "MewMuze places two locations side by side so you can translate a time zone without doing offset arithmetic in your head.",
+    detail:
+      "The converter handles the comparison locally and keeps both times visible long enough to plan the next call.",
+    demoLabel: "10:30 PM India → 1:00 PM New York",
+    video: "/videos/work-mode.mp4",
+    accent: "blue",
+    facts: ["Side-by-side locations", "Fast time comparison", "No cloud processing"],
+    availability: { free: true, pro: true },
+  },
 ];
 
 const helps: Record<string, string> = {
@@ -395,6 +455,12 @@ const helps: Record<string, string> = {
     "Stop babysitting a long build. Your pet works while the job runs and celebrates from across the screen when it lands, so you can go make tea and still know the moment it finishes.",
   lightweight:
     "It behaves itself. No taskbar clutter, clicks pass through to whatever is underneath, and it goes near idle when hidden, so company never costs you a battery or a frame rate.",
+  calculator:
+    "Tiny tools answer the questions that interrupt your day, so a quick sum stays quick and your actual work remains the thing in front of you.",
+  "unit-converter":
+    "The number becomes useful immediately. You can compare familiar units at a glance and move on without breaking concentration.",
+  "time-converter":
+    "Scheduling across cities stops being mental arithmetic. Both places stay visible, so the right time is obvious before the invitation goes out.",
 };
 
 const notices: Record<string, FeatureNotice> = {

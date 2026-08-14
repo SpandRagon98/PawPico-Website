@@ -4,6 +4,10 @@ export const TEST_DODO_PRODUCT_ID = "pdt_0NkKxv8HzpZgMPTzpIeWT";
 export const CHECKOUT_SUCCESS_URL = "https://mewmuze.com/checkout/success/";
 const testCheckoutUrl = `https://test.checkout.dodopayments.com/buy/${TEST_DODO_PRODUCT_ID}`;
 const configuredCheckoutUrl = process.env.NEXT_PUBLIC_DODO_CHECKOUT_URL?.trim() ?? "";
+const defaultFreeDownloadUrl =
+  "https://github.com/SpandRagon98/PawPico-Website/releases/download/v0.1.8/MewMuze_0.1.8_x64-setup.exe";
+const configuredFreeDownloadUrl =
+  process.env.NEXT_PUBLIC_MEWMUZE_FREE_DOWNLOAD_URL?.trim() ?? "";
 
 const isDodoCheckout = (url: string) =>
   /^https:\/\/(?:test\.)?checkout\.dodopayments\.com\//i.test(url);
@@ -33,6 +37,11 @@ export const commerceMode: CommerceMode = "test";
 
 export const commerce = {
   checkoutUrl: normalCheckoutUrl,
+  // Free and Pro use separate website journeys. Free downloads the public
+  // Windows installer directly; Pro continues through Dodo and licence delivery.
+  freeDownloadUrl: /^https:\/\/.+/i.test(configuredFreeDownloadUrl)
+    ? configuredFreeDownloadUrl
+    : defaultFreeDownloadUrl,
   // The optional supporter product is deliberately disabled in test mode. It
   // previously came from a deployment variable that could contain a live link.
   supporterCheckoutUrl: "",

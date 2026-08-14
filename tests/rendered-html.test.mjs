@@ -186,7 +186,7 @@ test("unlocks into the story while leaving the landing cat stationary", async ()
   assert.match(css, /\.hero-cat-motion\.is-travelling,[\s\S]*animation: none !important/);
 });
 
-test("ships a one-at-a-time keyboard and touch accessible 20-feature theatre", async () => {
+test("ships a one-at-a-time keyboard and touch accessible 23-feature theatre", async () => {
   const response = await render();
   const html = await response.text();
   const page = await source("../app/page.tsx");
@@ -197,7 +197,7 @@ test("ships a one-at-a-time keyboard and touch accessible 20-feature theatre", a
   assert.match(html, /Previous feature/);
   assert.match(html, /Next feature/);
   assert.equal((html.match(/feature-media-cat/g) ?? []).length, 1);
-  assert.equal((features.match(/number: "\d\d"/g) ?? []).length, 20);
+  assert.equal((features.match(/number: "\d\d"/g) ?? []).length, 23);
 
   for (const title of [
     "Cursor companion",
@@ -220,6 +220,9 @@ test("ships a one-at-a-time keyboard and touch accessible 20-feature theatre", a
     "Peek Mode",
     "Local Agent Status",
     "Lightweight Windows companion",
+    "Calculator",
+    "Unit Converter",
+    "Time Zone Converter",
   ]) {
     assert.match(features, new RegExp(title));
   }
@@ -237,10 +240,11 @@ test("uses transparent authentic feature media and retains the verified source f
   const features = await source("../data/features.ts");
   const ids = Array.from(features.matchAll(/id: "([^"]+)"/g), (match) => match[1]);
   const videos = Array.from(features.matchAll(/video: "(\/[^"]+\.mp4)"/g), (match) => match[1]);
-  assert.equal(ids.length, 20);
-  assert.equal(videos.length, 20);
+  assert.equal(ids.length, 23);
+  assert.equal(videos.length, 23);
 
-  for (const id of ids) {
+  const customFilms = new Set(["calculator", "unit-converter", "time-converter"]);
+  for (const id of ids.filter((id) => !customFilms.has(id))) {
     const media = await readFile(new URL(`../public/cat/features/${id}.webp`, import.meta.url));
     assert.ok(media.length > 1_000, id);
     assert.equal(media.toString("ascii", 0, 4), "RIFF");
@@ -252,6 +256,9 @@ test("uses transparent authentic feature media and retains the verified source f
 
   const page = await source("../app/page.tsx");
   assert.match(page, /\/cat\/features\/\$\{feature\.id\}\.webp/);
+  assert.match(page, /function QuickToolFilm/);
+  assert.match(page, /quickToolFeatureIds/);
+  assert.match(page, /quick-tool-film-\$\{toolId\}/);
   assert.match(page, /AUTHENTIC APP-RENDERED MOTION · TRANSPARENT/);
   assert.doesNotMatch(page, /<video/);
 });
@@ -315,7 +322,7 @@ test("keeps the complete grouped feature directory and day narrative", async () 
   ]) {
     assert.match(html, new RegExp(group));
   }
-  assert.equal((html.match(/class="directory-dot/g) ?? []).length, 20);
+  assert.equal((html.match(/class="directory-dot/g) ?? []).length, 23);
 });
 
 test("presents the accurate Appearance Studio and current Flower Band preset", async () => {
@@ -392,10 +399,12 @@ test("shows rupees to Indian visitors and dollars to everyone else", async () =>
   assert.equal(priceLabelFor(true, false), "₹549");
   assert.equal(priceLabelFor(true, true), "₹649");
 
-  // Server-rendered HTML must stay in dollars: the export is one static file
-  // served worldwide, so rupees are only ever swapped in after mount.
+  // The paid server-rendered price stays in dollars because one static file is
+  // served worldwide. The Free column deliberately shows both zero-currency
+  // labels; the Indian paid amount only appears after mount.
   assert.match(html, /\$7\.99/);
-  assert.doesNotMatch(html, /₹/);
+  assert.match(html, /₹0 \/ \$0/);
+  assert.doesNotMatch(html, /₹549/);
 
   const withZone = (zone) => {
     const real = Intl.DateTimeFormat;
@@ -611,15 +620,84 @@ test("explains in plain English what every feature does for the user", async () 
   assert.match(html, /WHAT THIS CHANGES FOR YOU/);
   assert.match(html, /HOW IT HELPS/);
   // one payoff block per feature in the detailed directory
-  assert.equal((html.match(/class="directory-helps"/g) ?? []).length, 20);
+  assert.equal((html.match(/class="directory-helps"/g) ?? []).length, 23);
   const features = await source("../data/features.ts");
   // every feature id in the data must have a payoff line written for it
-  const ids = [...features.matchAll(/^    id: "([a-z]+)",$/gm)].map((m) => m[1]);
-  assert.equal(ids.length, 20);
+  const ids = [...features.matchAll(/^    id: "([a-z-]+)",$/gm)].map((m) => m[1]);
+  assert.equal(ids.length, 23);
   const helpsBlock = features.slice(features.indexOf("const helps"));
   for (const id of ids) {
-    assert.match(helpsBlock, new RegExp(`\\n  ${id}:`), `${id} needs a payoff line`);
+    assert.match(
+      helpsBlock,
+      new RegExp(`\\n  (?:"${id}"|${id}):`),
+      `${id} needs a payoff line`,
+    );
   }
+});
+
+test("presents Calculator, Unit Converter and Time Zone Converter as Free and Pro", async () => {
+  const response = await render();
+  const html = await response.text();
+  const features = await source("../data/features.ts");
+  const css = await source("../app/globals.css");
+
+  for (const title of ["Calculator", "Unit Converter", "Time Zone Converter"]) {
+    assert.match(html, new RegExp(title));
+  }
+  assert.equal((features.match(/availability: \{ free: true, pro: true \}/g) ?? []).length, 3);
+  assert.equal((html.match(/Available in the Free and Pro editions/g) ?? []).length, 3);
+  assert.match(html, />FREE <i[^>]*>✓<\/i><\/span>/);
+  assert.match(html, />PRO <i[^>]*>✓<\/i><\/span>/);
+  assert.match(css, /\.quick-tool-film\s*\{/);
+  assert.match(css, /@keyframes calculator-key/);
+  assert.match(css, /@keyframes converter-card-swap/);
+  assert.match(css, /@media \(prefers-reduced-motion: reduce\)/);
+});
+
+test("compares Free and Pro accurately before pricing", async () => {
+  const html = await (await render()).text();
+  const page = await source("../app/page.tsx");
+  const css = await source("../app/globals.css");
+
+  assert.match(html, /id="editions"/);
+  assert.ok(html.indexOf('id="editions"') < html.indexOf('id="pricing"'));
+  assert.match(html, /<th[^>]*>Feature<\/th>/);
+  assert.match(html, /₹0 \/ \$0/);
+  assert.match(html, /\$7\.99/);
+  assert.match(html, /Free to keep · no activation/);
+  assert.match(html, /One-time activation/);
+  assert.match(html, /Calculator/);
+  assert.match(html, /Unit Converter/);
+  assert.match(html, /Time Zone Converter/);
+  assert.match(html, /Stacked cards \+ Open in Gmail/);
+  assert.match(html, /CSV ↔ XLSX, merge, split workbook/);
+  assert.match(html, /Every Pro feature remains visible inside MewMuze Free/);
+  assert.match(page, /const basePriceLabel = priceLabelFor\(rupees, false\)/);
+  assert.match(css, /\.edition-table-wrap\s*\{[^}]*overflow-x: auto/s);
+  assert.match(css, /\.edition-table thead th\s*\{[^}]*position: sticky/s);
+  assert.doesNotMatch(html, /free trial|trial period/i);
+});
+
+test("keeps the scheduled Free download disabled without changing the Pro path", async () => {
+  const html = await (await render()).text();
+  const commerce = await source("../lib/commerce.ts");
+
+  assert.equal((html.match(/Download Free/g) ?? []).length, 3);
+  assert.equal((html.match(/class="free-release-note"/g) ?? []).length, 3);
+  assert.match(html, /Free download available after 15 August 2026\./);
+  assert.doesNotMatch(
+    html,
+    /releases\/download\/v0\.1\.8\/MewMuze_0\.1\.8_x64-setup\.exe/,
+  );
+  assert.match(commerce, /NEXT_PUBLIC_MEWMUZE_FREE_DOWNLOAD_URL/);
+  assert.match(commerce, /freeDownloadUrl/);
+  assert.match(html, /hero-free-download[^>]*disabled/);
+  assert.match(html, /edition-download-button[^>]*disabled/);
+  assert.match(html, /final-free-download[^>]*disabled/);
+  assert.match(html, /class="hero-primary-actions"/);
+  assert.match(html, /class="hero-secondary-actions"/);
+  assert.match(html, />Get MewMuze Pro · \$7\.99</);
+  assert.doesNotMatch(html, />Download Free[^<]*\$7\.99/);
 });
 
 test("disables the optional supporter checkout while payment testing is active", async () => {
@@ -992,7 +1070,7 @@ test("puts purchase and support links in the navigation", async () => {
 
   assert.doesNotMatch(html, /View the price/);
   assert.match(html, /nav-cta nav-cta-signup/);
-  assert.match(html, />Buy MewMuze</);
+  assert.match(html, />Buy MewMuze Pro</);
   assert.match(html, />Support</);
   assert.doesNotMatch(page, /onAuthIntent|authMode|My account/);
 });

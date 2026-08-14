@@ -13,6 +13,7 @@ const links: Array<{
 }> = [
   { label: "Story", href: "/#story", page: "home" },
   { label: "Features", href: "/#features", page: "home" },
+  { label: "Free vs Pro", href: "/#editions", page: "home" },
   { label: "Appearance", href: "/#appearance", page: "home" },
   { label: "Store", href: "/store/", page: "store", note: "Coming Soon" },
   { label: "FAQ", href: "/#faq", page: "home" },
@@ -63,7 +64,7 @@ export function PublicHeader({ current }: PublicHeaderProps) {
           className="skeuo-button skeuo-button-primary nav-cta public-nav-buy"
           href={sitePath("/#pricing")}
         >
-          Buy MewMuze
+          Buy MewMuze Pro
         </a>
       </div>
     </header>

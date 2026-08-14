@@ -52,7 +52,7 @@ export const faqItems: FaqItem[] = [
       "Core companion animations, reminders and local tools work offline after activation. Gmail, Calendar, checkout and update checks naturally need internet. Licence validation includes an offline grace period, so a temporary outage does not evict your pet.",
   },
   {
-    question: "What does the one-time $7.99 include?",
+    question: "What does the one-time Pro price include?",
     answer:
       "It includes the Windows app, the desktop pet, all current companion and productivity features, appearance controls and future app updates covered by the lifetime licence. Dodo Payments shows the configured regional price and available payment methods at checkout.",
   },
