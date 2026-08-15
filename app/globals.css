@@ -2637,6 +2637,23 @@ h2 em {
   background: linear-gradient(135deg, #dff3ff, #e8e1ff 55%, #f8ddff);
 }
 
+.free-install-guide-section {
+  position: relative;
+  scroll-margin-top: 110px;
+  border-block: 1px solid rgba(20, 25, 34, 0.16);
+  background:
+    radial-gradient(circle at 10% 18%, rgba(255, 114, 167, 0.18), transparent 32%),
+    radial-gradient(circle at 90% 18%, rgba(255, 216, 95, 0.22), transparent 34%),
+    #fffaf0;
+}
+
+.free-install-guide-card {
+  display: block;
+  width: 100%;
+  max-width: 1260px;
+  margin-inline: auto;
+}
+
 .purchase-step-number {
   display: grid;
   width: 70px;

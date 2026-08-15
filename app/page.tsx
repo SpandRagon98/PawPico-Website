@@ -1026,7 +1026,13 @@ function EditionCell({ value }: { value: EditionValue }) {
   );
 }
 
-function EditionsComparison({ proPrice }: { proPrice: string }) {
+function EditionsComparison({
+  proPrice,
+  onFreeDownload,
+}: {
+  proPrice: string;
+  onFreeDownload: () => void;
+}) {
   return (
     <section
       className="editions section-pad"
@@ -1059,7 +1065,11 @@ function EditionsComparison({ proPrice }: { proPrice: string }) {
                   <span className="edition-name">Free</span>
                   <strong>₹0 / $0</strong>
                   <small>Free to keep · no activation</small>
-                  <a className="edition-download-button" href={commerce.freeDownloadUrl}>
+                  <a
+                    className="edition-download-button"
+                    href={commerce.freeDownloadUrl}
+                    onClick={onFreeDownload}
+                  >
                     Download Free <span aria-hidden="true">↓</span>
                   </a>
                 </th>
@@ -1095,6 +1105,71 @@ function EditionsComparison({ proPrice }: { proPrice: string }) {
           Every Pro feature remains visible inside MewMuze Free with a PRO badge, so
           you can see what the upgrade adds before purchasing.
         </p>
+      </div>
+    </section>
+  );
+}
+
+function FreeInstallGuide() {
+  return (
+    <section
+      className="free-install-guide-section section-pad"
+      id="free-install-guide"
+      aria-labelledby="free-install-guide-title"
+      data-reveal
+    >
+      <div className="section-shell">
+        <article className="purchase-step purchase-step-defender free-install-guide-card">
+          <div className="purchase-step-copy">
+            <p className="purchase-step-label">AFTER YOUR FREE DOWNLOAD</p>
+            <h2 id="free-install-guide-title">Let Windows know you trust this download</h2>
+            <p>
+              Windows Defender SmartScreen may show <strong>“Windows protected your PC”</strong>{" "}
+              because this young independent app does not have a paid code-signing certificate yet.
+              This is expected for the installer downloaded from this page.
+            </p>
+
+            <div className="defender-walkthrough" aria-label="Windows Defender installation walkthrough">
+              <figure>
+                <div className="defender-shot defender-shot-pink">
+                  <Image
+                    src={sitePath("/checkout/windows-defender-more-info.png")}
+                    alt="Windows Defender SmartScreen warning with the More info link visible"
+                    width={525}
+                    height={495}
+                    unoptimized
+                  />
+                </div>
+                <figcaption><strong>First:</strong> select <em>More info</em>.</figcaption>
+              </figure>
+              <span className="walkthrough-arrow" aria-hidden="true">→</span>
+              <figure>
+                <div className="defender-shot defender-shot-yellow">
+                  <Image
+                    src={sitePath("/checkout/windows-defender-run-anyway.png")}
+                    alt="Expanded Windows Defender warning showing the MewMuze installer and Run anyway button"
+                    width={525}
+                    height={495}
+                    unoptimized
+                  />
+                </div>
+                <figcaption>
+                  <strong>Then:</strong> confirm the app name and select <em>Run anyway</em>.
+                </figcaption>
+              </figure>
+            </div>
+
+            <aside className="founder-signing-note">
+              <span aria-hidden="true">♥</span>
+              <p>
+                MewMuze is just getting started as a tiny independent project. A trusted Windows
+                signing certificate has a real recurring cost that we cannot cover yet. Your support
+                helps us keep building and gets us closer to removing this extra screen from future
+                releases. Thank you for believing in our little pet.
+              </p>
+            </aside>
+          </div>
+        </article>
       </div>
     </section>
   );
@@ -1423,6 +1498,13 @@ export default function Home() {
     }, 80);
   };
 
+  const showFreeInstallGuide = () => {
+    document.getElementById("free-install-guide")?.scrollIntoView({
+      behavior: reducedMotion ? "auto" : "smooth",
+      block: "start",
+    });
+  };
+
   return (
     <main
       id="top"
@@ -1487,6 +1569,7 @@ export default function Home() {
             <div className="hero-primary-actions">
               <SkeuoButton
                 href={commerce.freeDownloadUrl}
+                onClick={showFreeInstallGuide}
                 variant="secondary"
                 className="hero-free-download"
               >
@@ -1669,7 +1752,9 @@ export default function Home() {
         </div>
       </section>
 
-      <EditionsComparison proPrice={basePriceLabel} />
+      <EditionsComparison proPrice={basePriceLabel} onFreeDownload={showFreeInstallGuide} />
+
+      <FreeInstallGuide />
 
       <section className="account-section section-pad" id="account" data-reveal>
         <div className="section-shell account-shell">
@@ -1845,6 +1930,7 @@ export default function Home() {
           <div className="hero-actions">
             <SkeuoButton
               href={commerce.freeDownloadUrl}
+              onClick={showFreeInstallGuide}
               variant="secondary"
               className="final-free-download"
             >

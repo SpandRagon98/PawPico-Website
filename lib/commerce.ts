@@ -1,16 +1,18 @@
 export type CommerceMode = "test" | "live";
 
-export const TEST_DODO_PRODUCT_ID = "pdt_0NkKxv8HzpZgMPTzpIeWT";
+export const LIVE_DODO_PRODUCT_ID = "pdt_0NkWDKYYlGSBLf59iNa4q";
 export const CHECKOUT_SUCCESS_URL = "https://mewmuze.com/checkout/success/";
-const testCheckoutUrl = `https://test.checkout.dodopayments.com/buy/${TEST_DODO_PRODUCT_ID}`;
+const liveCheckoutUrl = `https://checkout.dodopayments.com/buy/${LIVE_DODO_PRODUCT_ID}`;
 const configuredCheckoutUrl = process.env.NEXT_PUBLIC_DODO_CHECKOUT_URL?.trim() ?? "";
+const supporterCheckoutUrl =
+  process.env.NEXT_PUBLIC_DODO_SUPPORT_CHECKOUT_URL?.trim() ?? "";
 const defaultFreeDownloadUrl =
   "https://github.com/SpandRagon98/PawPico-Website/releases/download/v0.1.9/MewMuze_0.1.9_Free_x64-setup.exe";
 const configuredFreeDownloadUrl =
   process.env.NEXT_PUBLIC_MEWMUZE_FREE_DOWNLOAD_URL?.trim() ?? "";
 
-const isDodoCheckout = (url: string) =>
-  /^https:\/\/(?:test\.)?checkout\.dodopayments\.com\//i.test(url);
+const isLiveCheckout = (url: string) =>
+  /^https:\/\/checkout\.dodopayments\.com\//i.test(url);
 
 /**
  * Dodo's static product links only return to the merchant when redirect_url is
@@ -18,22 +20,27 @@ const isDodoCheckout = (url: string) =>
  * GitHub variables, so a completed purchase always comes back to MewMuze.
  */
 const withCheckoutReturn = (checkoutUrl: string): string => {
-  if (!isDodoCheckout(checkoutUrl)) return checkoutUrl;
+  if (!isLiveCheckout(checkoutUrl)) return checkoutUrl;
   const url = new URL(checkoutUrl);
   url.searchParams.set("quantity", "1");
   url.searchParams.set("redirect_url", CHECKOUT_SUCCESS_URL);
   return url.toString();
 };
 
-// Test mode is intentionally fail-safe: even a stale deployment variable that
-// still points at the live product is rejected in favour of this test product.
+// The public product ID is safe to ship. Falling back to the canonical live
+// link also prevents an old deployment variable from sending buyers to a
+// sandbox product after the production switch.
 const normalCheckoutUrl =
-  /^https:\/\/test\.checkout\.dodopayments\.com\//i.test(configuredCheckoutUrl) &&
-  configuredCheckoutUrl.includes(TEST_DODO_PRODUCT_ID)
+  isLiveCheckout(configuredCheckoutUrl) &&
+  configuredCheckoutUrl.includes(LIVE_DODO_PRODUCT_ID)
     ? withCheckoutReturn(configuredCheckoutUrl)
-    : withCheckoutReturn(testCheckoutUrl);
+    : withCheckoutReturn(liveCheckoutUrl);
 
-export const commerceMode: CommerceMode = "test";
+const configuredSupporterCheckoutUrl = isLiveCheckout(supporterCheckoutUrl)
+  ? withCheckoutReturn(supporterCheckoutUrl)
+  : supporterCheckoutUrl;
+
+export const commerceMode: CommerceMode = "live";
 
 export const commerce = {
   checkoutUrl: normalCheckoutUrl,
@@ -42,11 +49,9 @@ export const commerce = {
   freeDownloadUrl: /^https:\/\/.+/i.test(configuredFreeDownloadUrl)
     ? configuredFreeDownloadUrl
     : defaultFreeDownloadUrl,
-  // The optional supporter product is deliberately disabled in test mode. It
-  // previously came from a deployment variable that could contain a live link.
-  supporterCheckoutUrl: "",
+  supporterCheckoutUrl: configuredSupporterCheckoutUrl,
   configured: /^https:\/\/.+/i.test(normalCheckoutUrl),
-  supporterConfigured: false,
+  supporterConfigured: isLiveCheckout(configuredSupporterCheckoutUrl),
 } as const;
 
 export function checkoutUrlFor(supportDeveloper: boolean): string {

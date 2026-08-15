@@ -90,10 +90,13 @@ test("keeps the Dodo seller secret on Hostinger and validates an instance before
   assert.match(endpoint, /\/licenses\/validate/);
   assert.match(endpoint, /Authorization: Bearer/);
   assert.ok(endpoint.indexOf("/licenses/validate") < endpoint.indexOf("/license_keys/"));
-  assert.match(workflow, /secrets\.DODO_TEST_API_KEY/);
-  assert.match(workflow, /secrets\.DODO_TEST_WEBHOOK_SECRET/);
-  assert.match(workflow, /MEWMUZE_DODO_MODE: test_mode/);
-  assert.doesNotMatch(workflow, /secrets\.DODO_API_KEY/);
+  assert.match(workflow, /secrets\.DODO_API_KEY/);
+  assert.match(workflow, /secrets\.DODO_WEBHOOK_SECRET/);
+  assert.match(workflow, /MEWMUZE_DODO_MODE: live_mode/);
+  assert.match(workflow, /NEXT_PUBLIC_DODO_MODE: live/);
+  assert.match(workflow, /checkout\.dodopayments\.com\/buy\/pdt_0NkWDKYYlGSBLf59iNa4q/);
+  assert.doesNotMatch(workflow, /DODO_TEST_API_KEY|DODO_TEST_WEBHOOK_SECRET/);
+  assert.doesNotMatch(workflow, /test\.checkout\.dodopayments\.com|pdt_0NkKxv8HzpZgMPTzpIeWT/);
   assert.doesNotMatch(workflow, /NEXT_PUBLIC_DODO_API_KEY/);
 });
 
@@ -369,7 +372,7 @@ test("presents the accurate Appearance Studio and current Flower Band preset", a
   }
 });
 
-test("keeps the Pro purchase flow on Dodo test checkout", async () => {
+test("keeps the Pro purchase flow on the Dodo live checkout", async () => {
   const response = await render();
   const html = await response.text();
   const page = await source("../app/page.tsx");
@@ -381,14 +384,15 @@ test("keeps the Pro purchase flow on Dodo test checkout", async () => {
   assert.match(html, /Personal Windows desktop pet/);
   assert.match(html, /Local-first privacy/);
   assert.match(html, /Dodo Payments/);
-  assert.match(html, /test\.checkout\.dodopayments\.com/);
-  assert.match(html, /pdt_0NkKxv8HzpZgMPTzpIeWT/);
-  assert.match(html, /Open secure test checkout/);
-  assert.match(html, /no real charge is made/);
+  assert.match(html, /https:\/\/checkout\.dodopayments\.com/);
+  assert.match(html, /pdt_0NkWDKYYlGSBLf59iNa4q/);
+  assert.match(html, /Buy MewMuze securely/);
+  assert.match(html, /Dodo confirms the exact amount and currency before you pay/);
   assert.doesNotMatch(html, /Available after 15 August 2026|following the official release/);
   assert.match(page, /pricing-gate/);
   assert.match(commerce, /url\.searchParams\.set\("redirect_url", CHECKOUT_SUCCESS_URL\)/);
-  assert.doesNotMatch(html, /pdt_0NkWDKYYlGSBLf59iNa4q/);
+  assert.doesNotMatch(html, /test\.checkout\.dodopayments\.com|pdt_0NkKxv8HzpZgMPTzpIeWT|no real charge is made/);
+  assert.doesNotMatch(commerce, /test\.checkout\.dodopayments\.com|pdt_0NkKxv8HzpZgMPTzpIeWT/);
   assert.match(commerce, /NEXT_PUBLIC_DODO_CHECKOUT_URL/);
   assert.doesNotMatch(html, /Limited-time|refund policy/i);
 });
@@ -682,6 +686,7 @@ test("compares Free and Pro accurately before pricing", async () => {
 
 test("downloads the Free installer directly without changing the Pro checkout path", async () => {
   const html = await (await render()).text();
+  const page = await source("../app/page.tsx");
   const commerce = await source("../lib/commerce.ts");
 
   assert.equal((html.match(/Download Free/g) ?? []).length, 3);
@@ -700,9 +705,18 @@ test("downloads the Free installer directly without changing the Pro checkout pa
   assert.match(html, /class="hero-secondary-actions"/);
   assert.match(html, />Get MewMuze Pro · \$7\.99</);
   assert.doesNotMatch(html, />Download Free[^<]*\$7\.99/);
+  assert.match(html, /id="free-install-guide"/);
+  assert.match(html, /AFTER YOUR FREE DOWNLOAD/);
+  assert.match(html, /Let Windows know you trust this download/);
+  assert.match(html, /windows-defender-more-info\.png/);
+  assert.match(html, /windows-defender-run-anyway\.png/);
+  assert.ok(html.indexOf('id="editions"') < html.indexOf('id="free-install-guide"'));
+  assert.ok(html.indexOf('id="free-install-guide"') < html.indexOf('id="account"'));
+  assert.match(page, /onClick=\{showFreeInstallGuide\}/);
+  assert.match(page, /scrollIntoView/);
 });
 
-test("disables the optional supporter checkout while payment testing is active", async () => {
+test("keeps the optional supporter checkout behind its own configured live Dodo link", async () => {
   const response = await render();
   const html = await response.text();
   assert.match(html, /\$7\.99/);
@@ -717,8 +731,8 @@ test("disables the optional supporter checkout while payment testing is active",
   assert.match(page, /Add \$1 to support the developer/);
   assert.match(page, /priceLabelFor\(rupees, supportSelected\)/);
   assert.match(commerce, /supportDeveloper \? "\$8\.99" : "\$7\.99"/);
-  assert.match(commerce, /supporterCheckoutUrl: ""/);
-  assert.match(commerce, /supporterConfigured: false/);
+  assert.match(commerce, /NEXT_PUBLIC_DODO_SUPPORT_CHECKOUT_URL/);
+  assert.match(commerce, /supporterConfigured: isLiveCheckout/);
 
   const css = await source("../app/globals.css");
   assert.match(css, /\.tip-toggle:has\(input:checked\)/);
