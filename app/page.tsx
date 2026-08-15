@@ -20,7 +20,13 @@ import {
   type FeatureStory,
 } from "../data/features";
 import { faqItems } from "../data/faq";
-import { commerce, prefersRupees, priceLabelFor } from "../lib/commerce";
+import {
+  checkoutUrlFor,
+  commerce,
+  commerceMode,
+  prefersRupees,
+  priceLabelFor,
+} from "../lib/commerce";
 import { sitePath } from "../lib/site-path";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://mewmuze.com";
@@ -1053,12 +1059,9 @@ function EditionsComparison({ proPrice }: { proPrice: string }) {
                   <span className="edition-name">Free</span>
                   <strong>₹0 / $0</strong>
                   <small>Free to keep · no activation</small>
-                  <button className="edition-download-button" type="button" disabled>
+                  <a className="edition-download-button" href={commerce.freeDownloadUrl}>
                     Download Free <span aria-hidden="true">↓</span>
-                  </button>
-                  <small className="free-release-note">
-                    Available after 15 August 2026
-                  </small>
+                  </a>
                 </th>
                 <th scope="col" className="edition-pro-column">
                   <span className="pro-badge">PRO</span>
@@ -1483,9 +1486,9 @@ export default function Home() {
           <div className="hero-actions">
             <div className="hero-primary-actions">
               <SkeuoButton
+                href={commerce.freeDownloadUrl}
                 variant="secondary"
                 className="hero-free-download"
-                disabled
               >
                 Download Free <span aria-hidden="true">↓</span>
               </SkeuoButton>
@@ -1508,7 +1511,6 @@ export default function Home() {
                 See every feature
               </SkeuoButton>
             </div>
-            <p className="free-release-note">Free download available after 15 August 2026.</p>
           </div>
           <p className="privacy-note">
             <span aria-hidden="true">●</span> Cute companion. Real desktop utility.
@@ -1771,14 +1773,29 @@ export default function Home() {
                 </span>
               </label>
             )}
-            <button
-              className="skeuo-button skeuo-button-primary pricing-coming"
-              type="button"
-              disabled
-            >
-              Available after 15 August 2026
-            </button>
-            <p>Checkout will be available after 15 August 2026, following the official release.</p>
+            {commerce.configured ? (
+              <a
+                className="skeuo-button skeuo-button-primary pricing-gate"
+                href={checkoutUrlFor(supportSelected)}
+                target="_blank"
+                rel="noreferrer"
+              >
+                {commerceMode === "test" ? "Open secure test checkout" : "Buy MewMuze securely"}
+              </a>
+            ) : (
+              <button
+                className="skeuo-button skeuo-button-primary pricing-coming"
+                type="button"
+                disabled
+              >
+                Checkout configuration pending
+              </button>
+            )}
+            <p>
+              {commerceMode === "test"
+                ? "Test mode uses Dodo's sandbox: no real charge is made. Dodo confirms the exact amount before you pay."
+                : "Dodo confirms the exact amount and currency before you pay."}
+            </p>
           </div>
           <div className="pricing-copy">
             <Eyebrow>ONE PET. ONE PRICE. ONCE.</Eyebrow>
@@ -1806,9 +1823,7 @@ export default function Home() {
                 <span>Costumes added after you buy are included, so you never buy your pet twice.</span>
               </li>
             </ul>
-            <p className="pricing-footnote">
-              Purchasing opens after the official release on 15 August 2026.
-            </p>
+            <p className="pricing-footnote">Secure checkout and licence delivery are handled by Dodo Payments.</p>
           </div>
         </div>
       </section>
@@ -1829,9 +1844,9 @@ export default function Home() {
           </p>
           <div className="hero-actions">
             <SkeuoButton
+              href={commerce.freeDownloadUrl}
               variant="secondary"
               className="final-free-download"
-              disabled
             >
               Download Free <span aria-hidden="true">↓</span>
             </SkeuoButton>
@@ -1840,7 +1855,6 @@ export default function Home() {
               See every feature
             </SkeuoButton>
           </div>
-          <p className="free-release-note">Free download available after 15 August 2026.</p>
           <small>
             One-time payment · no subscription · future updates and costumes included.
           </small>

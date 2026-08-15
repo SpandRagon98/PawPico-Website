@@ -5,7 +5,7 @@ export const CHECKOUT_SUCCESS_URL = "https://mewmuze.com/checkout/success/";
 const testCheckoutUrl = `https://test.checkout.dodopayments.com/buy/${TEST_DODO_PRODUCT_ID}`;
 const configuredCheckoutUrl = process.env.NEXT_PUBLIC_DODO_CHECKOUT_URL?.trim() ?? "";
 const defaultFreeDownloadUrl =
-  "https://github.com/SpandRagon98/PawPico-Website/releases/download/v0.1.8/MewMuze_0.1.8_x64-setup.exe";
+  "https://github.com/SpandRagon98/PawPico-Website/releases/download/v0.1.9/MewMuze_0.1.9_Free_x64-setup.exe";
 const configuredFreeDownloadUrl =
   process.env.NEXT_PUBLIC_MEWMUZE_FREE_DOWNLOAD_URL?.trim() ?? "";
 

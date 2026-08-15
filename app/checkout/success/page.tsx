@@ -22,7 +22,7 @@ const emptyResult: PurchaseResult = {
  * publishes the asset, so the link and the release cannot drift apart.
  */
 const DOWNLOAD_URL =
-  "https://github.com/SpandRagon98/PawPico-Website/releases/download/v0.1.8/MewMuze_0.1.8_x64-setup.exe";
+  "https://github.com/SpandRagon98/PawPico-Website/releases/download/v0.1.9/MewMuze_0.1.9_Pro_x64-setup.exe";
 
 export default function CheckoutSuccess() {
   const [purchase, setPurchase] = useState<PurchaseResult>(emptyResult);
@@ -115,10 +115,10 @@ export default function CheckoutSuccess() {
                 <h2>Download the MewMuze app</h2>
                 <p>
                   Use the button below to download the official Windows installer. When the
-                  download finishes, open <strong>MewMuze_0.1.8_x64-setup.exe</strong> to begin.
+                  download finishes, open <strong>MewMuze_0.1.9_Pro_x64-setup.exe</strong> to begin.
                 </p>
                 <a className="skeuo-button skeuo-button-primary" href={DOWNLOAD_URL}>
-                  Download MewMuze 0.1.8
+                  Download MewMuze Pro 0.1.9
                 </a>
                 <small>For Windows 10 and 11 · downloaded from the official MewMuze release</small>
               </div>

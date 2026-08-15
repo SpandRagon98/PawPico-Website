@@ -369,7 +369,7 @@ test("presents the accurate Appearance Studio and current Flower Band preset", a
   }
 });
 
-test("keeps Dodo test configuration ready while checkout remains disabled until release", async () => {
+test("keeps the Pro purchase flow on Dodo test checkout", async () => {
   const response = await render();
   const html = await response.text();
   const page = await source("../app/page.tsx");
@@ -381,10 +381,12 @@ test("keeps Dodo test configuration ready while checkout remains disabled until 
   assert.match(html, /Personal Windows desktop pet/);
   assert.match(html, /Local-first privacy/);
   assert.match(html, /Dodo Payments/);
-  assert.doesNotMatch(html, /test\.checkout\.dodopayments\.com/);
-  assert.match(html, /Available after 15 August 2026/);
-  assert.match(html, /following the official release/);
-  assert.match(page, /disabled/);
+  assert.match(html, /test\.checkout\.dodopayments\.com/);
+  assert.match(html, /pdt_0NkKxv8HzpZgMPTzpIeWT/);
+  assert.match(html, /Open secure test checkout/);
+  assert.match(html, /no real charge is made/);
+  assert.doesNotMatch(html, /Available after 15 August 2026|following the official release/);
+  assert.match(page, /pricing-gate/);
   assert.match(commerce, /url\.searchParams\.set\("redirect_url", CHECKOUT_SUCCESS_URL\)/);
   assert.doesNotMatch(html, /pdt_0NkWDKYYlGSBLf59iNa4q/);
   assert.match(commerce, /NEXT_PUBLIC_DODO_CHECKOUT_URL/);
@@ -678,22 +680,22 @@ test("compares Free and Pro accurately before pricing", async () => {
   assert.doesNotMatch(html, /free trial|trial period/i);
 });
 
-test("keeps the scheduled Free download disabled without changing the Pro path", async () => {
+test("downloads the Free installer directly without changing the Pro checkout path", async () => {
   const html = await (await render()).text();
   const commerce = await source("../lib/commerce.ts");
 
   assert.equal((html.match(/Download Free/g) ?? []).length, 3);
-  assert.equal((html.match(/class="free-release-note"/g) ?? []).length, 3);
-  assert.match(html, /Free download available after 15 August 2026\./);
-  assert.doesNotMatch(
+  assert.equal((html.match(/class="free-release-note"/g) ?? []).length, 0);
+  assert.doesNotMatch(html, /Free download available after 15 August 2026\./);
+  assert.match(
     html,
-    /releases\/download\/v0\.1\.8\/MewMuze_0\.1\.8_x64-setup\.exe/,
+    /releases\/download\/v0\.1\.9\/MewMuze_0\.1\.9_Free_x64-setup\.exe/,
   );
   assert.match(commerce, /NEXT_PUBLIC_MEWMUZE_FREE_DOWNLOAD_URL/);
   assert.match(commerce, /freeDownloadUrl/);
-  assert.match(html, /hero-free-download[^>]*disabled/);
-  assert.match(html, /edition-download-button[^>]*disabled/);
-  assert.match(html, /final-free-download[^>]*disabled/);
+  assert.match(html, /hero-free-download[^>]*href=/);
+  assert.match(html, /edition-download-button[^>]*href=/);
+  assert.match(html, /final-free-download[^>]*href=/);
   assert.match(html, /class="hero-primary-actions"/);
   assert.match(html, /class="hero-secondary-actions"/);
   assert.match(html, />Get MewMuze Pro · \$7\.99</);
@@ -1013,7 +1015,7 @@ test("uses Dodo checkout instead of collecting a local website account", async (
   assert.match(html, /Secure checkout/);
   assert.match(html, /Copy your licence/);
   assert.match(html, /Unlock MewMuze/);
-  assert.doesNotMatch(page, /pricing-gate/);
+  assert.match(page, /pricing-gate/);
   assert.match(page, /pricing-coming/);
   assert.doesNotMatch(page, /type="password"|setPassword|localStorage|sessionStorage/);
   assert.doesNotMatch(html, /Create account|Log in|Signed in as/);
@@ -1087,7 +1089,7 @@ test("renders purchase success, cancellation and support routes with navigation"
   assert.doesNotMatch(successSource, /params\.get\("license_key"\)/);
   assert.match(successSource, /replaceState/);
   assert.match(successSource, /your key is in your Dodo Payments email/i);
-  assert.match(success, /Download MewMuze 0\.1\.8/);
+  assert.match(success, /Download MewMuze Pro 0\.1\.9/);
   assert.match(successSource, /href=\{DOWNLOAD_URL\}/);
   assert.doesNotMatch(successSource, /\{succeeded && \(\s*<a[^>]+href=\{DOWNLOAD_URL\}/);
   assert.match(success, /Download the MewMuze app/);
@@ -1140,7 +1142,7 @@ test("uses the MewMuze Baloo and Quicksand typography contract on every route", 
     /\.site-brand,[\s\S]*?\.eyebrow\s*\{[\s\S]*?font-family: var\(--font-kawaii-ui\), var\(--font-montserrat\), system-ui, sans-serif;/,
   );
   assert.match(success, /We are checking your purchase/);
-  assert.match(success, /Download MewMuze 0\.1\.8/);
+  assert.match(success, /Download MewMuze Pro 0\.1\.9/);
 });
 
 test("stops clip-path from cropping the cat's ears on phones", async () => {
