@@ -91,6 +91,28 @@ const heroEmotionAssets = {
 
 type HeroEmotion = "neutral" | keyof typeof heroEmotionAssets;
 
+function useVisibleMotion(ref: RefObject<HTMLElement | null>, initiallyVisible = false) {
+  const [active, setActive] = useState(initiallyVisible);
+  useEffect(() => {
+    const element = ref.current;
+    if (!element) return;
+    let visible = initiallyVisible;
+    const sync = () => setActive(visible && !document.hidden);
+    const observer = new IntersectionObserver(([entry]) => {
+      visible = entry.isIntersecting;
+      sync();
+    }, { rootMargin: "120px" });
+    observer.observe(element);
+    document.addEventListener("visibilitychange", sync);
+    sync();
+    return () => {
+      observer.disconnect();
+      document.removeEventListener("visibilitychange", sync);
+    };
+  }, [ref, initiallyVisible]);
+  return active;
+}
+
 function CatFigure({
   className = "",
   priority = false,
@@ -180,7 +202,7 @@ function HeroCat({
           unoptimized
         />
       </span>
-      {Object.entries(heroEmotionAssets).map(([name, asset]) => (
+      {!reducedMotion && Object.entries(heroEmotionAssets).map(([name, asset]) => (
         <Image
           key={name}
           className={`hero-cat-layer hero-cat-emotion hero-cat-emotion-${name}`}
@@ -189,7 +211,6 @@ function HeroCat({
           width={128}
           height={128}
           unoptimized
-          priority
           onLoad={() =>
             setLoadedEmotions((current) =>
               current[name as Exclude<HeroEmotion, "neutral">]
@@ -285,7 +306,14 @@ function SiteNavigation() {
       <nav className="desktop-nav" aria-label="Primary navigation">
         {links}
       </nav>
-      <details className="mobile-nav">
+      <details className="mobile-nav" onClick={(event) => {
+        if ((event.target as HTMLElement).closest("a")) event.currentTarget.open = false;
+      }} onKeyDown={(event) => {
+        if (event.key === "Escape") {
+          event.currentTarget.open = false;
+          event.currentTarget.querySelector("summary")?.focus();
+        }
+      }}>
         <summary aria-label="Open navigation">Menu</summary>
         <nav aria-label="Mobile navigation">
           {links}
@@ -311,7 +339,7 @@ function WelcomeSplash() {
 
   useEffect(() => {
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const hold = reduced ? 260 : 2150;
+    const hold = reduced ? 0 : 450;
     const lift = reduced ? 120 : 720;
     const toLeaving = window.setTimeout(() => setPhase("leaving"), hold);
     const toGone = window.setTimeout(() => setPhase("gone"), hold + lift);
@@ -541,19 +569,8 @@ const appearanceShowcase = [
 
 function AppearanceShowcase({ reducedMotion }: { reducedMotion: boolean }) {
   const [activeIndex, setActiveIndex] = useState(0);
-  const [isVisible, setIsVisible] = useState(false);
   const stageRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const stage = stageRef.current;
-    if (!stage) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => setIsVisible(entry.isIntersecting),
-      { rootMargin: "120px" },
-    );
-    observer.observe(stage);
-    return () => observer.disconnect();
-  }, []);
+  const isVisible = useVisibleMotion(stageRef);
 
   useEffect(() => {
     if (reducedMotion || !isVisible) return;
@@ -577,7 +594,7 @@ function AppearanceShowcase({ reducedMotion }: { reducedMotion: boolean }) {
         <i />
       </span>
       <div className="showcase-cat-well">
-        {reducedMotion ? (
+        {reducedMotion || !isVisible ? (
           <Image
             className="showcase-cat-static"
             src={sitePath(CAT_ASSET)}
@@ -587,7 +604,7 @@ function AppearanceShowcase({ reducedMotion }: { reducedMotion: boolean }) {
             unoptimized
           />
         ) : (
-          appearanceShowcase.map(([id, label], index) => (
+          appearanceShowcase.map(([id, label], index) => index === activeIndex && (
             <Image
               key={id}
               className={`showcase-cat-media ${
@@ -619,6 +636,8 @@ function AppearanceShowcase({ reducedMotion }: { reducedMotion: boolean }) {
 }
 
 function FeatureTheatre({ reducedMotion }: { reducedMotion: boolean }) {
+  const stageRef = useRef<HTMLDivElement>(null);
+  const active = useVisibleMotion(stageRef, true);
   const [activeIndex, setActiveIndex] = useState(0);
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const feature = featureStories[activeIndex];
@@ -653,6 +672,7 @@ function FeatureTheatre({ reducedMotion }: { reducedMotion: boolean }) {
   return (
     <section
       className="feature-theatre section-shell"
+      data-motion-paused={!active || reducedMotion}
       id="features"
       data-reveal
       aria-labelledby="feature-theatre-title"
@@ -679,6 +699,7 @@ function FeatureTheatre({ reducedMotion }: { reducedMotion: boolean }) {
       </div>
 
       <div
+        ref={stageRef}
         className={`theatre-console accent-${feature.accent}`}
         aria-roledescription="carousel"
         aria-label="MewMuze feature stories"
@@ -695,7 +716,7 @@ function FeatureTheatre({ reducedMotion }: { reducedMotion: boolean }) {
               <span>AUTHENTIC APP-RENDERED MOTION · TRANSPARENT</span>
               <i aria-hidden="true" />
             </div>
-            <FeatureFilm feature={feature} reducedMotion={reducedMotion} />
+            <FeatureFilm feature={feature} reducedMotion={reducedMotion || !active} />
             {feature.notice && (
               <AppNotice key={feature.id} notice={feature.notice} className="notice-float" />
             )}
@@ -1389,6 +1410,7 @@ export default function Home() {
   const basePriceLabel = priceLabelFor(rupees, false);
   const priceLabel = priceLabelFor(rupees, supportSelected);
   const heroRef = useRef<HTMLElement>(null);
+  const heroActive = useVisibleMotion(heroRef, true);
   const catMotionRef = useRef<HTMLSpanElement>(null);
   const heroHeadRef = useRef<HTMLSpanElement>(null);
   const leftPupilRef = useRef<HTMLSpanElement>(null);
@@ -1425,7 +1447,7 @@ export default function Home() {
   }, [experienceUnlocked]);
 
   useEffect(() => {
-    if (reducedMotion) {
+    if (reducedMotion || !heroActive) {
       const neutralTimer = window.setTimeout(() => setHeroEmotion("neutral"), 0);
       return () => window.clearTimeout(neutralTimer);
     }
@@ -1453,7 +1475,7 @@ export default function Home() {
       window.clearTimeout(neutralTimer);
       window.clearInterval(emotionTimer);
     };
-  }, [reducedMotion]);
+  }, [reducedMotion, heroActive]);
 
   useEffect(() => {
     const sections = Array.from(
@@ -1472,7 +1494,7 @@ export default function Home() {
           observer.unobserve(entry.target);
         });
       },
-      { threshold: 0.12, rootMargin: "0px 0px -8% 0px" },
+      { threshold: 0, rootMargin: "0px 0px -8% 0px" },
     );
     sections.forEach((section) => observer.observe(section));
     return () => observer.disconnect();
@@ -1539,6 +1561,7 @@ export default function Home() {
       <section
         ref={heroRef}
         className={`hero ${!finePointer ? "touch-look" : ""}`}
+        data-motion-paused={!heroActive || reducedMotion}
         aria-labelledby="hero-title"
       >
         <div className="hero-edge" aria-hidden="true" />
@@ -1552,7 +1575,7 @@ export default function Home() {
               leftPupilRef={leftPupilRef}
               rightPupilRef={rightPupilRef}
               emotion={heroEmotion}
-              reducedMotion={reducedMotion}
+              reducedMotion={reducedMotion || !heroActive}
             />
           </span>
           <span className="cat-speech">Hi. I live here now.</span>

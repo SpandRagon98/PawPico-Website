@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import { PublicHeader } from "../../../components/PublicHeader";
 import { sitePath } from "../../../lib/site-path";
 
@@ -139,11 +140,12 @@ export default function CheckoutSuccess() {
                 <div className="defender-walkthrough" aria-label="Windows Defender installation walkthrough">
                   <figure>
                     <div className="defender-shot defender-shot-pink">
-                      <img
+                      <Image
                         src={sitePath("/checkout/windows-defender-more-info.png")}
                         alt="Windows Defender SmartScreen warning with the More info link visible"
-                        width="525"
-                        height="495"
+                        width={525}
+                        height={495}
+                        unoptimized
                       />
                     </div>
                     <figcaption><strong>First:</strong> select <em>More info</em>.</figcaption>
@@ -151,11 +153,12 @@ export default function CheckoutSuccess() {
                   <span className="walkthrough-arrow" aria-hidden="true">→</span>
                   <figure>
                     <div className="defender-shot defender-shot-yellow">
-                      <img
+                      <Image
                         src={sitePath("/checkout/windows-defender-run-anyway.png")}
                         alt="Expanded Windows Defender warning showing the MewMuze installer and Run anyway button"
-                        width="525"
-                        height="495"
+                        width={525}
+                        height={495}
+                        unoptimized
                       />
                     </div>
                     <figcaption>

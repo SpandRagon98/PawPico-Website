@@ -1,6 +1,43 @@
 import assert from "node:assert/strict";
 import { access, readFile, stat } from "node:fs/promises";
 import test from "node:test";
+import { execFileSync } from "node:child_process";
+
+test("checkout configuration rejects lookalike hosts, credentials and wrong product paths", () => {
+  const moduleUrl = new URL("../lib/commerce.ts", import.meta.url).href;
+  for (const configured of [
+    "https://checkout.dodopayments.com.evil.example/buy/pdt_0NkWDKYYlGSBLf59iNa4q",
+    "https://user:password@checkout.dodopayments.com/buy/pdt_0NkWDKYYlGSBLf59iNa4q",
+    "https://checkout.dodopayments.com/buy/pdt_other?reference=pdt_0NkWDKYYlGSBLf59iNa4q",
+    "javascript:alert(1)",
+    "https://checkout.dodopayments.com:8443/buy/pdt_0NkWDKYYlGSBLf59iNa4q",
+  ]) {
+    const result = JSON.parse(execFileSync(process.execPath, ["--input-type=module", "-e",
+      `const {commerce}=await import(${JSON.stringify(moduleUrl)}); console.log(JSON.stringify(commerce));`,
+    ], { encoding: "utf8", env: { ...process.env, NEXT_PUBLIC_DODO_CHECKOUT_URL: configured,
+      NEXT_PUBLIC_DODO_SUPPORT_CHECKOUT_URL: configured } }));
+    const checkout = new URL(result.checkoutUrl);
+    assert.equal(checkout.origin, "https://checkout.dodopayments.com");
+    assert.equal(checkout.pathname, "/buy/pdt_0NkWDKYYlGSBLf59iNa4q");
+    assert.equal(checkout.searchParams.get("redirect_url"), "https://mewmuze.com/checkout/success/");
+    if (!configured.includes("/buy/pdt_other?")) assert.equal(result.supporterConfigured, false);
+  }
+});
+
+test("defers hidden appearances and provides motion, touch and script-failure fallbacks", async () => {
+  const page = await source("../app/page.tsx");
+  const css = await source("../app/carousel-theme.css");
+  assert.match(page, /document\.addEventListener\("visibilitychange", sync\)/);
+  assert.match(page, /index === activeIndex &&/);
+  assert.match(page, /reducedMotion=\{reducedMotion \|\| !active\}/);
+  assert.match(css, /animation-play-state: paused !important/);
+  assert.match(css, /@keyframes splash-failsafe/);
+  assert.match(css, /min-height: 44px/);
+  const headers = await source("../public/.htaccess");
+  assert.match(headers, /X-Content-Type-Options "nosniff"/);
+  assert.match(headers, /frame-ancestors 'self'/);
+  assert.match(headers, /object-src 'none'/);
+});
 
 async function render(path = "/") {
   const workerUrl = new URL("../dist/server/index.js", import.meta.url);

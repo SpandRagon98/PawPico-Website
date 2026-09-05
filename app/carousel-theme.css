@@ -1723,3 +1723,73 @@ h4 {
     padding: 22px 20px;
   }
 }
+
+/* Keep the tactile design usable with touch, zoom, and motion preferences. */
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+:where(a, button, summary, input):focus-visible {
+  outline: 3px solid #23517e;
+  outline-offset: 4px;
+}
+
+.mobile-nav nav {
+  max-height: 70vh;
+  max-height: 70dvh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.hero-primary-actions .skeuo-button {
+  white-space: normal;
+  text-align: center;
+}
+
+[data-motion-paused="true"],
+[data-motion-paused="true"] *,
+[data-motion-paused="true"] *::before,
+[data-motion-paused="true"] *::after {
+  animation-play-state: paused !important;
+}
+
+/* A failed or blocked script must never leave a curtain over the website. */
+.welcome-splash {
+  animation: splash-failsafe 0s 3s forwards;
+}
+
+@keyframes splash-failsafe {
+  to { visibility: hidden; pointer-events: none; }
+}
+
+@media (pointer: coarse) {
+  .choice-block button,
+  .edition-download-button,
+  .edition-pro-button,
+  .mobile-nav nav a {
+    min-height: 44px;
+  }
+}
+
+@media (max-width: 760px) {
+  .hero-copy .hero-primary-actions .skeuo-button {
+    height: auto;
+  }
+
+  .feature-helps,
+  .theatre-copy,
+  .commerce-card {
+    overflow-wrap: anywhere;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto !important; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

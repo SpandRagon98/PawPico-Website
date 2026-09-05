@@ -11,8 +11,15 @@ const defaultFreeDownloadUrl =
 const configuredFreeDownloadUrl =
   process.env.NEXT_PUBLIC_MEWMUZE_FREE_DOWNLOAD_URL?.trim() ?? "";
 
-const isLiveCheckout = (url: string) =>
-  /^https:\/\/checkout\.dodopayments\.com\//i.test(url);
+const isLiveCheckout = (value: string) => {
+  try {
+    const url = new URL(value);
+    return url.origin === "https://checkout.dodopayments.com" &&
+      !url.username && !url.password && /^\/buy\/pdt_[A-Za-z0-9]+\/?$/.test(url.pathname);
+  } catch {
+    return false;
+  }
+};
 
 /**
  * Dodo's static product links only return to the merchant when redirect_url is
@@ -32,13 +39,13 @@ const withCheckoutReturn = (checkoutUrl: string): string => {
 // sandbox product after the production switch.
 const normalCheckoutUrl =
   isLiveCheckout(configuredCheckoutUrl) &&
-  configuredCheckoutUrl.includes(LIVE_DODO_PRODUCT_ID)
+  new URL(configuredCheckoutUrl).pathname.replace(/\/$/, "") === `/buy/${LIVE_DODO_PRODUCT_ID}`
     ? withCheckoutReturn(configuredCheckoutUrl)
     : withCheckoutReturn(liveCheckoutUrl);
 
 const configuredSupporterCheckoutUrl = isLiveCheckout(supporterCheckoutUrl)
   ? withCheckoutReturn(supporterCheckoutUrl)
-  : supporterCheckoutUrl;
+  : "";
 
 export const commerceMode: CommerceMode = "live";
 
