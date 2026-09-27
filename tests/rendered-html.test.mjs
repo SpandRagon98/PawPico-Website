@@ -81,11 +81,11 @@ test("labels Paper experiments and macOS honestly while preserving public downlo
   const html = await (await render()).text();
   const page = await source("../app/page.tsx");
   assert.match(html, /INSIDE THE PAPER LAB/);
-  assert.match(html, /not included in the current Free or Pro downloads/);
+  assert.match(html, /come with MewMuze Pro/);
   assert.match(html, /Illustrative conversation, not a live AI chat on this page/);
   assert.match(html, /macOS coming soon/);
   assert.match(page, /macOS coming soon/);
-  // The Free installer is still the real release URL, now behind the account gate.
+  // Free opens the Microsoft Store listing, now behind the account gate.
   assert.match(page, /<DownloadButton[^>]*href=\{commerce\.freeDownloadUrl\}[^>]*edition="free"/);
   assert.match(page, /Download Free/);
 });
@@ -599,19 +599,19 @@ test("never advertises a free trial", async () => {
   assert.doesNotMatch(html, /free trial|trial period/i);
 });
 
-test("downloads the Free installer directly without changing the Pro checkout path", async () => {
+test("sends Free to the Microsoft Store without changing the Pro checkout path", async () => {
   const html = await (await render()).text();
   const page = await source("../app/page.tsx");
   const commerce = await source("../lib/commerce.ts");
 
-  // Two: the hero and the closing beat at the end of the story. Both are the
-  // same real installer, and neither sits next to a price.
+  // Two: the hero and the closing beat at the end of the story. Both point to
+  // the same Store listing, and neither sits next to a price.
   assert.equal((html.match(/Download Free/g) ?? []).length, 2);
   assert.equal((html.match(/class="free-release-note"/g) ?? []).length, 0);
   assert.doesNotMatch(html, /Free download available after 15 August 2026\./);
   assert.match(
     html,
-    /releases\/download\/v0\.1\.9\/MewMuze_0\.1\.9_Free_x64-setup\.exe/,
+    /apps\.microsoft\.com\/detail\/9MWTS6WZD1N1/,
   );
   assert.match(commerce, /NEXT_PUBLIC_MEWMUZE_FREE_DOWNLOAD_URL/);
   assert.match(commerce, /freeDownloadUrl/);
@@ -974,7 +974,7 @@ test("renders purchase success, cancellation and support routes with navigation"
   assert.doesNotMatch(successSource, /params\.get\("license_key"\)/);
   assert.match(successSource, /replaceState/);
   assert.match(successSource, /your key is in your Dodo Payments email/i);
-  assert.match(success, /Download MewMuze Pro 0\.1\.9/);
+  assert.match(success, /Download MewMuze Pro 0\.1\.10/);
   assert.match(successSource, /href=\{DOWNLOAD_URL\}/);
   assert.doesNotMatch(successSource, /\{succeeded && \(\s*<a[^>]+href=\{DOWNLOAD_URL\}/);
   assert.match(success, /Download the MewMuze app/);
@@ -1019,7 +1019,7 @@ test("uses the MewMuze Baloo and Quicksand typography contract on every route", 
     /\.site-brand,[\s\S]*?\.eyebrow\s*\{[\s\S]*?font-family: var\(--font-kawaii-ui\), var\(--font-montserrat\), system-ui, sans-serif;/,
   );
   assert.match(success, /We are checking your purchase/);
-  assert.match(success, /Download MewMuze Pro 0\.1\.9/);
+  assert.match(success, /Download MewMuze Pro 0\.1\.10/);
 });
 
 test("stops clip-path from cropping the cat's ears on phones", async () => {
@@ -1337,7 +1337,7 @@ test("shows Care as a labelled Paper preview that makes no health claims", async
   assert.match(care, /videos\/mewmuze-care\.mp4/);
   assert.match(care, /videos\/mewmuze-care-poster\.webp/);
   // The app's own boundaries, said on the page too.
-  assert.match(care, /not included in the current Free or Pro downloads/);
+  assert.match(care, /comes with MewMuze Pro/);
   assert.match(care, /nothing in it scores, diagnoses or judges/);
   assert.match(care, /every number stays on your\s+computer/);
   assert.match(care, /No streaks\./);

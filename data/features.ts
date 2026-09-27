@@ -136,7 +136,7 @@ const stories: Omit<FeatureStory, "helps" | "notice">[] = [
     story: "A day list with subtasks, times and zero guilt trips.",
     video: "/videos/mewmuze-tasks.mp4",
     accent: "lavender",
-    availability: { paper: true },
+    availability: { pro: true },
   },
   {
     id: "gmail",
@@ -202,7 +202,7 @@ const stories: Omit<FeatureStory, "helps" | "notice">[] = [
     story: "29 moods, and yes, the savage ones are in there.",
     video: "/videos/mewmuze-emotions.mp4",
     accent: "mint",
-    availability: { paper: true },
+    availability: { pro: true },
   },
   {
     id: "chat",
@@ -212,7 +212,7 @@ const stories: Omit<FeatureStory, "helps" | "notice">[] = [
     story: "Talk to her. Pick the energy: comfort, rant, savage, calm.",
     video: "/videos/mewmuze-chat-demo.mp4",
     accent: "blue",
-    availability: { paper: true },
+    availability: { pro: true },
   },
   {
     id: "diary",
@@ -222,7 +222,7 @@ const stories: Omit<FeatureStory, "helps" | "notice">[] = [
     story: "A private page for the day, kept on your machine.",
     video: "/videos/mewmuze-chat-demo.mp4",
     accent: "pink",
-    availability: { paper: true },
+    availability: { pro: true },
   },
   {
     id: "adapts",
@@ -232,7 +232,7 @@ const stories: Omit<FeatureStory, "helps" | "notice">[] = [
     story: "She learns your hours and how you talk. Slowly, and only on this PC.",
     video: "/videos/rest-and-emotion.mp4",
     accent: "lavender",
-    availability: { paper: true },
+    availability: { pro: true },
   },
   {
     id: "voice",
@@ -242,7 +242,7 @@ const stories: Omit<FeatureStory, "helps" | "notice">[] = [
     story: "Hold the key, talk, she types it out.",
     video: "/videos/music-and-singing.mp4",
     accent: "peach",
-    availability: { paper: true },
+    availability: { pro: true },
   },
   {
     id: "appearance",

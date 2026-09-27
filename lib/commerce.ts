@@ -6,8 +6,9 @@ const liveCheckoutUrl = `https://checkout.dodopayments.com/buy/${LIVE_DODO_PRODU
 const configuredCheckoutUrl = process.env.NEXT_PUBLIC_DODO_CHECKOUT_URL?.trim() ?? "";
 const supporterCheckoutUrl =
   process.env.NEXT_PUBLIC_DODO_SUPPORT_CHECKOUT_URL?.trim() ?? "";
+// Free is a Microsoft Store listing, not a direct installer download.
 const defaultFreeDownloadUrl =
-  "https://github.com/SpandRagon98/PawPico-Website/releases/download/v0.1.9/MewMuze_0.1.9_Free_x64-setup.exe";
+  "https://apps.microsoft.com/detail/9MWTS6WZD1N1?hl=en-us&gl=IN&ocid=pdpshare";
 const configuredFreeDownloadUrl =
   process.env.NEXT_PUBLIC_MEWMUZE_FREE_DOWNLOAD_URL?.trim() ?? "";
 
@@ -51,8 +52,8 @@ export const commerceMode: CommerceMode = "live";
 
 export const commerce = {
   checkoutUrl: normalCheckoutUrl,
-  // Free and Pro use separate website journeys. Free downloads the public
-  // Windows installer directly; Pro continues through Dodo and licence delivery.
+  // Free and Pro use separate website journeys. Free opens the Microsoft
+  // Store listing; Pro continues through Dodo and licence delivery.
   freeDownloadUrl: /^https:\/\/.+/i.test(configuredFreeDownloadUrl)
     ? configuredFreeDownloadUrl
     : defaultFreeDownloadUrl,

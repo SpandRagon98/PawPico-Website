@@ -22,9 +22,13 @@ const emptyResult: PurchaseResult = {
  * megabytes and pushes had started timing out, and git never forgets a blob.
  * scripts/release.ps1 in the desktop repo rewrites this one line after it
  * publishes the asset, so the link and the release cannot drift apart.
+ *
+ * v0.1.10 is built from the MewMuze Paper app (not the older Pro app): the
+ * same installer adds Care, Tasks, the fuller emotion engine, chat/companion
+ * and Diary on top of everything Pro already had.
  */
 const DOWNLOAD_URL =
-  "https://github.com/SpandRagon98/PawPico-Website/releases/download/v0.1.9/MewMuze_0.1.9_Pro_x64-setup.exe";
+  "https://github.com/SpandRagon98/PawPico-Website/releases/download/v0.1.10/MewMuze_0.1.10_Pro_x64-setup.exe";
 
 export default function CheckoutSuccess() {
   const [purchase, setPurchase] = useState<PurchaseResult>(emptyResult);
@@ -117,7 +121,7 @@ export default function CheckoutSuccess() {
                 <h2>Download the MewMuze app</h2>
                 <p>
                   Use the button below to download the official Windows installer. When the
-                  download finishes, open <strong>MewMuze_0.1.9_Pro_x64-setup.exe</strong> to begin.
+                  download finishes, open <strong>MewMuze_0.1.10_Pro_x64-setup.exe</strong> to begin.
                 </p>
                 {/* Gated on an account, like every other download. The payment
                     itself is already done and verified above: this only decides
@@ -127,7 +131,7 @@ export default function CheckoutSuccess() {
                   href={DOWNLOAD_URL}
                   edition="pro"
                 >
-                  Download MewMuze Pro 0.1.9
+                  Download MewMuze Pro 0.1.10
                 </DownloadButton>
                 <small>For Windows 10 and 11 · macOS coming soon · downloaded from the official MewMuze release</small>
               </div>

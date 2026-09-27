@@ -56,7 +56,7 @@ const appStructuredData = {
   image: `${SITE_URL}/og-mewmuze.png`,
   applicationCategory: "UtilitiesApplication",
   operatingSystem: "Windows 10, Windows 11",
-  softwareVersion: "0.1.9",
+  softwareVersion: "0.1.10",
   publisher: { "@id": `${SITE_URL}/#organization` },
   offers: {
     "@type": "Offer",
@@ -450,7 +450,7 @@ function ChatLab({ reducedMotion }: { reducedMotion: boolean }) {
             ))}
           </div>
           <p className="chat-lab-note">
-            Paper preview: chat, personas and voice are <strong>not included in the current Free or Pro downloads</strong>.
+            From the Paper build: chat, personas and voice <strong>come with MewMuze Pro</strong>.
             Illustrative conversation, not a live AI chat on this page.
           </p>
         </div>
@@ -570,8 +570,8 @@ function EmotionLab({ reducedMotion }: { reducedMotion: boolean }) {
             </figure>
           </div>
           <p className="emotion-lab-note">
-            Paper preview: the emotion engine and Diary are <strong>not included in the current Free or Pro downloads</strong>.
-            The Cyberpunk Cat costume comes with Pro. Film rendered by the Paper app&rsquo;s own sprite renderer.
+            From the Paper build: the emotion engine and Diary <strong>come with MewMuze Pro</strong>.
+            The Cyberpunk Cat costume comes with Pro too. Film rendered by the Paper app&rsquo;s own sprite renderer.
           </p>
         </div>
         <div className="emotion-lab-film">
@@ -767,7 +767,7 @@ function CareLab({ reducedMotion }: { reducedMotion: boolean }) {
             ))}
           </ul>
           <p className="care-lab-note">
-            Paper preview: Care is <strong>not included in the current Free or Pro downloads</strong>. It is not a
+            From the Paper build: Care <strong>comes with MewMuze Pro</strong>. It is not a
             health product or a therapist: nothing in it scores, diagnoses or judges, and every number stays on your
             computer. Film rebuilt from the app&rsquo;s own Care panel.
           </p>
@@ -830,7 +830,7 @@ function TasksLab({ reducedMotion }: { reducedMotion: boolean }) {
             ))}
           </ul>
           <p className="tasks-lab-note">
-            Paper preview: Tasks is <strong>not included in the current Free or Pro downloads</strong>. Illustrative demo with made-up tasks.
+            From the Paper build: Tasks <strong>comes with MewMuze Pro</strong>. Illustrative demo with made-up tasks.
           </p>
         </div>
       </div>
