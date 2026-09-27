@@ -187,14 +187,6 @@
 .hero-glass-link:hover { color: #1269bd; }
 .hero-glass-link span { font-size: 16px; }
 
-.hero .hero-secondary-actions {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 25px;
-  width: 100%;
-}
-
 .hero-text-link,
 .hero-film-link {
   padding: 4px 0;
@@ -342,7 +334,6 @@
   .hero-primary-actions .glass-surface { width: 100%; height: 45px; }
   .hero-glass-pro { grid-column: 1 / -1; grid-row: 1; }
   .hero-glass-link { padding: 0 8px; font-size: 11px; }
-  .hero .hero-secondary-actions { gap: 21px; }
   .hero-text-link, .hero-film-link { font-size: 10px; }
   .hero .privacy-note { max-width: 32ch; margin: 8px auto 0; font-size: 9px; }
   .hero .hero-cat-peek {

@@ -617,7 +617,6 @@ test("sends Free to the Microsoft Store without changing the Pro checkout path",
   assert.match(commerce, /freeDownloadUrl/);
   assert.match(html, /hero-glass-free[^>]*[\s\S]*?href=/);
   assert.match(html, /class="hero-primary-actions"/);
-  assert.match(html, /class="hero-secondary-actions"/);
   assert.match(html, />Get MewMuze Pro · \$7\.99</);
   assert.doesNotMatch(html, />Download Free[^<]*\$7\.99/);
   assert.match(page, /<DownloadButton[^>]*href=\{commerce\.freeDownloadUrl\}[^>]*edition="free"/);
@@ -954,7 +953,7 @@ test("keeps download, store and support reachable through the navigation", async
   const page = await source("../app/page.tsx");
 
   assert.doesNotMatch(html, /View the price/);
-  assert.match(html, /nav-cta nav-cta-signup/);
+  assert.match(html, /nav-account-button-live/);
   assert.match(html, />Download</);
   assert.match(html, />Live demo</);
   assert.doesNotMatch(html, /Store\s*<span class="coming-pill"/);

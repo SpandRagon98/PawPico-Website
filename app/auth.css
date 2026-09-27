@@ -98,7 +98,8 @@
 }
 .auth-badge img {
   width: 100%;
-  height: auto;
+  height: 100%;
+  object-fit: contain;
   image-rendering: pixelated;
 }
 
@@ -285,11 +286,13 @@
   transform: translateY(-1px);
 }
 .nav-account-button:active { transform: translateY(0); }
+.nav-account-button-live { color: var(--hero-accent, #2c7a00); font-weight: 800; }
 
 html[data-nav-tone="dark"] .nav-account-button { color: #f4fbef; }
 html[data-nav-tone="dark"] .nav-account-button:hover {
   background: rgba(255, 255, 255, .16);
 }
+html[data-nav-tone="dark"] .nav-account-button-live { color: var(--hero-neon, #74ff2a); }
 
 .nav-account-name {
   max-width: 14ch;

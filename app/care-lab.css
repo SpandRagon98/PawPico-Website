@@ -47,7 +47,7 @@
   line-height: 1.08;
   letter-spacing: -.045em;
 }
-.care-lab .care-lab-copy h2 em { color: #c73866 !important; font-style: normal; }
+.care-lab .care-lab-copy h2 em { color: var(--hero-accent) !important; font-style: normal; }
 .care-lab-lead {
   margin: 0 0 20px;
   color: #3f4a3a;

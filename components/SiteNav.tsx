@@ -125,9 +125,13 @@ export function SiteNav({ base = "" }: { base?: string }) {
       </details>
       <div className="nav-auth">
         <AccountControl />
-        <a className="skeuo-button skeuo-button-primary nav-cta nav-cta-signup" href={`${base}#paper-preview`}>
-          Live demo
-        </a>
+        <GlassSurface className="nav-glass nav-glass-account" variant="navigation" fit>
+          <span className="nav-account">
+            <a className="nav-account-button nav-account-button-live" href={`${base}#paper-preview`}>
+              Live demo
+            </a>
+          </span>
+        </GlassSurface>
       </div>
     </div>
   );

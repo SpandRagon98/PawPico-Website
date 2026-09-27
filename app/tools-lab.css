@@ -16,7 +16,6 @@
   height: 100%;
   object-fit: cover;
   pointer-events: none;
-  filter: hue-rotate(var(--theme-hue));
 }
 /* Near-solid behind the words so the film all but disappears there, easing off
    gradually toward both sides where it keeps moving. */

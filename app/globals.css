@@ -8396,7 +8396,7 @@ body.mewmuze-splash-open {
   align-items: center;
 }
 
-/* Log in and Sign up share the nav-cta format, side by side. */
+/* The account control and Live demo, side by side. */
 .nav-auth {
   display: flex;
   align-items: center;
@@ -8417,14 +8417,6 @@ body.mewmuze-splash-open {
   .nav-cta {
     padding-inline: 14px;
     font-size: 12px;
-  }
-}
-
-@media (max-width: 560px) {
-  /* on the narrowest phones only Sign up stays in the bar, Log in lives in the
-     account section a tap away */
-  .nav-cta-login {
-    display: none;
   }
 }
 
@@ -10179,16 +10171,6 @@ button,
   flex: 1.35 1 210px;
 }
 
-.hero-secondary-actions {
-  display: flex;
-  justify-content: flex-start;
-}
-
-.hero-secondary-actions .skeuo-button {
-  min-height: 36px;
-  padding-block: 6px;
-}
-
 .hero-copy .hero-actions > .free-release-note {
   margin-top: 0;
 }
@@ -10254,10 +10236,6 @@ button,
     height: 50px;
     min-height: 50px;
     font-size: 14px;
-  }
-
-  .hero-secondary-actions {
-    justify-content: center;
   }
 
   .hero-copy .hero-actions > .free-release-note {

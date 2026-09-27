@@ -3,7 +3,9 @@
 import Image from "next/image";
 import { GlassSurface } from "./GlassSurface";
 import { HeroCatCanvas, type Rgb } from "./HeroCatCanvas";
-import { heroThemes, type HeroThemeId } from "./hero-themes";
+
+/** The jacket's colour: matches hero-neon.css's --hero-neon green palette. */
+const HERO_JACKET: Rgb = [0.43, 1, 0.18];
 import {
   useEffect,
   useRef,
@@ -242,11 +244,9 @@ function ScrollPet({ reducedMotion }: { reducedMotion: boolean }) {
 function RealisticHeroVideo({
   reducedMotion,
   jacket,
-  themeId,
 }: {
   reducedMotion: boolean;
   jacket: Rgb;
-  themeId: HeroThemeId;
 }) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const visible = useVisibleMotion(videoRef, true);
@@ -273,11 +273,11 @@ function RealisticHeroVideo({
     <div className="realistic-hero-media" data-renderer={renderer}>
       <div className="hero-cat-stage">
         {/* Transparent still of the poster frame, pre-rendered through the same
-            keying for each jacket colour: visible from the first paint and kept
-            as the fallback when WebGL is unavailable. */}
+            keying used live: visible from the first paint and kept as the
+            fallback when WebGL is unavailable. */}
         <Image
           className="hero-cat-still"
-          src={sitePath(`/film/mewmuze-cutout-${themeId}.webp`)}
+          src={sitePath("/film/mewmuze-cutout-green.webp")}
           alt=""
           aria-hidden="true"
           width={1280}
@@ -315,59 +315,6 @@ function RealisticHeroVideo({
           video.pause();
         }
       }}>{playing ? "Pause" : "Play"} <span aria-hidden="true">{playing ? "Ⅱ" : "▶"}</span></button>
-    </div>
-  );
-}
-
-function HeroSwatches({
-  value,
-  onChange,
-}: {
-  value: HeroThemeId;
-  onChange: (theme: HeroThemeId) => void;
-}) {
-  const buttons = useRef<(HTMLButtonElement | null)[]>([]);
-  const activeIndex = Math.max(0, heroThemes.findIndex((theme) => theme.id === value));
-
-  const select = (index: number) => {
-    const next = (index + heroThemes.length) % heroThemes.length;
-    onChange(heroThemes[next].id);
-    buttons.current[next]?.focus();
-  };
-
-  return (
-    <div className="hero-swatches" role="radiogroup" aria-label="MewMuze jacket colour">
-      <span className="hero-swatch-dots">
-        {heroThemes.map((theme, index) => (
-          <button
-            key={theme.id}
-            ref={(element) => {
-              buttons.current[index] = element;
-            }}
-            type="button"
-            role="radio"
-            className="hero-swatch"
-            aria-checked={theme.id === value}
-            aria-label={`${theme.label} jacket`}
-            title={theme.label}
-            tabIndex={theme.id === value ? 0 : -1}
-            style={{ "--swatch": theme.swatch } as CSSProperties}
-            onClick={() => onChange(theme.id)}
-            onKeyDown={(event) => {
-              if (event.key === "ArrowRight" || event.key === "ArrowDown") {
-                event.preventDefault();
-                select(index + 1);
-              } else if (event.key === "ArrowLeft" || event.key === "ArrowUp") {
-                event.preventDefault();
-                select(index - 1);
-              }
-            }}
-          />
-        ))}
-      </span>
-      <span className="hero-swatch-label" aria-live="polite">
-        {heroThemes[activeIndex].label}
-      </span>
     </div>
   );
 }
@@ -916,12 +863,6 @@ export default function Home() {
   const priceLabel = priceLabelFor(rupees, supportSelected);
   const heroRef = useRef<HTMLElement>(null);
   const heroActive = useVisibleMotion(heroRef, true);
-  const [heroTheme, setHeroTheme] = useState<HeroThemeId>("green");
-  const activeHeroTheme = heroThemes.find((theme) => theme.id === heroTheme) ?? heroThemes[0];
-  // The jacket colour themes the whole page, not just the hero (hero-neon.css :root palettes).
-  useEffect(() => {
-    document.documentElement.dataset.heroTheme = heroTheme;
-  }, [heroTheme]);
   useDarkNavTone();
   useEffect(() => {
     const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -1018,7 +959,6 @@ export default function Home() {
         ref={heroRef}
         id="companion"
         className="hero cinematic-hero"
-        data-hero-theme={heroTheme}
         data-motion-paused={!heroActive || reducedMotion}
         aria-labelledby="hero-title"
       >
@@ -1030,17 +970,10 @@ export default function Home() {
           <span className="hero-pattern" />
           <span className="hero-grain" />
         </div>
-        <div className="hero-secondary-actions">
-          <HeroSwatches value={heroTheme} onChange={setHeroTheme} />
-        </div>
         <p className="privacy-note">
           <span aria-hidden="true">●</span> Free to keep · Windows 10/11 · macOS coming soon · Local-first by design
         </p>
-        <RealisticHeroVideo
-          reducedMotion={reducedMotion}
-          jacket={activeHeroTheme.jacket}
-          themeId={activeHeroTheme.id}
-        />
+        <RealisticHeroVideo reducedMotion={reducedMotion} jacket={HERO_JACKET} />
 
         <div className="hero-copy">
           <Eyebrow>A PERSONAL DESKTOP PET FOR WINDOWS AND MACOS</Eyebrow>
