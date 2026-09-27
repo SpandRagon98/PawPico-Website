@@ -1,0 +1,185 @@
+/* The complete feature directory. Loaded after site-polish.css, so it wins over
+   the legacy sheets that set the old sticker borders with !important.
+
+   No liquid glass here on purpose: a GlassSurface per group portals a
+   page-level refraction layer, which was both heavy to scroll and left a stray
+   rounded pane floating over the section above when a group collapsed. The
+   panels are plain painted surfaces instead. */
+
+.directory-groups {
+  display: grid;
+  gap: clamp(12px, 1.4vw, 18px);
+}
+
+.feature-directory .directory-panel {
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--hero-ink, #16321f) 12%, transparent) !important;
+  border-radius: 24px !important;
+  background: rgba(255, 255, 255, .86) !important;
+  box-shadow: 0 10px 26px rgba(28, 46, 72, .07) !important;
+}
+
+/* The header row is the whole panel while the group is closed, so it owns the
+   corners and must not add height of its own. */
+.feature-directory .directory-panel > h3 {
+  margin: 0;
+  border: 0 !important;
+  background: transparent !important;
+}
+.feature-directory .directory-panel > h3 > button {
+  display: grid;
+  width: 100%;
+  min-height: 0 !important;
+  align-items: center;
+  gap: 16px;
+  grid-template-columns: auto 1fr auto auto;
+  padding: 14px clamp(14px, 1.6vw, 22px);
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  text-align: left;
+}
+.feature-directory .directory-panel > h3 > button:hover {
+  background: rgba(255, 255, 255, .6) !important;
+}
+.feature-directory .directory-panel > h3 > button > span,
+.feature-directory .directory-panel > h3 > button > i {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  border: 1px solid color-mix(in srgb, var(--hero-ink, #16321f) 14%, transparent) !important;
+  border-radius: 11px !important;
+  background: rgba(255, 255, 255, .8) !important;
+  box-shadow: inset 0 1px 0 #fff !important;
+}
+.feature-directory .directory-panel > h3 > button > strong {
+  font-size: clamp(18px, 1.7vw, 25px);
+  letter-spacing: -.035em;
+}
+.feature-directory .directory-panel > h3 > button > small {
+  color: color-mix(in srgb, var(--hero-ink, #16321f) 55%, transparent);
+  font: 650 10px/1 var(--mono, monospace);
+  white-space: nowrap;
+}
+.feature-directory .directory-panel.is-open > h3 > button > i {
+  background: var(--hero-neon, #9dff4a) !important;
+}
+
+.feature-directory .directory-reveal {
+  border: 0 !important;
+  background: transparent !important;
+}
+
+.feature-directory .directory-grid {
+  gap: clamp(12px, 1.3vw, 18px);
+  padding: 0;
+  border-top: 0 !important;
+  background: transparent !important;
+}
+
+/* Padding only while the group is open. A collapsed panel sets the reveal's
+   grid row to 0fr, which zeroes the content height but NOT the padding, so
+   padding here left every closed panel about 24px too tall. */
+.feature-directory .directory-panel.is-open .directory-grid {
+  padding: 0 clamp(12px, 1.4vw, 20px) clamp(16px, 1.8vw, 24px);
+}
+
+.feature-directory .directory-grid article {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: clamp(16px, 1.5vw, 22px);
+  border: 1px solid color-mix(in srgb, var(--hero-ink, #16321f) 10%, transparent) !important;
+  border-radius: 18px !important;
+  background: #fff !important;
+  box-shadow: 0 6px 18px rgba(28, 46, 72, .05) !important;
+}
+
+.feature-directory .directory-grid article > small {
+  color: color-mix(in srgb, var(--hero-ink, #16321f) 45%, transparent);
+  font: 700 10px/1 var(--mono, monospace);
+  letter-spacing: .1em;
+}
+
+.feature-directory .directory-grid h4 {
+  margin: 0;
+  font-size: clamp(17px, 1.4vw, 21px);
+  line-height: 1.15;
+  letter-spacing: -.03em;
+}
+
+/* The one line under the title. */
+.feature-directory .directory-grid article > p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* The pointers. */
+.feature-directory .directory-helps {
+  padding: 12px 14px;
+  border: 0 !important;
+  border-radius: 14px !important;
+  background: color-mix(in srgb, var(--hero-neon, #9dff4a) 8%, #f7faf5) !important;
+  box-shadow: none !important;
+}
+.feature-directory .directory-helps > small {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--hero-accent, #2f7a3f);
+  font: 800 9px/1 var(--mono, monospace);
+  letter-spacing: .12em;
+}
+.feature-directory .directory-helps ul {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.feature-directory .directory-helps li {
+  position: relative;
+  padding-left: 18px;
+  font-size: 13px;
+  line-height: 1.45;
+}
+.feature-directory .directory-helps li::before {
+  content: "";
+  position: absolute;
+  top: 7px;
+  left: 2px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--hero-neon, #9dff4a);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--hero-accent, #2f7a3f) 55%, transparent);
+}
+
+.availability-paper {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 9px;
+  border: 1px solid rgba(124, 92, 216, .35);
+  border-radius: 999px;
+  background: rgba(157, 124, 255, .16);
+  color: #5b46a8;
+  font: 800 9px/1 var(--mono, monospace);
+  letter-spacing: .08em;
+}
+
+@media (max-width: 760px) {
+  .feature-directory .directory-panel > h3 > button {
+    gap: 10px;
+    grid-template-columns: auto 1fr auto;
+  }
+
+  .feature-directory .directory-panel > h3 > button > small {
+    display: none;
+  }
+
+  .feature-directory .directory-grid {
+    padding-inline: 10px;
+  }
+}

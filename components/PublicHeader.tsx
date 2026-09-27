@@ -11,13 +11,11 @@ const links: Array<{
   page: NonNullable<PublicHeaderProps["current"]>;
   note?: string;
 }> = [
-  { label: "Story", href: "/#story", page: "home" },
-  { label: "Features", href: "/#features", page: "home" },
-  { label: "Free vs Pro", href: "/#editions", page: "home" },
-  { label: "Appearance", href: "/#appearance", page: "home" },
-  { label: "Store", href: "/store/", page: "store", note: "Coming Soon" },
-  { label: "FAQ", href: "/#faq", page: "home" },
-  { label: "Privacy", href: "/#privacy", page: "home" },
+  { label: "Home", href: "/", page: "home" },
+  { label: "Features", href: "/#directory", page: "home" },
+  { label: "Looks", href: "/#costumes", page: "home" },
+  { label: "Pricing", href: "/#pricing", page: "home" },
+  { label: "Store", href: "/store/", page: "store" },
   { label: "Support", href: "/support/", page: "support" },
 ];
 

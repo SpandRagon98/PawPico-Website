@@ -1,9 +1,30 @@
 import type { Metadata, Viewport } from "next";
-import "@fontsource-variable/baloo-2";
-import "@fontsource-variable/montserrat";
-import "@fontsource-variable/quicksand";
+import "@fontsource/montserrat/400.css";
+import "@fontsource/montserrat/500.css";
+import "@fontsource/montserrat/600.css";
+import "@fontsource/montserrat/700.css";
+import "@fontsource/montserrat/800.css";
 import "./globals.css";
 import "./carousel-theme.css";
+import "./modern.css";
+import "./liquid.css";
+import "./hero-glass.css";
+import "./site-polish.css";
+import "./hero-neon.css";
+import "./chat-lab.css";
+import "./emotion-lab.css";
+import "./tools-lab.css";
+import "./costume-lab.css";
+import "./tasks-lab.css";
+import "./care-lab.css";
+import "./feature-roll.css";
+import "./adapts-lab.css";
+import "./story.css";
+import "./directory-glass.css";
+import "./section-flow.css";
+import "./auth.css";
+import { AuthProvider } from "../components/AuthProvider";
+import { AuthDialog } from "../components/AuthDialog";
 // mewmuze.com is the only production and canonical public website. The former
 // GitHub Pages mirror is no longer deployed, so it must not be a fallback.
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://mewmuze.com";
@@ -50,7 +71,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#f5f6f7",
+  themeColor: "#f9fbff",
   colorScheme: "light",
 };
 
@@ -87,7 +108,12 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(siteStructuredData) }}
         />
-        {children}
+        {/* Accounts wrap every route: the nav and the download buttons on the
+            homepage, the store and the checkout pages all read the session. */}
+        <AuthProvider>
+          {children}
+          <AuthDialog />
+        </AuthProvider>
       </body>
     </html>
   );

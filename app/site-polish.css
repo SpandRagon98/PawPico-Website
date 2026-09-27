@@ -1,0 +1,85 @@
+/* Shared light finish, with real refraction confined to the interactive glass. */
+body { --glass-shadow: 0 14px 45px rgba(46, 78, 125, .075); }
+body * { text-shadow: none !important; }
+.glass-surface > .bg-black,
+.glass-surface > span { display: none !important; }
+.glass-surface-package .glass {
+  background: rgba(255,255,255,.24);
+  border-color: rgba(255,255,255,.92);
+  box-shadow: 0 8px 26px rgba(54,99,160,.1), inset 0 1px 1px #fff !important;
+}
+.glass-surface-package .glass__warp { opacity: .85; }
+.glass-surface--action .glass-surface-package .glass__warp { opacity: .25; }
+.nav-glass { border-radius: 999px; background: rgba(255,255,255,.48); }
+.hero-glass-pro { border-radius: 999px; background: linear-gradient(115deg,#b9e9ff,#d4e2ff 55%,#e3dcff); }
+.hero-glass-free { border-radius: 999px; background: #e9f9ff; }
+.hero-glass-explore { border-radius: 999px; background: #f3efff; }
+.hero-glass-pro .hero-glass-link { color: #154daa; }
+.hero-glass-link { font-size: 14px; font-weight: 700; }
+.nav-glass .mobile-nav nav {
+  border: 1px solid #e0e9f3;
+  border-radius: 22px;
+  background: #fff;
+  box-shadow: 0 20px 60px rgba(39,65,107,.15);
+  max-height: calc(100svh - 90px);
+  overflow-y: auto;
+}
+
+/* The hero's environment, film, headline and swatches live in hero-neon.css. */
+
+body :is(.section-pad,.desktop-playground,.paper-preview,.work-overview,.mood-gallery) { padding-block:clamp(65px,7vw,108px); }
+body :is(.section-heading,.liquid-heading) { margin-bottom:34px; }
+body :is(.section-heading,.liquid-heading,.monotony-copy,.appearance-copy,.privacy-copy,.pricing-copy,.account-copy-block,.faq-heading) h2 {
+  font-size:clamp(32px,3.8vw,58px);line-height:1.12;letter-spacing:-.045em;
+}
+body h2 em { color:#537cbd !important; }
+body :is(.monotony-copy,.section-heading,.liquid-heading,.appearance-copy,.privacy-copy,.pricing-copy,.account-copy-block)>p {
+  font-size:clamp(14px,1.2vw,17px);line-height:1.7;color:#56647b !important;
+}
+body :is(.theatre-console,.theatre-stage,.theatre-media,.theatre-copy,.theatre-controls,.directory-panel,.directory-grid article,.appearance-showcase,.studio-window,.store-teaser-card,.privacy-grid article,.edition-table-wrap,.pricing-card,.faq-list details,.account-panel,.account-perks li,.purchase-flow-steps li,.commerce-card,.support-options article,.day-timeline li,.playground-frame,.mood-cards article,.liquid-panel) {
+  -webkit-backdrop-filter:none !important;backdrop-filter:none !important;
+  border-color:#e1eaf5 !important;
+  box-shadow:0 12px 38px rgba(55,84,129,.065) !important;
+}
+body :is(.directory-grid article,.privacy-grid article,.day-timeline li,.support-options article,.account-perks li,.purchase-flow-steps li) { background:#fff !important; }
+body .feature-theatre .theatre-stage { background:#fff !important; gap:24px; padding:18px; }
+body .feature-theatre .theatre-media { background:linear-gradient(150deg,#eaf8ff,#f4efff) !important; box-shadow:none !important; }
+body .feature-theatre .theatre-copy { background:#fff !important;box-shadow:none !important;border-color:transparent !important; }
+body .theatre-copy h3 { font-size:clamp(28px,3vw,46px);line-height:1.1;letter-spacing:-.04em; }
+body .theatre-progress button { box-shadow:none !important; }
+body .theatre-copy > ul > li,body .theatre-progress button>span { border:1px solid #dbe7f5 !important;box-shadow:none !important;background:#f7faff !important; }
+body .scroll-pet { display:none; }
+body .theatre-progress button.is-active { background:#e7f1ff !important;border-color:#a8c9f5 !important;color:#205ba5 !important; }
+body .feature-helps { border:1px solid #e4ecf5 !important;background:#f8fbff !important;box-shadow:none !important;border-radius:18px; }
+body .edition-table thead th { background:#f7faff !important; }
+body .edition-table .edition-pro-column { background:#edf5ff !important; }
+body .edition-table tbody td,body .edition-table tbody th { border-color:#e6edf6; }
+body :is(.skeuo-button-primary,.nav-cta,.store-button) {
+  background:linear-gradient(120deg,#347af0,#479ce8) !important;color:#fff !important;
+  border:1px solid rgba(31,108,219,.15) !important;box-shadow:0 8px 20px rgba(55,117,214,.15) !important;
+}
+body .skeuo-button-secondary { background:#fff !important;color:#275997 !important;border:1px solid #d8e6f6 !important;box-shadow:0 7px 20px rgba(55,84,129,.07) !important; }
+body :is(.skeuo-button-quiet,.store-button-quiet) { background:transparent !important;color:#3269b0 !important;border-color:transparent !important;box-shadow:none !important; }
+body :is(.skeuo-button,.store-button) { border-radius:999px !important; }
+body .final-cta { border:0 !important;background:linear-gradient(130deg,#edf8ff,#f5efff) !important;box-shadow:none !important; }
+body .cta-cat { border:1px solid #e2eaf4 !important;border-radius:26px;background:#fff !important;box-shadow:0 12px 32px rgba(55,84,129,.08) !important; }
+body .cta-cat::before,body .cta-cat::after { display:none; }
+body .site-footer { background:#fff;border-top:1px solid #e7edf5; }
+body .skip-link:not(:focus-visible) { opacity:0;pointer-events:none;transform:translateY(-150%) !important; }
+body .skip-link:focus-visible { opacity:1;pointer-events:auto;transform:none !important; }
+body .edition-download-button { border:1px solid #cde2f7;box-shadow:none;background:#e7f5ff;color:#24568d; }
+body .edition-pro-button { border:1px solid #cbdcf6;box-shadow:none;background:#eaf1ff;color:#245aa4; }
+@media(min-width:961px){body .pricing-shell{grid-template-columns:minmax(410px,1fr) minmax(0,1.1fr);gap:clamp(40px,5vw,80px);}}
+
+@media(max-width:760px){
+  .hero-glass-link{font-size:12px;}
+  body .feature-theatre .theatre-stage{padding:8px;gap:12px;}
+  body .feature-theatre .theatre-copy{padding:22px 16px;}
+  body .section-pad{padding-block:62px;}
+  body .day-timeline{gap:16px;}
+}
+
+/* Performance: a frosted backdrop blur is recomputed on every scroll frame and
+   over the page's flat grounds it looks the same as a translucent fill, so the
+   only backdrop filters left are the refraction layers (GlassSurface .glass-bend). */
+body *:not(.glass-bend) { -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }

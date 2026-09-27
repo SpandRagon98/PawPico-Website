@@ -1,0 +1,40 @@
+/* One continuous page: sections sit flush against each other, and the whole page
+   wears the jacket colour chosen in the hero (the --hero-* palette on :root,
+   hero-neon.css).
+
+   There used to be a gradient band at every section boundary; the user did not
+   like it, so the edges are plain again. Do not reintroduce it. */
+
+main > section { margin-bottom: 0 !important; }
+
+/* The two older sections keep their own markup: lift their content above the
+   section grounds like the newer ones. */
+.feature-directory > *,
+.pricing > .section-shell {
+  position: relative;
+  z-index: 5;
+}
+
+/* ...and wear the chosen colour like everything above them. The legacy sheets
+   set these with !important, hence the extra `body` and !important here. */
+body .feature-directory,
+body .pricing,
+body .site-footer {
+  background: var(--hero-base-1) !important;
+}
+body .site-footer { border-top-color: color-mix(in srgb, var(--hero-ink) 8%, transparent) !important; }
+body :is(.feature-directory, .pricing) .eyebrow { color: var(--hero-accent) !important; }
+body :is(.feature-directory, .pricing) .eyebrow > span {
+  background: var(--hero-neon) !important;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--hero-neon) 28%, transparent) !important;
+}
+body :is(.feature-directory, .pricing) h2 em { color: var(--hero-accent) !important; }
+body .pricing .pricing-price strong { color: var(--hero-accent) !important; }
+body .pricing .pricing-card li::before {
+  background: color-mix(in srgb, var(--hero-neon) 30%, white) !important;
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--hero-accent) 55%, transparent) !important;
+}
+body .pricing .pricing-gate {
+  background: linear-gradient(115deg, var(--hero-neon), var(--hero-acid)) !important;
+  color: var(--hero-ink) !important;
+}

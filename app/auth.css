@@ -1,0 +1,322 @@
+/* Accounts: the sign in dialog and the navigation's account control.
+   Same language as the rest of the site: soft green ground, pill controls,
+   the face logo, and the skeuo button for the action. */
+
+.auth-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(10, 22, 14, .52);
+  /* The ground dims first and slightly slower than the card arrives, so the
+     card reads as landing on top of the page rather than appearing with it. */
+  animation: auth-fade 260ms cubic-bezier(.22, .8, .28, 1);
+}
+
+@keyframes auth-fade {
+  from { opacity: 0; backdrop-filter: blur(0); }
+  to { opacity: 1; }
+}
+
+.auth-dialog {
+  position: relative;
+  width: min(460px, 100%);
+  max-height: calc(100svh - 40px);
+  overflow-y: auto;
+  padding: clamp(28px, 3.4vw, 40px) clamp(24px, 3vw, 38px) clamp(22px, 2.6vw, 30px);
+  border: 1px solid rgba(255, 255, 255, .9);
+  border-radius: 32px;
+  background:
+    radial-gradient(90% 60% at 50% -10%, color-mix(in srgb, var(--hero-neon, #9dff4a) 22%, transparent), transparent 100%),
+    #fff;
+  box-shadow: 0 34px 90px rgba(14, 32, 20, .32);
+  color: var(--hero-ink, #16321f);
+  text-align: center;
+  /* Overshoots a touch and settles, like the app's own panels. */
+  animation: auth-rise 460ms cubic-bezier(.16, 1.06, .3, 1) both;
+}
+
+@keyframes auth-rise {
+  from { opacity: 0; transform: translateY(26px) scale(.94); }
+  60% { opacity: 1; }
+  to { opacity: 1; transform: none; }
+}
+
+/* The contents follow the card in, staggered, rather than arriving with it. */
+.auth-dialog > * {
+  animation: auth-step 420ms cubic-bezier(.22, .8, .28, 1) both;
+}
+.auth-dialog > .auth-badge { animation-delay: 90ms; }
+.auth-dialog > .auth-eyebrow { animation-delay: 130ms; }
+.auth-dialog > h2 { animation-delay: 165ms; }
+.auth-dialog > .auth-sub { animation-delay: 200ms; }
+.auth-dialog > .auth-tabs { animation-delay: 235ms; }
+.auth-dialog > .auth-form { animation-delay: 270ms; }
+.auth-dialog > .auth-fineprint { animation-delay: 310ms; }
+.auth-dialog > .auth-close { animation-delay: 300ms; }
+
+@keyframes auth-step {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: none; }
+}
+
+/* Her face lands last and bounces, so the dialog opens with her, not a form. */
+.auth-dialog > .auth-badge {
+  animation:
+    auth-step 420ms cubic-bezier(.22, .8, .28, 1) 90ms both,
+    auth-badge-pop 620ms cubic-bezier(.18, 1.2, .32, 1) 120ms both;
+}
+
+@keyframes auth-badge-pop {
+  from { transform: scale(.6) rotate(-8deg); }
+  55% { transform: scale(1.06) rotate(3deg); }
+  to { transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .auth-backdrop,
+  .auth-dialog,
+  .auth-dialog > * {
+    animation-duration: .01ms !important;
+    animation-delay: 0ms !important;
+  }
+}
+
+.auth-badge {
+  display: grid;
+  width: 62px;
+  height: 62px;
+  place-items: center;
+  overflow: hidden;
+  margin: 0 auto 14px;
+  border: 1px solid rgba(22, 50, 31, .12);
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: inset 0 2px 0 #fff, 0 6px 16px rgba(20, 44, 26, .14);
+}
+.auth-badge img {
+  width: 100%;
+  height: auto;
+  image-rendering: pixelated;
+}
+
+.auth-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 34px;
+  height: 34px;
+  border: 1px solid rgba(22, 50, 31, .12);
+  border-radius: 50%;
+  background: #fff;
+  color: #56675c;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+}
+.auth-close:hover { background: #f2f7f1; }
+
+.auth-eyebrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  margin: 0 0 12px;
+  color: var(--hero-accent, #2f7a3f);
+  font: 800 9px/1 var(--mono, monospace);
+  letter-spacing: .13em;
+}
+.auth-eyebrow > span {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--hero-neon, #9dff4a);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--hero-neon, #9dff4a) 28%, transparent);
+}
+
+.auth-dialog h2 {
+  margin: 0 0 10px;
+  font-size: clamp(27px, 3vw, 36px);
+  line-height: 1.02;
+  letter-spacing: -.045em;
+}
+.auth-dialog h2 em {
+  color: var(--hero-accent, #2f7a3f);
+  font-style: normal;
+}
+
+.auth-sub {
+  max-width: 34ch;
+  margin: 0 auto 22px;
+  color: #5b6a60;
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.auth-tabs {
+  display: grid;
+  gap: 4px;
+  grid-template-columns: 1fr 1fr;
+  margin-bottom: 18px;
+  padding: 4px;
+  border: 1px solid rgba(22, 50, 31, .1);
+  border-radius: 999px;
+  background: #f1f6ef;
+}
+.auth-tabs button {
+  padding: 10px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: #5b6a60;
+  font: 700 12px/1 inherit;
+  cursor: pointer;
+  transition: background 140ms ease, color 140ms ease;
+}
+.auth-tabs button.is-active {
+  background: #fff;
+  color: var(--hero-ink, #16321f);
+  box-shadow: 0 2px 8px rgba(20, 44, 26, .14);
+}
+
+.auth-form {
+  display: grid;
+  gap: 12px;
+  text-align: left;
+}
+.auth-form label {
+  display: grid;
+  gap: 6px;
+}
+.auth-form label > span {
+  color: #4b5a50;
+  font: 700 9px/1 var(--mono, monospace);
+  letter-spacing: .11em;
+  text-transform: uppercase;
+}
+.auth-form input {
+  width: 100%;
+  min-height: 48px;
+  padding: 12px 16px;
+  border: 1px solid rgba(22, 50, 31, .16);
+  border-radius: 14px;
+  background: #fbfdfa;
+  color: inherit;
+  font: inherit;
+  font-size: 15px;
+}
+.auth-form input:focus-visible {
+  border-color: color-mix(in srgb, var(--hero-accent, #2f7a3f) 60%, transparent);
+  outline: 3px solid color-mix(in srgb, var(--hero-neon, #9dff4a) 45%, transparent);
+  outline-offset: 0;
+}
+
+.auth-hint {
+  margin-top: -4px;
+  color: #6b7a70;
+  font-size: 12px;
+}
+
+.auth-error {
+  margin: 0;
+  padding: 11px 13px;
+  border: 1px solid rgba(203, 68, 74, .28);
+  border-radius: 12px;
+  background: #fff3f3;
+  color: #a3353b;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.auth-notice {
+  margin: 0;
+  padding: 15px 17px;
+  border: 1px solid rgba(22, 50, 31, .12);
+  border-radius: 16px;
+  background: #f4f8f2;
+  color: #4b5a50;
+  font-size: 13px;
+  line-height: 1.6;
+  text-align: left;
+}
+
+.auth-submit {
+  width: 100%;
+  margin-top: 6px;
+}
+.auth-submit[disabled] { opacity: .65; cursor: progress; }
+
+.auth-fineprint {
+  margin: 16px 0 0;
+  color: #77857b;
+  font-size: 11.5px;
+  line-height: 1.55;
+}
+/* The navigation's account control: its own liquid-glass island, sized and
+   shaped like the links island beside it. */
+.nav-glass-account { flex: none; }
+
+.nav-account {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 4px;
+}
+
+.nav-account-button {
+  display: inline-flex;
+  min-height: 38px;
+  align-items: center;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: inherit;
+  font: 650 11px/1 var(--mono, monospace);
+  letter-spacing: .04em;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 160ms ease, transform 160ms ease;
+}
+.nav-account-button:hover {
+  background: color-mix(in srgb, var(--hero-neon, #74ff2a) 22%, transparent);
+  transform: translateY(-1px);
+}
+.nav-account-button:active { transform: translateY(0); }
+
+html[data-nav-tone="dark"] .nav-account-button { color: #f4fbef; }
+html[data-nav-tone="dark"] .nav-account-button:hover {
+  background: rgba(255, 255, 255, .16);
+}
+
+.nav-account-name {
+  max-width: 14ch;
+  overflow: hidden;
+  padding-left: 12px;
+  font-weight: 700;
+  font-size: 11px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 960px) {
+  .nav-glass-account { display: none; }
+}
+
+/* The account entry inside the phone menu drawer. Matches .mobile-nav nav a
+   (globals.css) so it does not read as a different kind of thing. */
+.mobile-nav nav .mobile-nav-account {
+  display: flex;
+  width: 100%;
+  min-height: 52px;
+  align-items: center;
+  padding: 0 12px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: 650 13px/1 var(--mono);
+  text-align: left;
+  cursor: pointer;
+}

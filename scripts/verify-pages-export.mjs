@@ -7,10 +7,6 @@ const basePath =
     : process.env.NEXT_PUBLIC_BASE_PATH ?? "/PawPico-Website";
 const html = await readFile(new URL("../out/index.html", import.meta.url), "utf8");
 const storeHtml = await readFile(new URL("../out/store/index.html", import.meta.url), "utf8");
-const detailHtml = await readFile(
-  new URL("../out/store/mecha-hero/index.html", import.meta.url),
-  "utf8",
-);
 
 for (const expected of [
   `${basePath}/_next/`,
@@ -27,14 +23,16 @@ if (basePath) {
   );
 }
 assert.ok(
-  storeHtml.includes("The wardrobe is still being stitched."),
+  storeHtml.includes("store-video-hero-cta"),
   "Static export is missing the Store hero",
 );
+for (const costume of ["Corporate Cat", "Cyberpunk Cat", "Bat Cat"]) {
+  assert.ok(storeHtml.includes(costume), `Static export is missing ${costume}`);
+}
 assert.ok(
-  storeHtml.includes(`${basePath}/store/mecha-hero/`),
-  "Store links do not include the Pages base path",
+  storeHtml.includes(`${basePath}/videos/costume-corporate.mp4`),
+  "Costume films do not include the Pages base path",
 );
-assert.ok(detailHtml.includes("Mecha Hero"), "Static export is missing concept detail pages");
 if (basePath) {
   assert.ok(
     !storeHtml.includes(`href="${basePath}${basePath}`),
@@ -51,7 +49,25 @@ assert.doesNotMatch(
   storeHtml,
   /Iron Man|Spider-Man|Captain America|Avengers|Naruto|Itachi|Mock buy|\$\d+\.\d{2}|Dummy total|USD/i,
 );
-assert.doesNotMatch(storeHtml, /\sdownload(?:=|\s|>)/i);
+// The store hands over the three signed costume packages, and nothing else.
+// A download of any other kind on this page would mean an order flow crept in.
+for (const file of [
+  "mewmuze.corporate-cat.v1.mewcostume",
+  "mewmuze.cyberpunk-cat.v1.mewcostume",
+  "mewmuze.bat-cat.v1.mewcostume",
+]) {
+  assert.ok(storeHtml.includes(file), `Store is missing the ${file} package`);
+  assert.ok(
+    (await stat(new URL(`../out/costumes/${file}`, import.meta.url))).size > 4_000,
+    `${file} did not ship`,
+  );
+}
+assert.equal(
+  // The attribute, not the word: the copy below the cards says "download" too.
+  (storeHtml.match(/\sdownload="/gi) ?? []).length,
+  3,
+  "Only the three costume packages may be downloadable from the store",
+);
 
 for (const file of [
   "../out/index.html",
@@ -62,8 +78,9 @@ for (const file of [
   "../out/cat/appearance/white-curious.webp",
   "../out/og-mewmuze.png",
   "../out/videos/desktop-physics.mp4",
+  "../out/videos/mewmuze-care.mp4",
   "../out/store/index.html",
-  "../out/store/mecha-hero/index.html",
+  "../out/videos/costume-corporate.mp4",
 ]) {
   assert.ok((await stat(new URL(file, import.meta.url))).size > 0, `${file} is empty`);
 }
@@ -79,20 +96,6 @@ const isHostingerBuild = process.env.HOSTINGER_BUILD === "true";
 const robotsTxt = await readFile(new URL("../out/robots.txt", import.meta.url), "utf8");
 const sitemapXml = await readFile(new URL("../out/sitemap.xml", import.meta.url), "utf8");
 
-// Costume concepts are pre-release studies with nothing purchasable behind them.
-// They stay readable for visitors but are deliberately kept out of search, so the
-// exported HTML must carry a real noindex rather than relying on the store layout
-// canonicalising every child route to /store/.
-assert.match(
-  detailHtml,
-  /<meta name="robots" content="[^"]*noindex[^"]*"/,
-  "Concept detail pages must carry an explicit noindex",
-);
-assert.match(
-  detailHtml,
-  /<link rel="canonical" href="[^"]*\/store\/mecha-hero\/"/,
-  "Concept detail pages must canonicalise to themselves, not to /store/",
-);
 assert.doesNotMatch(
   storeHtml,
   /<meta name="robots" content="[^"]*noindex/,

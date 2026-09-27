@@ -8671,13 +8671,16 @@ body.mewmuze-splash-open {
   position: relative;
 }
 
+/* The logo art is centred in its own canvas now, so the medallion no longer
+   nudges it: the old top/left offsets were correcting off-centre source art. */
 .brand-medallion img {
   position: absolute;
-  top: -2.83%;
-  left: -6.06%;
-  width: 104%;
-  height: 104%;
-  object-fit: fill;
+  inset: 0;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 
 /* ============================================================================

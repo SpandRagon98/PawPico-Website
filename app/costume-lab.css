@@ -1,0 +1,61 @@
+/* The wardrobe teaser: a short dark band on the same ground as the feelings
+   section, pointing at the store, where the three costumes actually live.
+   (The cards that used to sit here moved to app/store, .wardrobe-card.) */
+
+.costume-lab {
+  position: relative;
+  overflow: hidden;
+  border: 0 !important;
+  /* Texture behind the glass, so the page-level refraction has something to bend. */
+  background:
+    radial-gradient(34% 44% at 4% 18%, color-mix(in srgb, var(--hero-neon) 16%, transparent), transparent 100%),
+    radial-gradient(30% 42% at 50% 62%, rgba(255, 47, 185, .13), transparent 100%),
+    radial-gradient(34% 44% at 96% 30%, rgba(34, 224, 255, .14), transparent 100%),
+    radial-gradient(40% 40% at 70% 104%, rgba(242, 180, 40, .1), transparent 100%),
+    #060b05 !important;
+  color: #f4fbef;
+}
+.costume-lab::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(circle, rgba(244, 251, 239, .12) 1px, transparent 1.7px);
+  background-size: 22px 22px;
+  pointer-events: none;
+}
+.costume-lab.section-pad { padding-block: clamp(52px, 5.5vw, 88px); }
+
+/* Above the page-level refraction layers (z 4), like the other sections. */
+.costume-lab-shell {
+  position: relative;
+  z-index: 5;
+}
+
+.costume-lab-head {
+  max-width: 820px;
+  margin: 0 auto;
+  text-align: center;
+}
+.costume-lab-head > .liquid-kicker { color: var(--theme-bright); }
+.costume-lab .costume-lab-head h2 {
+  margin: 12px 0 12px;
+  color: #f4fbef;
+  font-size: clamp(32px, 3.5vw, 54px);
+  line-height: 1.06;
+  letter-spacing: -.045em;
+}
+.costume-lab .costume-lab-head h2 em {
+  color: var(--theme-bright) !important;
+  font-style: normal;
+}
+.costume-lab-head > p {
+  max-width: 620px;
+  margin: 0 auto;
+  color: rgba(244, 251, 239, .7);
+  font-size: clamp(14px, 1.05vw, 16px);
+  line-height: 1.6;
+}
+
+.costume-lab-cta {
+  margin-top: clamp(22px, 2.4vw, 32px);
+}

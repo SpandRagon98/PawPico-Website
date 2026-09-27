@@ -1,0 +1,448 @@
+/* Neon hero: themed light environment, a large transparent cat, the one-line
+   headline, jacket swatches and the refractive navigation glass. Loaded last so
+   it owns the first viewport; nothing below the hero is styled here. */
+
+/* Registered so the whole environment crossfades when the jacket colour changes. */
+@property --hero-base-1 { syntax: "<color>"; inherits: true; initial-value: #f6ffe8; }
+@property --hero-base-2 { syntax: "<color>"; inherits: true; initial-value: #e2ff9a; }
+@property --hero-neon { syntax: "<color>"; inherits: true; initial-value: #74ff2a; }
+@property --hero-acid { syntax: "<color>"; inherits: true; initial-value: #c6ff1a; }
+@property --hero-soft { syntax: "<color>"; inherits: true; initial-value: #f0ffb8; }
+@property --hero-glow { syntax: "<color>"; inherits: true; initial-value: #6ff3ff; }
+@property --hero-bloom { syntax: "<color>"; inherits: true; initial-value: #fbfff0; }
+@property --hero-ink { syntax: "<color>"; inherits: true; initial-value: #0f1f0a; }
+@property --hero-accent { syntax: "<color>"; inherits: true; initial-value: #2c7a00; }
+
+/* The jacket colour themes the whole page: the palette lives on the root
+   (page.tsx mirrors the hero's choice there), every section reads it, and the
+   crossfade runs once, here, for all of them. */
+:root {
+  --theme-bright: color-mix(in oklab, var(--hero-neon) 72%, white);
+  /* Turns the green-shot Quick Tools film toward the chosen colour. */
+  --theme-hue: 0deg;
+  transition:
+    --hero-base-1 700ms ease, --hero-base-2 700ms ease, --hero-neon 700ms ease,
+    --hero-acid 700ms ease, --hero-soft 700ms ease, --hero-glow 700ms ease,
+    --hero-bloom 700ms ease, --hero-ink 700ms ease, --hero-accent 700ms ease;
+}
+:root[data-hero-theme="pink"] { --theme-hue: 225deg; }
+:root[data-hero-theme="blue"] { --theme-hue: 110deg; }
+:root[data-hero-theme="purple"] { --theme-hue: 160deg; }
+:root[data-hero-theme="red"] { --theme-hue: 265deg; }
+@media (prefers-reduced-motion: reduce) {
+  :root { transition: none; }
+}
+
+:root[data-hero-theme="green"] {
+  --hero-base-1: #f6ffe8; --hero-base-2: #e2ff9a; --hero-neon: #74ff2a; --hero-acid: #c6ff1a;
+  --hero-soft: #f0ffb8; --hero-glow: #6ff3ff; --hero-bloom: #fbfff0; --hero-ink: #0f1f0a; --hero-accent: #2c7a00;
+}
+:root[data-hero-theme="pink"] {
+  --hero-base-1: #fff1f8; --hero-base-2: #ffc4e2; --hero-neon: #ff3f9f; --hero-acid: #ff7ac6;
+  --hero-soft: #ffd9ee; --hero-glow: #b58cff; --hero-bloom: #fff7fb; --hero-ink: #2a0b1c; --hero-accent: #b0126a;
+}
+:root[data-hero-theme="blue"] {
+  --hero-base-1: #eef8ff; --hero-base-2: #bde3ff; --hero-neon: #1f8fff; --hero-acid: #33d6ff;
+  --hero-soft: #d4f2ff; --hero-glow: #7cffe8; --hero-bloom: #f5fbff; --hero-ink: #06172b; --hero-accent: #0b5fc4;
+}
+:root[data-hero-theme="purple"] {
+  --hero-base-1: #f7f0ff; --hero-base-2: #dbc6ff; --hero-neon: #8f4dff; --hero-acid: #d45cff;
+  --hero-soft: #eddcff; --hero-glow: #ff7ad9; --hero-bloom: #fbf7ff; --hero-ink: #1a0b33; --hero-accent: #6a2bd8;
+}
+:root[data-hero-theme="red"] {
+  --hero-base-1: #fff4ef; --hero-base-2: #ffcabd; --hero-neon: #ff3b30; --hero-acid: #ff8a3d;
+  --hero-soft: #ffe2cc; --hero-glow: #ff5fa8; --hero-bloom: #fff8f5; --hero-ink: #2a0906; --hero-accent: #c21d12;
+}
+
+.hero.cinematic-hero[data-hero-theme] {
+  /* Cat height tracks the viewport so heading, actions and a large cat all fit
+     on 16:9 screens; the ears may tuck behind the actions, never the face. */
+  --cat-h: clamp(360px, calc(90svh - 172px), 1240px);
+  /* Not a stacking context, so the page-level glass layers (z 4) can slot
+     between the cat (z 2) and the copy (z 5). globals.css isolates .hero. */
+  isolation: auto;
+  /* Flows straight into the chat section below (an older rule left a 24px gap). */
+  margin-bottom: 0 !important;
+  padding-top: clamp(88px, 9svh, 116px) !important;
+  background:
+    radial-gradient(34% 40% at 50% 100%, color-mix(in srgb, var(--hero-bloom) 88%, transparent) 0%, transparent 100%),
+    radial-gradient(30% 38% at 7% 14%, color-mix(in srgb, var(--hero-acid) 70%, transparent) 0%, transparent 72%),
+    radial-gradient(28% 34% at 95% 10%, color-mix(in srgb, var(--hero-glow) 55%, transparent) 0%, transparent 72%),
+    radial-gradient(42% 60% at 0% 100%, var(--hero-neon) 0%, transparent 72%),
+    radial-gradient(42% 60% at 100% 100%, var(--hero-neon) 0%, transparent 72%),
+    linear-gradient(180deg, var(--hero-base-1) 0%, var(--hero-soft) 48%, var(--hero-base-2) 100%) !important;
+}
+
+
+/* Blurred light shapes, a halftone pattern and fine grain. */
+.hero-environment {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+/* Soft light shapes are gradients, not filter: blur() layers: the navigation's
+   backdrop-filter reads blurred composited layers behind it as flat grey. */
+.hero-light {
+  --light: var(--hero-acid);
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, var(--light), color-mix(in srgb, var(--light) 45%, transparent) 45%, transparent);
+  opacity: .8;
+  animation: hero-light-drift 22s ease-in-out infinite alternate;
+}
+.hero-light-a { top: -22%; left: -14%; width: 50vw; height: 50vw; }
+.hero-light-b { --light: var(--hero-glow); top: -4%; right: -18%; width: 44vw; height: 44vw; opacity: .5; animation-delay: -7s; }
+.hero-light-c { --light: var(--hero-neon); bottom: -34%; left: 6%; width: 40vw; height: 40vw; opacity: .6; animation-delay: -12s; }
+.hero-light-d { --light: var(--hero-neon); bottom: -30%; right: 4%; width: 42vw; height: 42vw; opacity: .55; animation-delay: -4s; }
+.hero-pattern {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(circle, color-mix(in srgb, var(--hero-ink) 16%, transparent) 1px, transparent 1.7px);
+  background-size: 22px 22px;
+  -webkit-mask-image: radial-gradient(60% 55% at 50% 30%, transparent 30%, #000 80%);
+  mask-image: radial-gradient(60% 55% at 50% 30%, transparent 30%, #000 80%);
+  opacity: .5;
+}
+.hero-grain {
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .55 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  /* Normal blending on purpose: a blend-mode layer here turns the glass above it grey. */
+  opacity: .1;
+}
+@keyframes hero-light-drift {
+  from { transform: translate3d(0, 0, 0) scale(1); }
+  to { transform: translate3d(4vw, 3vh, 0) scale(1.12); }
+}
+
+/* The cat: transparent WebGL film anchored to the hero floor, centred. */
+.hero.cinematic-hero .realistic-hero-media {
+  position: absolute;
+  inset: auto 0 0 0;
+  z-index: 2;
+  width: auto;
+  height: var(--cat-h);
+  transform: none;
+  mix-blend-mode: normal;
+  pointer-events: none;
+}
+.hero-cat-stage {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  height: 100%;
+  aspect-ratio: 16 / 9;
+  /* Scaled from low on her body: she grows upward (the ears may tuck behind the
+     actions) while the jacket and bandana stay in view above the hero floor. */
+  transform: translateX(-50%) scale(var(--cat-zoom, 1.18));
+  transform-origin: 50% 85%;
+}
+.hero-cat-stage::before {
+  content: "";
+  position: absolute;
+  bottom: -12%;
+  left: 50%;
+  width: 56%;
+  height: 62%;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--hero-bloom) 80%, transparent), transparent);
+  filter: blur(24px);
+}
+.hero-cat-stage .realistic-hero-video,
+.hero-cat-still,
+.hero-cat-canvas {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.hero-cat-stage .realistic-hero-video {
+  opacity: 0;
+  mask-image: none;
+  -webkit-mask-image: none;
+}
+.hero-cat-canvas {
+  opacity: 0;
+  transition: opacity 500ms ease;
+}
+.hero-cat-still { transition: opacity 500ms ease; }
+.realistic-hero-media[data-renderer="webgl"] .hero-cat-canvas { opacity: 1; }
+.realistic-hero-media[data-renderer="webgl"] .hero-cat-still { opacity: 0; }
+/* No WebGL: the transparent still for the chosen jacket stays in place. */
+.realistic-hero-media[data-renderer="fallback"] .hero-cat-canvas { display: none; }
+
+.hero.cinematic-hero .hero-video-control {
+  position: absolute;
+  right: clamp(16px, 3vw, 44px);
+  bottom: 18px;
+  z-index: 6;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 36px;
+  padding: 8px 13px;
+  border: 1px solid rgba(255, 255, 255, .7);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .78);
+  color: var(--hero-ink);
+  font-size: 11px;
+  font-weight: 650;
+  cursor: pointer;
+  pointer-events: auto;
+}
+.hero.cinematic-hero .hero-video-control:hover { background: rgba(255, 255, 255, .85); }
+
+/* Copy sits in front of the cat. */
+.hero.cinematic-hero .hero-copy { z-index: 5; }
+.hero.cinematic-hero .hero-copy > .eyebrow { color: var(--hero-accent) !important; }
+.hero.cinematic-hero .hero-copy > .eyebrow > span {
+  background: var(--hero-neon);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--hero-neon) 28%, transparent);
+}
+
+/* One-line Montserrat headline. */
+.hero.cinematic-hero .hero-copy { width: min(1440px, 100%); }
+.hero.cinematic-hero .hero-copy > h1 {
+  max-width: none;
+  margin: 0 auto 12px;
+  color: var(--hero-ink);
+  font-size: clamp(32px, 3.3vw, 60px);
+  font-weight: 800;
+  line-height: 1.08;
+  letter-spacing: -.045em;
+  white-space: nowrap;
+}
+.hero.cinematic-hero .hero-support {
+  max-width: 600px;
+  margin-bottom: 16px;
+  color: color-mix(in srgb, var(--hero-ink) 76%, transparent) !important;
+  font-size: clamp(12px, .85vw, 14px);
+  font-weight: 550;
+  line-height: 1.5;
+}
+/* Small print sits in the bottom-left corner, balancing the Pause control. */
+.hero.cinematic-hero > .privacy-note {
+  position: absolute;
+  bottom: 24px;
+  left: max(20px, calc((100% - 1440px) / 2));
+  z-index: 6;
+  justify-content: flex-start;
+  max-width: 34ch;
+  margin: 0;
+  text-align: left;
+  color: color-mix(in srgb, var(--hero-ink) 70%, transparent) !important;
+  font-weight: 600;
+}
+.hero.cinematic-hero .privacy-note > span { color: var(--hero-neon); }
+
+/* The refracting layer (GlassSurface's .glass-bend) sits under the pane, so the
+   wrappers stay transparent and each tint lives on the pane above it. The Pro
+   action wears the theme's own neon; the others stay clear glass. */
+/* GlassSurface portals each pane's refracting layer to the page root; it sits
+   above the hero's environment and cat (z 0 to 2) and below the copy (z 5) and
+   the header (z 100), so the panes above it look through bent glass. */
+.glass-bend-defs { position: absolute; width: 0; height: 0; }
+.glass-bend { z-index: 4; border-radius: 999px; pointer-events: none; }
+.glass-bend--navigation { z-index: 99; }
+.glass-surface .glass__warp { display: none !important; }
+.hero.cinematic-hero :is(.hero-glass-free, .hero-glass-explore, .hero-glass-pro) { background: transparent; }
+.hero.cinematic-hero :is(.hero-glass-free, .hero-glass-explore) .glass { background: rgba(255, 255, 255, .34) !important; }
+.hero.cinematic-hero .hero-glass-pro { box-shadow: 0 10px 28px color-mix(in srgb, var(--hero-neon) 45%, transparent); }
+.hero.cinematic-hero .hero-glass-pro :is(.glass, .glass-surface-fallback) {
+  background: linear-gradient(120deg, color-mix(in srgb, var(--hero-neon) 80%, transparent), color-mix(in srgb, var(--hero-acid) 80%, transparent)) !important;
+}
+.hero.cinematic-hero .hero-glass-link,
+.hero.cinematic-hero .hero-glass-pro .hero-glass-link { color: var(--hero-ink); }
+/* The package's own pointer-tracking rim highlights (site-polish.css hides them). */
+.hero.cinematic-hero .glass-surface > span { display: block !important; }
+
+/* Jacket swatches: a small horizontal pill in the top-left corner. */
+.hero.cinematic-hero .hero-secondary-actions {
+  position: absolute;
+  top: 84px;
+  left: max(16px, calc((100% - 1440px) / 2));
+  z-index: 6;
+  width: auto;
+}
+.hero-swatches {
+  display: inline-flex;
+  align-items: center;
+  gap: 0;
+  padding: 2px 5px;
+  border: 1px solid rgba(255, 255, 255, .75);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .66);
+  box-shadow: 0 8px 22px color-mix(in srgb, var(--hero-ink) 10%, transparent), inset 0 1px #fff;
+}
+.hero-swatch-dots { display: inline-flex; }
+.hero-swatch {
+  position: relative;
+  display: grid;
+  width: 24px;
+  height: 26px;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+}
+.hero-swatch::before {
+  content: "";
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 34% 30%, rgba(255, 255, 255, .75), transparent 42%), var(--swatch);
+  box-shadow: inset 0 -2px 3px rgba(0, 0, 0, .16), 0 2px 6px color-mix(in srgb, var(--swatch) 55%, transparent);
+  transition: transform 200ms ease, box-shadow 200ms ease;
+}
+.hero-swatch:hover::before { transform: scale(1.12); }
+.hero-swatch[aria-checked="true"]::before {
+  transform: scale(1.14);
+  box-shadow: 0 0 0 2px #fff, 0 0 0 3px var(--hero-ink), 0 3px 8px color-mix(in srgb, var(--swatch) 60%, transparent);
+}
+.hero-swatch:focus-visible { outline: 3px solid var(--hero-ink) !important; outline-offset: 1px !important; }
+/* The selected ring shows the choice; the name is for screen readers (and title). */
+.hero-swatch-label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Navigation: real liquid-glass-react islands (brand, links) refracting the hero.
+   The dock itself becomes a transparent layout row. */
+.site-navigation .nav-dock.nav-dock-islands {
+  width: min(1440px, calc(100% - 32px));
+  min-height: 62px;
+  gap: 12px;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+.nav-dock-islands .nav-glass {
+  width: auto;
+  height: 60px;
+  margin: 0;
+  border-radius: 999px;
+}
+.nav-dock-islands .nav-glass-links { justify-self: center; }
+@media (min-width: 961px) {
+  /* Equal outer columns keep the links island on the page's own centre line. */
+  .site-navigation .nav-dock.nav-dock-islands { grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); }
+  .nav-dock-islands .nav-glass-brand { justify-self: start; }
+  /* Column 3 explicitly: the links island below leaves the grid when it goes fixed. */
+  .nav-dock-islands .nav-auth { grid-column: 3; justify-self: end; }
+  /* Only the links island follows you down the page. The brand, the swatches
+     and Live demo belong to the hero and scroll away with it. */
+  .site-navigation:not(.public-navigation) { position: absolute; top: 10px; left: 0; right: 0; }
+  .nav-dock-islands .nav-glass-links { position: fixed; top: 10px; left: 50%; z-index: 100; transform: translateX(-50%); }
+}
+.nav-dock-islands .glass-surface-content {
+  display: flex;
+  flex: none;
+  align-items: center;
+  width: max-content;
+  height: 100%;
+  white-space: nowrap;
+}
+.nav-glass-brand .glass-surface-content { padding: 0 24px 0 8px; }
+.nav-glass-links .glass-surface-content { padding: 0 28px; }
+.nav-glass-links .desktop-nav { height: 100%; }
+.nav-dock-islands .nav-glass .glass-surface-package .glass { overflow: hidden !important; }
+.nav-dock-islands .nav-glass .glass__warp { border-radius: inherit; }
+.nav-dock-islands .mobile-nav nav {
+  z-index: 120;
+  max-height: calc(100svh - 90px);
+  overflow-y: auto;
+  border: 1px solid #e0e9f3;
+  border-radius: 22px;
+  background: #fff;
+  box-shadow: 0 20px 60px rgba(39, 65, 107, .15);
+}
+.nav-dock-islands .mobile-nav > summary {
+  background: rgba(255, 255, 255, .62) !important;
+}
+@media (max-width: 960px) {
+  .nav-dock-islands .nav-glass-links { display: none; }
+}
+@media (max-width: 760px) {
+  .site-navigation .nav-dock.nav-dock-islands { width: calc(100% - 24px); min-height: 54px; }
+  .nav-dock-islands .nav-glass { height: 52px; }
+  .nav-glass-brand .glass-surface-content { padding: 0 18px 0 6px; }
+}
+
+.glass-surface.nav-glass { background: transparent; }
+.nav-glass .glass-surface-package .glass {
+  background: rgba(255, 255, 255, .32) !important;
+  border: 1px solid rgba(255, 255, 255, .6) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .95),
+    inset 0 -1px 0 rgba(255, 255, 255, .35),
+    inset 0 0 18px rgba(255, 255, 255, .28),
+    0 18px 48px rgba(24, 40, 30, .16) !important;
+}
+.glass-surface.nav-glass > span { display: block !important; }
+.nav-glass[data-glass="fallback"] .glass-surface-fallback {
+  background: rgba(255, 255, 255, .72);
+}
+
+/* Laptop-height screens (1366x768, 1440x900): tighter copy, so the cat can grow
+   while its ears still tuck behind the actions rather than the text. */
+@media (max-height: 920px) and (min-width: 761px) {
+  .hero.cinematic-hero[data-hero-theme] {
+    --cat-h: clamp(360px, calc(100svh - 204px), 1180px);
+    padding-top: 84px !important;
+  }
+  .hero.cinematic-hero .hero-copy > .eyebrow { margin-bottom: 6px; }
+  .hero.cinematic-hero .hero-copy > h1 { margin-bottom: 8px; font-size: min(3.3vw, 6svh); }
+  .hero.cinematic-hero .hero-support { margin-bottom: 10px; font-size: 12px; }
+  .hero.cinematic-hero .hero-actions { gap: 9px; }
+}
+
+/* Phones: stack the copy above the cat instead of overlapping them. */
+@media (max-width: 760px) {
+  .hero.cinematic-hero[data-hero-theme] {
+    height: auto !important;
+    min-height: 100svh !important;
+    padding-top: calc(84px + env(safe-area-inset-top)) !important;
+  }
+  .hero.cinematic-hero .realistic-hero-media {
+    position: relative;
+    inset: auto;
+    order: 2;
+    flex: 1 1 auto;
+    width: 100%;
+    height: auto;
+    min-height: clamp(220px, 44svh, 420px);
+    margin-top: 6px;
+  }
+  .hero-cat-stage { height: 100%; --cat-zoom: 1.08; }
+  .hero.cinematic-hero .hero-copy > h1 { max-width: 14ch; font-size: clamp(30px, 8.6vw, 38px); white-space: normal; }
+  .hero.cinematic-hero .hero-support { max-width: 34ch; margin-bottom: 14px; font-size: 12px; }
+  .hero.cinematic-hero .hero-secondary-actions { position: static; order: 1; justify-content: center; width: 100%; margin-top: 12px; }
+  /* Touch-sized targets around the same small dots. */
+  .hero-swatch { width: 36px; height: 36px; }
+  .hero.cinematic-hero > .privacy-note { position: static; order: 1; justify-content: center; max-width: none; margin: 10px auto 0; font-size: 9px; text-align: center; }
+  .hero.cinematic-hero .hero-video-control { right: 14px; bottom: 12px; }
+  .hero-light-a { width: 80vw; height: 80vw; }
+  .hero-light-b { width: 70vw; height: 70vw; }
+  .hero-light-c, .hero-light-d { width: 60vw; height: 60vw; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero.cinematic-hero[data-hero-theme] { transition: none; }
+  .hero-light { animation: none; }
+  .hero-cat-canvas, .hero-swatch::before { transition: none; }
+}

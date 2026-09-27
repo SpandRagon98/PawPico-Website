@@ -1,15 +1,15 @@
 "use client";
 
 import Image from "next/image";
+import { GlassSurface } from "./GlassSurface";
+import { HeroCatCanvas, type Rgb } from "./HeroCatCanvas";
+import { heroThemes, type HeroThemeId } from "./hero-themes";
 import {
-  useCallback,
   useEffect,
   useRef,
   useState,
   useSyncExternalStore,
   type CSSProperties,
-  type KeyboardEvent,
-  type PointerEvent,
   type RefObject,
   type ReactNode,
 } from "react";
@@ -19,7 +19,6 @@ import {
   type FeatureNotice,
   type FeatureStory,
 } from "../data/features";
-import { faqItems } from "../data/faq";
 import {
   checkoutUrlFor,
   commerce,
@@ -28,6 +27,13 @@ import {
   priceLabelFor,
 } from "../lib/commerce";
 import { sitePath } from "../lib/site-path";
+import { SiteBrand, SiteNav } from "../components/SiteNav";
+import { AdaptsLab } from "../components/AdaptsLab";
+import { DownloadButton } from "../components/DownloadButton";
+import { ColdOpen } from "../components/story/ColdOpen";
+import { DayWithHer } from "../components/story/DayWithHer";
+import { Receipts } from "../components/story/Receipts";
+import { ClosingBeat } from "../components/story/ClosingBeat";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://mewmuze.com";
 
@@ -50,7 +56,7 @@ const appStructuredData = {
   image: `${SITE_URL}/og-mewmuze.png`,
   applicationCategory: "UtilitiesApplication",
   operatingSystem: "Windows 10, Windows 11",
-  softwareVersion: "0.1.8",
+  softwareVersion: "0.1.9",
   publisher: { "@id": `${SITE_URL}/#organization` },
   offers: {
     "@type": "Offer",
@@ -61,35 +67,13 @@ const appStructuredData = {
   },
 };
 
-const faqStructuredData = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  mainEntity: faqItems.map((item) => ({
-    "@type": "Question",
-    name: item.question,
-    acceptedAnswer: { "@type": "Answer", text: item.answer },
-  })),
-};
-
 const CAT_ASSET = "/cat/mewmuze-hero-reference-app.png";
-const HERO_CAT_BODY_ASSET = "/cat/mewmuze-hero-front-body-app.png";
-const HERO_CAT_BODY_ALIVE_ASSET = "/cat/mewmuze-hero-front-body-alive.webp";
-const HERO_CAT_HEAD_ASSET = "/cat/mewmuze-hero-front-head-app.png";
-const HERO_CAT_BLINK_ASSET = "/cat/mewmuze-hero-front-head-blink-app.png";
-const HERO_CAT_EARS_ASSET = "/cat/mewmuze-hero-front-head-ears-app.png";
 const FACE_LOGO_ASSET = "/cat/mewmuze-face-logo-hd.png";
 
 /** The visitor's timezone cannot change mid-visit, so there is nothing to subscribe to. */
 const noSubscribe = () => () => {};
 const serverPrefersRupees = () => false;
 
-const heroEmotionAssets = {
-  happy: "/cat/hero-emotions/happy.webp",
-  sad: "/cat/hero-emotions/sad.webp",
-  cheerful: "/cat/hero-emotions/cheerful.webp",
-} as const;
-
-type HeroEmotion = "neutral" | keyof typeof heroEmotionAssets;
 
 function useVisibleMotion(ref: RefObject<HTMLElement | null>, initiallyVisible = false) {
   const [active, setActive] = useState(initiallyVisible);
@@ -113,304 +97,12 @@ function useVisibleMotion(ref: RefObject<HTMLElement | null>, initiallyVisible =
   return active;
 }
 
-function CatFigure({
-  className = "",
-  priority = false,
-}: {
-  className?: string;
-  priority?: boolean;
-}) {
-  return (
-    <span className={`cat-figure ${className}`} aria-hidden="true">
-      <Image
-        src={sitePath(CAT_ASSET)}
-        alt=""
-        width={128}
-        height={128}
-        unoptimized
-        priority={priority}
-      />
-    </span>
-  );
-}
-
-function HeroCat({
-  headUnitRef,
-  leftPupilRef,
-  rightPupilRef,
-  emotion,
-  reducedMotion,
-}: {
-  headUnitRef: RefObject<HTMLSpanElement | null>;
-  leftPupilRef: RefObject<HTMLSpanElement | null>;
-  rightPupilRef: RefObject<HTMLSpanElement | null>;
-  emotion: HeroEmotion;
-  reducedMotion: boolean;
-}) {
-  const [loadedEmotions, setLoadedEmotions] = useState<
-    Partial<Record<Exclude<HeroEmotion, "neutral">, true>>
-  >({});
-  const displayedEmotion =
-    emotion === "neutral" || loadedEmotions[emotion] ? emotion : "neutral";
-
-  return (
-    <span
-      className={`hero-cat-art emotion-${displayedEmotion}`}
-      aria-hidden="true"
-    >
-      <Image
-        className="hero-cat-layer hero-cat-body"
-        src={sitePath(
-          reducedMotion ? HERO_CAT_BODY_ASSET : HERO_CAT_BODY_ALIVE_ASSET,
-        )}
-        alt=""
-        width={128}
-        height={128}
-        unoptimized
-        priority
-      />
-      <span ref={headUnitRef} className="hero-cat-head-unit">
-        <Image
-          className="hero-cat-layer hero-cat-head"
-          src={sitePath(HERO_CAT_HEAD_ASSET)}
-          alt=""
-          width={128}
-          height={128}
-          unoptimized
-          priority
-        />
-        <span className="hero-eye-track hero-eye-track-left">
-          <span ref={leftPupilRef} className="hero-pupil" />
-        </span>
-        <span className="hero-eye-track hero-eye-track-right">
-          <span ref={rightPupilRef} className="hero-pupil" />
-        </span>
-        <Image
-          className="hero-cat-layer hero-cat-expression hero-cat-ears"
-          src={sitePath(HERO_CAT_EARS_ASSET)}
-          alt=""
-          width={128}
-          height={128}
-          unoptimized
-        />
-        <Image
-          className="hero-cat-layer hero-cat-expression hero-cat-blink"
-          src={sitePath(HERO_CAT_BLINK_ASSET)}
-          alt=""
-          width={128}
-          height={128}
-          unoptimized
-        />
-      </span>
-      {!reducedMotion && Object.entries(heroEmotionAssets).map(([name, asset]) => (
-        <Image
-          key={name}
-          className={`hero-cat-layer hero-cat-emotion hero-cat-emotion-${name}`}
-          src={sitePath(asset)}
-          alt=""
-          width={128}
-          height={128}
-          unoptimized
-          onLoad={() =>
-            setLoadedEmotions((current) =>
-              current[name as Exclude<HeroEmotion, "neutral">]
-                ? current
-                : {
-                    ...current,
-                    [name]: true,
-                  },
-            )
-          }
-        />
-      ))}
-    </span>
-  );
-}
-
-function SkeuoButton({
-  href,
-  children,
-  variant = "primary",
-  onClick,
-  className = "",
-  disabled = false,
-}: {
-  href?: string;
-  children: ReactNode;
-  variant?: "primary" | "secondary" | "quiet";
-  onClick?: () => void;
-  className?: string;
-  disabled?: boolean;
-}) {
-  const classes = `skeuo-button skeuo-button-${variant} ${className}`.trim();
-  if (href && !disabled) {
-    return (
-      <a className={classes} href={href} onClick={onClick}>
-        {children}
-      </a>
-    );
-  }
-  return (
-    <button className={classes} type="button" onClick={onClick} disabled={disabled}>
-      {children}
-    </button>
-  );
-}
-
 function Eyebrow({ children }: { children: ReactNode }) {
   return (
     <p className="eyebrow">
       <span aria-hidden="true" />
       {children}
     </p>
-  );
-}
-
-function SiteBrand() {
-  return (
-    <span className="site-brand">
-      <span className="brand-medallion">
-        <Image src={sitePath(FACE_LOGO_ASSET)} alt="" width={512} height={512} unoptimized />
-      </span>
-      <span>
-        <strong>MewMuze</strong>
-        <small>personal desktop pet</small>
-      </span>
-    </span>
-  );
-}
-
-function SiteNavigation() {
-  const links = (
-    <>
-      <a href="#story" aria-current="page">
-        Story
-      </a>
-      <a href="#features">Features</a>
-      <a href="#editions">Free vs Pro</a>
-      <a href="#appearance">Appearance</a>
-      <a href={sitePath("/store/")}>
-        Store <span className="coming-pill">Coming Soon</span>
-      </a>
-      <a href="#faq">FAQ</a>
-      <a href="#privacy">Privacy</a>
-      <a href={sitePath("/support/")}>Support</a>
-    </>
-  );
-
-  return (
-    <div className="nav-dock">
-      <a className="brand-link" href="#top" aria-label="MewMuze home">
-        <SiteBrand />
-      </a>
-      <nav className="desktop-nav" aria-label="Primary navigation">
-        {links}
-      </nav>
-      <details className="mobile-nav" onClick={(event) => {
-        if ((event.target as HTMLElement).closest("a")) event.currentTarget.open = false;
-      }} onKeyDown={(event) => {
-        if (event.key === "Escape") {
-          event.currentTarget.open = false;
-          event.currentTarget.querySelector("summary")?.focus();
-        }
-      }}>
-        <summary aria-label="Open navigation">Menu</summary>
-        <nav aria-label="Mobile navigation">
-          {links}
-          <a href="#pricing">Buy MewMuze Pro</a>
-        </nav>
-      </details>
-      <div className="nav-auth">
-        <SkeuoButton href="#pricing" variant="primary" className="nav-cta nav-cta-signup">
-          Buy MewMuze Pro
-        </SkeuoButton>
-      </div>
-    </div>
-  );
-}
-
-/**
- * Opening curtain. Holds for a beat on a soft blue field, fills a loading bar,
- * then lifts away. Rendered on the server too, so there is no flash of the page
- * underneath before it appears.
- */
-function WelcomeSplash() {
-  const [phase, setPhase] = useState<"loading" | "leaving" | "gone">("loading");
-
-  useEffect(() => {
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const hold = reduced ? 0 : 450;
-    const lift = reduced ? 120 : 720;
-    const toLeaving = window.setTimeout(() => setPhase("leaving"), hold);
-    const toGone = window.setTimeout(() => setPhase("gone"), hold + lift);
-    return () => {
-      window.clearTimeout(toLeaving);
-      window.clearTimeout(toGone);
-    };
-  }, []);
-
-  useEffect(() => {
-    // Keep the page still underneath while the curtain is up.
-    document.body.classList.toggle("mewmuze-splash-open", phase !== "gone");
-    return () => document.body.classList.remove("mewmuze-splash-open");
-  }, [phase]);
-
-  if (phase === "gone") return null;
-
-  return (
-    <div
-      className={phase === "leaving" ? "welcome-splash is-leaving" : "welcome-splash"}
-      role="status"
-      aria-live="polite"
-    >
-      <div className="splash-inner">
-        {/* Same head, pupil and blink stack the hero uses, so the splash cat
-            blinks with the app's own artwork. The eye sockets are positioned in
-            percentages, so they land correctly in any square container. */}
-        <span className="splash-cat" aria-hidden="true">
-          {/* splash-disc is the white circle and the clip; splash-frame is the
-              sprite's own 128 grid, scaled up and nudged so the head fills the
-              circle. Keeping the frame as its own element means the eye sockets
-              stay on the sprite's coordinates and need no recalibration. */}
-          <span className="splash-disc">
-            <span className="splash-frame">
-              <Image
-                className="splash-layer"
-                src={sitePath(HERO_CAT_HEAD_ASSET)}
-                alt=""
-                width={128}
-                height={128}
-                unoptimized
-                priority
-              />
-              <span className="hero-eye-track hero-eye-track-left">
-                <span className="hero-pupil" />
-              </span>
-              <span className="hero-eye-track hero-eye-track-right">
-                <span className="hero-pupil" />
-              </span>
-              <Image
-                className="splash-layer splash-blink"
-                src={sitePath(HERO_CAT_BLINK_ASSET)}
-                alt=""
-                width={128}
-                height={128}
-                unoptimized
-                priority
-              />
-            </span>
-          </span>
-          <i className="splash-sparkle splash-sparkle-1" />
-          <i className="splash-sparkle splash-sparkle-2" />
-          <i className="splash-sparkle splash-sparkle-3" />
-        </span>
-        <p className="splash-title">Welcome to MewMuze</p>
-        <p className="splash-sub">Waking up your desktop pet</p>
-        <span className="splash-bar" aria-hidden="true">
-          <i />
-        </span>
-      </div>
-    </div>
   );
 }
 
@@ -428,396 +120,36 @@ function AppNotice({ notice, className = "" }: { notice: FeatureNotice; classNam
   );
 }
 
-const quickToolFeatureIds = [
-  "calculator",
-  "unit-converter",
-  "time-converter",
-] as const;
-
-type QuickToolFeatureId = (typeof quickToolFeatureIds)[number];
-
-function isQuickToolFeature(id: string): id is QuickToolFeatureId {
-  return quickToolFeatureIds.includes(id as QuickToolFeatureId);
-}
-
-function QuickToolFilm({ feature }: { feature: FeatureStory }) {
-  const toolId = feature.id as QuickToolFeatureId;
-
-  return (
-    <div
-      className={`quick-tool-film quick-tool-film-${toolId}`}
-      role="img"
-      aria-label={`MewMuze demonstrating ${feature.title}`}
-    >
-      <CatFigure className="quick-tool-cat" />
-
-      {toolId === "calculator" && (
-        <div className="quick-tool-panel quick-tool-calculator" aria-hidden="true">
-          <span className="quick-tool-panel-label">CALCULATOR</span>
-          <div className="calculator-display">
-            <small>2450 + 785</small>
-            <strong>3,235</strong>
-          </div>
-          <div className="calculator-keys">
-            {["7", "8", "9", "+", "4", "5", "6", "="].map((key) => (
-              <span key={key}>{key}</span>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {toolId === "unit-converter" && (
-        <div className="quick-tool-panel quick-tool-converter" aria-hidden="true">
-          <span className="quick-tool-panel-label">UNIT CONVERTER</span>
-          <div className="converter-card converter-card-from">
-            <small>KILOMETRES</small>
-            <strong>5 km</strong>
-          </div>
-          <span className="converter-swap">↔</span>
-          <div className="converter-card converter-card-to">
-            <small>MILES</small>
-            <strong>3.11 mi</strong>
-          </div>
-        </div>
-      )}
-
-      {toolId === "time-converter" && (
-        <div className="quick-tool-panel quick-tool-time" aria-hidden="true">
-          <span className="quick-tool-panel-label">TIME ZONE CONVERTER</span>
-          <div className="time-card time-card-india">
-            <i />
-            <small>INDIA</small>
-            <strong>10:30 PM</strong>
-          </div>
-          <span className="time-card-arrow">→</span>
-          <div className="time-card time-card-new-york">
-            <i />
-            <small>NEW YORK</small>
-            <strong>1:00 PM</strong>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
 function FeatureAvailability({ feature }: { feature: FeatureStory }) {
   if (!feature.availability) return null;
 
-  const availabilityLabel = feature.availability.free
-    ? "Available in the Free and Pro editions"
-    : "Available in the Pro edition";
+  const { free, pro, paper } = feature.availability;
+  const availabilityLabel = paper
+    ? "In the Paper preview build only"
+    : free
+      ? "Available in the Free and Pro editions"
+      : "Available in the Pro edition";
 
   return (
     <div
       className="feature-availability"
       aria-label={availabilityLabel}
     >
-      {feature.availability.free && (
+      {free && (
         <span className="availability-free">FREE <i aria-hidden="true">✓</i></span>
       )}
-      {feature.availability.pro && (
+      {pro && (
         <span className="availability-pro">PRO <i aria-hidden="true">✓</i></span>
       )}
+      {paper && <span className="availability-paper">PAPER PREVIEW</span>}
     </div>
   );
 }
-
-function FeatureFilm({
-  feature,
-  reducedMotion,
-}: {
-  feature: FeatureStory;
-  reducedMotion: boolean;
-}) {
-  if (reducedMotion) {
-    return (
-      <div className="reduced-film" role="img" aria-label={`${feature.title} illustrated by MewMuze`}>
-        <CatFigure className="reduced-film-cat" />
-        <span>{feature.demoLabel}</span>
-      </div>
-    );
-  }
-
-  if (isQuickToolFeature(feature.id)) {
-    return <QuickToolFilm feature={feature} />;
-  }
-
-  return (
-    <Image
-      key={feature.id}
-      className={`feature-media-cat feature-media-${feature.id}`}
-      src={sitePath(`/cat/features/${feature.id}.webp`)}
-      alt={`Authentic MewMuze animation for ${feature.title}`}
-      width={128}
-      height={128}
-      unoptimized
-    />
-  );
-}
-
-const appearanceShowcase = [
-  ["white-grey-flower", "White & grey · calm"],
-  ["orange-happy", "Orange · happy"],
-  ["calico-wave", "Calico · wave"],
-  ["tuxedo-placard", "Black tuxedo · placard"],
-  ["tabby-groom", "Grey tabby · groom"],
-  ["fluffy-stretch", "White fluffy · stretch"],
-  ["kitten-yawn", "Bicolour kitten · yawn"],
-  ["siamese-celebrate", "Siamese · celebration"],
-] as const;
-
-function AppearanceShowcase({ reducedMotion }: { reducedMotion: boolean }) {
-  const [activeIndex, setActiveIndex] = useState(0);
-  const stageRef = useRef<HTMLDivElement>(null);
-  const isVisible = useVisibleMotion(stageRef);
-
-  useEffect(() => {
-    if (reducedMotion || !isVisible) return;
-    const interval = window.setInterval(() => {
-      setActiveIndex((current) => (current + 1) % appearanceShowcase.length);
-    }, 2200);
-    return () => window.clearInterval(interval);
-  }, [isVisible, reducedMotion]);
-
-  const [, activeLabel] = appearanceShowcase[activeIndex];
-
-  return (
-    <div
-      ref={stageRef}
-      className={`appearance-showcase ${isVisible ? "is-visible" : ""}`}
-      aria-label="Authentic MewMuze appearances and emotions"
-    >
-      <span className="showcase-window-bar" aria-hidden="true">
-        <i />
-        <i />
-        <i />
-      </span>
-      <div className="showcase-cat-well">
-        {reducedMotion || !isVisible ? (
-          <Image
-            className="showcase-cat-static"
-            src={sitePath(CAT_ASSET)}
-            alt="MewMuze in the white and grey Flower Band appearance"
-            width={128}
-            height={128}
-            unoptimized
-          />
-        ) : (
-          appearanceShowcase.map(([id, label], index) => index === activeIndex && (
-            <Image
-              key={id}
-              className={`showcase-cat-media ${
-                index === activeIndex ? "is-current" : ""
-              }`}
-              src={sitePath(`/cat/appearance/${id}.webp`)}
-              alt={index === activeIndex ? `MewMuze appearance: ${label}` : ""}
-              aria-hidden={index === activeIndex ? undefined : "true"}
-              width={128}
-              height={128}
-              loading="eager"
-              unoptimized
-            />
-          ))
-        )}
-      </div>
-      <span className="showcase-ticket">
-        <small>LIVE APPEARANCE / AUTHENTIC RENDERER</small>
-        <strong>{activeLabel}</strong>
-      </span>
-      <div className="showcase-progress" aria-hidden="true">
-        {appearanceShowcase.map(([id], index) => (
-          <span key={id} className={index === activeIndex ? "is-active" : ""} />
-        ))}
-      </div>
-      <p aria-live="polite">{activeLabel}</p>
-    </div>
-  );
-}
-
-function FeatureTheatre({ reducedMotion }: { reducedMotion: boolean }) {
-  const stageRef = useRef<HTMLDivElement>(null);
-  const active = useVisibleMotion(stageRef, true);
-  const [activeIndex, setActiveIndex] = useState(0);
-  const [touchStart, setTouchStart] = useState<number | null>(null);
-  const feature = featureStories[activeIndex];
-
-  const show = useCallback((next: number) => {
-    setActiveIndex(Math.min(featureStories.length - 1, Math.max(0, next)));
-  }, []);
-
-  const handleKeyboard = (event: KeyboardEvent<HTMLElement>) => {
-    if (event.key === "ArrowLeft") {
-      event.preventDefault();
-      show(activeIndex - 1);
-    } else if (event.key === "ArrowRight") {
-      event.preventDefault();
-      show(activeIndex + 1);
-    } else if (event.key === "Home") {
-      event.preventDefault();
-      show(0);
-    } else if (event.key === "End") {
-      event.preventDefault();
-      show(featureStories.length - 1);
-    }
-  };
-
-  const finishSwipe = (event: PointerEvent<HTMLElement>) => {
-    if (touchStart === null || event.pointerType === "mouse") return;
-    const distance = event.clientX - touchStart;
-    if (Math.abs(distance) > 46) show(activeIndex + (distance < 0 ? 1 : -1));
-    setTouchStart(null);
-  };
-
-  return (
-    <section
-      className="feature-theatre section-shell"
-      data-motion-paused={!active || reducedMotion}
-      id="features"
-      data-reveal
-      aria-labelledby="feature-theatre-title"
-      onKeyDown={handleKeyboard}
-      onPointerDown={(event) => {
-        if (event.pointerType !== "mouse") setTouchStart(event.clientX);
-      }}
-      onPointerUp={finishSwipe}
-      onPointerCancel={() => setTouchStart(null)}
-    >
-      <div className="section-heading theatre-heading">
-        <div>
-          <Eyebrow>THE FEATURE THEATRE</Eyebrow>
-          <h2 id="feature-theatre-title">
-            One small companion.
-            <br />
-            <em>A surprisingly useful day.</em>
-          </h2>
-        </div>
-        <p>
-          Move through MewMuze&apos;s day one scene at a time. Nothing advances until
-          you ask it to.
-        </p>
-      </div>
-
-      <div
-        ref={stageRef}
-        className={`theatre-console accent-${feature.accent}`}
-        aria-roledescription="carousel"
-        aria-label="MewMuze feature stories"
-      >
-        <div className="console-rim" aria-hidden="true">
-          <span />
-          <span />
-          <span />
-        </div>
-
-        <div className="theatre-stage">
-          <div className="theatre-media">
-            <div className="media-label">
-              <span>AUTHENTIC APP-RENDERED MOTION · TRANSPARENT</span>
-              <i aria-hidden="true" />
-            </div>
-            <FeatureFilm feature={feature} reducedMotion={reducedMotion || !active} />
-            {feature.notice && (
-              <AppNotice key={feature.id} notice={feature.notice} className="notice-float" />
-            )}
-            <span className="media-caption">{feature.demoLabel}</span>
-          </div>
-
-          <article className="theatre-copy" key={feature.id}>
-            <div className="feature-index">
-              <span>{feature.number}</span>
-              <small>{feature.group}</small>
-            </div>
-            <FeatureAvailability feature={feature} />
-            <p className="feature-scene">{feature.scene}</p>
-            <h3>{feature.title}</h3>
-            <p className="feature-story">{feature.story}</p>
-            <div className="feature-helps">
-              <small>WHAT THIS CHANGES FOR YOU</small>
-              <p>{feature.helps}</p>
-            </div>
-            <p className="feature-detail">{feature.detail}</p>
-            <ul>
-              {feature.facts.map((fact) => (
-                <li key={fact}>{fact}</li>
-              ))}
-            </ul>
-          </article>
-        </div>
-
-        <div className="theatre-controls">
-          <button
-            className="theatre-arrow theatre-arrow-left"
-            type="button"
-            aria-label="Previous feature"
-            disabled={activeIndex === 0}
-            onClick={() => show(activeIndex - 1)}
-          >
-            <span aria-hidden="true">←</span>
-            <small>Previous</small>
-          </button>
-          <div className="theatre-counter" aria-hidden="true">
-            <small>
-              FEATURE {String(activeIndex + 1).padStart(2, "0")} /{" "}
-              {featureStories.length}
-            </small>
-            <strong>{feature.title}</strong>
-          </div>
-          <button
-            className="theatre-arrow theatre-arrow-right"
-            type="button"
-            aria-label="Next feature"
-            disabled={activeIndex === featureStories.length - 1}
-            onClick={() => show(activeIndex + 1)}
-          >
-            <small>Next</small>
-            <span aria-hidden="true">→</span>
-          </button>
-        </div>
-
-        <div className="theatre-progress" aria-label="Choose a feature">
-          {featureStories.map((item, index) => (
-            <button
-              key={item.id}
-              type="button"
-              className={index === activeIndex ? "is-active" : ""}
-              aria-label={`Feature ${item.number}: ${item.title}`}
-              aria-current={index === activeIndex ? "true" : undefined}
-              onClick={() => show(index)}
-            >
-              <span>{item.number}</span>
-              <small>{item.shortTitle}</small>
-            </button>
-          ))}
-        </div>
-        <p className="carousel-status" aria-live="polite">
-          Feature {activeIndex + 1} of {featureStories.length}: {feature.title}
-        </p>
-      </div>
-    </section>
-  );
-}
-
-const bodyOptions = [
-  ["Classic", "classic"],
-  ["Chonk", "chonk"],
-  ["Fluffy", "fluffy"],
-  ["Siamese", "siamese"],
-  ["Kitten", "kitten"],
-] as const;
-
-const patternOptions = [
-  ["Solid", "solid"],
-  ["Tuxedo", "tuxedo"],
-  ["Tabby", "tabby"],
-  ["Socks", "socks"],
-  ["Spotted", "spotted"],
-  ["Calico", "calico"],
-  ["Bicolour", "bicolour"],
-] as const;
 
 function FeatureDirectory() {
-  const [openGroup, setOpenGroup] = useState(0);
+  // Every group starts closed: the directory is a long list, and opening one
+  // by default buried the groups under it.
+  const [openGroup, setOpenGroup] = useState(-1);
 
   return (
     <div className="directory-groups">
@@ -861,16 +193,15 @@ function FeatureDirectory() {
                     <p>{feature.story}</p>
                     <div className="directory-helps">
                       <small>HOW IT HELPS</small>
-                      <p>{feature.helps}</p>
+                      <ul>
+                        {feature.helps.map((point) => (
+                          <li key={point}>{point}</li>
+                        ))}
+                      </ul>
                     </div>
                     {feature.notice && (
                       <AppNotice notice={feature.notice} className="notice-inline" />
                     )}
-                    <ul>
-                      {feature.facts.map((fact) => (
-                        <li key={fact}>{fact}</li>
-                      ))}
-                    </ul>
                   </article>
                 ))}
               </div>
@@ -882,554 +213,725 @@ function FeatureDirectory() {
   );
 }
 
-type EditionValue =
-  | { kind: "included"; label?: string }
-  | { kind: "limited"; label: string }
-  | { kind: "unavailable" }
-  | { kind: "text"; label: string };
-
-type EditionRow = {
-  feature: string;
-  free: EditionValue;
-  pro: EditionValue;
-};
-
-type EditionGroup = {
-  name: string;
-  rows: EditionRow[];
-};
-
-const included = (label?: string): EditionValue => ({ kind: "included", label });
-const limited = (label: string): EditionValue => ({ kind: "limited", label });
-const unavailable: EditionValue = { kind: "unavailable" };
-const editionText = (label: string): EditionValue => ({ kind: "text", label });
-
-const editionGroups: EditionGroup[] = [
-  {
-    name: "Appearance",
-    rows: [
-      {
-        feature: "Pet breeds",
-        free: editionText("Classic"),
-        pro: editionText("Classic + Chonk, Fluffy, Siamese, Kitten"),
-      },
-      {
-        feature: "Coat patterns",
-        free: editionText("Solid, Tuxedo"),
-        pro: editionText("All 7, including Tabby, Socks, Spotted, Calico, Bicolour"),
-      },
-      {
-        feature: "Fur colour",
-        free: limited("3 preset coats"),
-        pro: included("Any colour"),
-      },
-      {
-        feature: "Eye & inner-ear colour",
-        free: unavailable,
-        pro: included("Full control"),
-      },
-      {
-        feature: "Outline / stroke",
-        free: unavailable,
-        pro: included("On, any colour"),
-      },
-      {
-        feature: "Accessories",
-        free: editionText("Flower Band"),
-        pro: editionText("Flower Band + Bandana, Sunglasses, Headphones, Glasses"),
-      },
-    ],
-  },
-  {
-    name: "Companion",
-    rows: [
-      { feature: "Walking / roaming", free: included(), pro: included() },
-      { feature: "Cursor, eye & head tracking", free: included(), pro: included() },
-      { feature: "Petting", free: included(), pro: included() },
-      { feature: "Climbing & window physics", free: included(), pro: included() },
-      { feature: "Edge peek", free: included(), pro: included() },
-      { feature: "Full-screen hide / return", free: included(), pro: included() },
-      { feature: "Personality & idle animations", free: included(), pro: included() },
-      { feature: "Music reaction", free: included(), pro: included() },
-      { feature: "Microphone reaction", free: included(), pro: included() },
-      {
-        feature: "Mochi drag / stretch",
-        free: limited("Basic drag"),
-        pro: included("Full elastic stretch physics"),
-      },
-    ],
-  },
-  {
-    name: "Productivity",
-    rows: [
-      {
-        feature: "Pomodoro",
-        free: limited("Fixed 25 / 5"),
-        pro: included("Fully customizable"),
-      },
-      {
-        feature: "Custom reminders",
-        free: limited("1 active"),
-        pro: included("Unlimited"),
-      },
-      { feature: "Water & stretch reminders", free: included(), pro: included() },
-    ],
-  },
-  {
-    name: "Calculator & converters",
-    rows: [
-      { feature: "Calculator", free: included(), pro: included() },
-      { feature: "Unit Converter", free: included(), pro: included() },
-      { feature: "Time Zone Converter", free: included(), pro: included() },
-    ],
-  },
-  {
-    name: "Pro productivity",
-    rows: [
-      {
-        feature: "Gmail notifications",
-        free: unavailable,
-        pro: included("Stacked cards + Open in Gmail"),
-      },
-      {
-        feature: "Google Calendar",
-        free: unavailable,
-        pro: included("Meeting warnings"),
-      },
-      {
-        feature: "Clipboard Assistant",
-        free: unavailable,
-        pro: included("Full local helper"),
-      },
-      {
-        feature: "PDF Tools",
-        free: unavailable,
-        pro: included("Existing PDF tool set"),
-      },
-      {
-        feature: "Spreadsheet Tools",
-        free: unavailable,
-        pro: included("CSV ↔ XLSX, merge, split workbook"),
-      },
-      { feature: "Complete Work Mode", free: unavailable, pro: included() },
-    ],
-  },
-];
-
-function EditionCell({ value }: { value: EditionValue }) {
-  if (value.kind === "unavailable") {
-    return (
-      <span className="edition-value edition-value-unavailable" aria-label="Not included">
-        <i aria-hidden="true">×</i>
-        <small>Not included</small>
-      </span>
-    );
-  }
-
-  if (value.kind === "limited") {
-    return (
-      <span className="edition-value edition-value-limited">
-        <i aria-hidden="true">◐</i>
-        <small>{value.label}</small>
-      </span>
-    );
-  }
-
-  if (value.kind === "text") {
-    return <span className="edition-value edition-value-text">{value.label}</span>;
-  }
-
+function ScrollPet({ reducedMotion }: { reducedMotion: boolean }) {
+  const [position, setPosition] = useState<{ x: number; y: number } | null>(null);
+  useEffect(() => {
+    if (reducedMotion || window.matchMedia("(max-width: 1100px)").matches) return;
+    const sections = ["desktop", "features", "moods", "appearance", "privacy"]
+      .map((id) => document.getElementById(id))
+      .filter((section): section is HTMLElement => Boolean(section));
+    const observer = new IntersectionObserver((entries) => {
+      const entering = entries.find((entry) => entry.isIntersecting);
+      if (!entering) { setPosition(null); return; }
+      const heading = entering.target.querySelector("h2");
+      if (!heading) return;
+      const rect = heading.getBoundingClientRect();
+      setPosition({ x: Math.min(window.innerWidth - 102, rect.right + 8), y: Math.max(92, rect.top - 60) });
+    }, { rootMargin: "-12% 0px -54% 0px" });
+    sections.forEach((section) => observer.observe(section));
+    return () => observer.disconnect();
+  }, [reducedMotion]);
   return (
-    <span className="edition-value edition-value-included">
-      <i aria-hidden="true">✓</i>
-      <small>{value.label ?? "Included"}</small>
+    <span className={`scroll-pet ${position ? "is-visible" : ""}`} aria-hidden="true"
+      style={{ transform: `translate3d(${position?.x ?? -100}px, ${position?.y ?? 0}px, 0)` }}>
+      <Image src={sitePath(CAT_ASSET)} alt="" width={128} height={128} unoptimized />
     </span>
   );
 }
 
-function EditionsComparison({
-  proPrice,
-  onFreeDownload,
+function RealisticHeroVideo({
+  reducedMotion,
+  jacket,
+  themeId,
 }: {
-  proPrice: string;
-  onFreeDownload: () => void;
+  reducedMotion: boolean;
+  jacket: Rgb;
+  themeId: HeroThemeId;
 }) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const visible = useVisibleMotion(videoRef, true);
+  const [playing, setPlaying] = useState(false);
+  const [userPaused, setUserPaused] = useState(false);
+  const [manualPlay, setManualPlay] = useState(false);
+  // "pending" until the transparent WebGL cat has drawn; the raw film (which has
+  // a studio backdrop baked in) is never shown.
+  const [renderer, setRenderer] = useState<"pending" | "webgl" | "fallback">("pending");
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    const saveData = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData;
+    if (!visible || userPaused || ((reducedMotion || saveData) && !manualPlay)) {
+      video.pause();
+      return;
+    }
+    void video.play().catch(() => {});
+    return () => video.pause();
+  }, [visible, reducedMotion, userPaused, manualPlay]);
+
   return (
-    <section
-      className="editions section-pad"
-      id="editions"
-      aria-labelledby="editions-title"
-      data-reveal
-    >
-      <div className="section-shell editions-shell">
-        <div className="section-heading editions-heading">
-          <div>
-            <Eyebrow>FREE OR PRO</Eyebrow>
-            <h2 id="editions-title">
-              Start with the companion.
-              <br />
-              <em>Upgrade when the tools fit.</em>
-            </h2>
-          </div>
-          <p>
-            Free is yours to keep. Pro adds deeper customization and the complete
-            productivity toolkit with one payment, not a subscription.
-          </p>
-        </div>
-
-        <div className="edition-table-wrap">
-          <table className="edition-table">
-            <thead>
-              <tr>
-                <th scope="col">Feature</th>
-                <th scope="col">
-                  <span className="edition-name">Free</span>
-                  <strong>₹0 / $0</strong>
-                  <small>Free to keep · no activation</small>
-                  <a
-                    className="edition-download-button"
-                    href={commerce.freeDownloadUrl}
-                    onClick={onFreeDownload}
-                  >
-                    Download Free <span aria-hidden="true">↓</span>
-                  </a>
-                </th>
-                <th scope="col" className="edition-pro-column">
-                  <span className="pro-badge">PRO</span>
-                  <strong>{proPrice}</strong>
-                  <small>One-time activation</small>
-                  <a className="edition-pro-button" href="#pricing">View Pro</a>
-                </th>
-              </tr>
-            </thead>
-            {editionGroups.map((group) => (
-              <tbody key={group.name}>
-                <tr className="edition-group-row">
-                  <th colSpan={3} scope="colgroup">{group.name}</th>
-                </tr>
-                {group.rows.map((row) => (
-                  <tr key={`${group.name}-${row.feature}`}>
-                    <th scope="row">{row.feature}</th>
-                    <td data-edition="Free"><EditionCell value={row.free} /></td>
-                    <td data-edition="Pro" className="edition-pro-column">
-                      <EditionCell value={row.pro} />
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            ))}
-          </table>
-        </div>
-
-        <p className="editions-note">
-          <span className="pro-badge">PRO</span>
-          Every Pro feature remains visible inside MewMuze Free with a PRO badge, so
-          you can see what the upgrade adds before purchasing.
-        </p>
+    <div className="realistic-hero-media" data-renderer={renderer}>
+      <div className="hero-cat-stage">
+        {/* Transparent still of the poster frame, pre-rendered through the same
+            keying for each jacket colour: visible from the first paint and kept
+            as the fallback when WebGL is unavailable. */}
+        <Image
+          className="hero-cat-still"
+          src={sitePath(`/film/mewmuze-cutout-${themeId}.webp`)}
+          alt=""
+          aria-hidden="true"
+          width={1280}
+          height={720}
+          priority
+          unoptimized
+        />
+        <video
+          ref={videoRef}
+          className="realistic-hero-video"
+          poster={sitePath("/film/mewmuze-intro-poster.webp")}
+          src={sitePath("/film/mewmuze-intro.mp4")}
+          muted playsInline loop preload="none"
+          onPlay={() => setPlaying(true)}
+          onPause={() => setPlaying(false)}
+          aria-label="A realistic playful cat introducing MewMuze"
+        />
+        <HeroCatCanvas
+          videoRef={videoRef}
+          posterSrc={sitePath("/film/mewmuze-intro-poster.webp")}
+          jacket={jacket}
+          reducedMotion={reducedMotion}
+          onRendererChange={setRenderer}
+        />
       </div>
-    </section>
+      <button className="hero-video-control" type="button" aria-label={playing ? "Pause cat video" : "Play cat video"} onClick={() => {
+        const video = videoRef.current;
+        if (!video) return;
+        if (video.paused) {
+          setManualPlay(true);
+          setUserPaused(false);
+          void video.play().catch(() => {});
+        } else {
+          setUserPaused(true);
+          video.pause();
+        }
+      }}>{playing ? "Pause" : "Play"} <span aria-hidden="true">{playing ? "Ⅱ" : "▶"}</span></button>
+    </div>
   );
 }
 
-function FreeInstallGuide() {
+function HeroSwatches({
+  value,
+  onChange,
+}: {
+  value: HeroThemeId;
+  onChange: (theme: HeroThemeId) => void;
+}) {
+  const buttons = useRef<(HTMLButtonElement | null)[]>([]);
+  const activeIndex = Math.max(0, heroThemes.findIndex((theme) => theme.id === value));
+
+  const select = (index: number) => {
+    const next = (index + heroThemes.length) % heroThemes.length;
+    onChange(heroThemes[next].id);
+    buttons.current[next]?.focus();
+  };
+
   return (
-    <section
-      className="free-install-guide-section section-pad"
-      id="free-install-guide"
-      aria-labelledby="free-install-guide-title"
-      data-reveal
-    >
-      <div className="section-shell">
-        <article className="purchase-step purchase-step-defender free-install-guide-card">
-          <div className="purchase-step-copy">
-            <p className="purchase-step-label">AFTER YOUR FREE DOWNLOAD</p>
-            <h2 id="free-install-guide-title">Let Windows know you trust this download</h2>
-            <p>
-              Windows Defender SmartScreen may show <strong>“Windows protected your PC”</strong>{" "}
-              because this young independent app does not have a paid code-signing certificate yet.
-              This is expected for the installer downloaded from this page.
-            </p>
-
-            <div className="defender-walkthrough" aria-label="Windows Defender installation walkthrough">
-              <figure>
-                <div className="defender-shot defender-shot-pink">
-                  <Image
-                    src={sitePath("/checkout/windows-defender-more-info.png")}
-                    alt="Windows Defender SmartScreen warning with the More info link visible"
-                    width={525}
-                    height={495}
-                    unoptimized
-                  />
-                </div>
-                <figcaption><strong>First:</strong> select <em>More info</em>.</figcaption>
-              </figure>
-              <span className="walkthrough-arrow" aria-hidden="true">→</span>
-              <figure>
-                <div className="defender-shot defender-shot-yellow">
-                  <Image
-                    src={sitePath("/checkout/windows-defender-run-anyway.png")}
-                    alt="Expanded Windows Defender warning showing the MewMuze installer and Run anyway button"
-                    width={525}
-                    height={495}
-                    unoptimized
-                  />
-                </div>
-                <figcaption>
-                  <strong>Then:</strong> confirm the app name and select <em>Run anyway</em>.
-                </figcaption>
-              </figure>
-            </div>
-
-            <aside className="founder-signing-note">
-              <span aria-hidden="true">♥</span>
-              <p>
-                MewMuze is just getting started as a tiny independent project. A trusted Windows
-                signing certificate has a real recurring cost that we cannot cover yet. Your support
-                helps us keep building and gets us closer to removing this extra screen from future
-                releases. Thank you for believing in our little pet.
-              </p>
-            </aside>
-          </div>
-        </article>
-      </div>
-    </section>
+    <div className="hero-swatches" role="radiogroup" aria-label="MewMuze jacket colour">
+      <span className="hero-swatch-dots">
+        {heroThemes.map((theme, index) => (
+          <button
+            key={theme.id}
+            ref={(element) => {
+              buttons.current[index] = element;
+            }}
+            type="button"
+            role="radio"
+            className="hero-swatch"
+            aria-checked={theme.id === value}
+            aria-label={`${theme.label} jacket`}
+            title={theme.label}
+            tabIndex={theme.id === value ? 0 : -1}
+            style={{ "--swatch": theme.swatch } as CSSProperties}
+            onClick={() => onChange(theme.id)}
+            onKeyDown={(event) => {
+              if (event.key === "ArrowRight" || event.key === "ArrowDown") {
+                event.preventDefault();
+                select(index + 1);
+              } else if (event.key === "ArrowLeft" || event.key === "ArrowUp") {
+                event.preventDefault();
+                select(index - 1);
+              }
+            }}
+          />
+        ))}
+      </span>
+      <span className="hero-swatch-label" aria-live="polite">
+        {heroThemes[activeIndex].label}
+      </span>
+    </div>
   );
 }
 
-function AppearanceStudio() {
-  const [body, setBody] = useState<(typeof bodyOptions)[number][1]>("classic");
-  const [pattern, setPattern] =
-    useState<(typeof patternOptions)[number][1]>("solid");
-  const bodyLabel = bodyOptions.find((option) => option[1] === body)?.[0] ?? "Classic";
-  const patternLabel =
-    patternOptions.find((option) => option[1] === pattern)?.[0] ?? "Solid";
-  const asset = `/cat/studio/${body}-${pattern}.webp`;
+/** A few of the Paper chat's 37 personas, with the emoji its chat header shows. */
+const chatPersonas = [
+  ["💔", "Breakup Buddy"],
+  ["🩺", "Health Guide"],
+  ["😼", "Savage Bestie"],
+  ["🫶", "Rant Buddy"],
+  ["🌷", "Comfort Companion"],
+  ["🚀", "Hype Cat"],
+  ["🌙", "Night Owl"],
+  ["💼", "Career Coach"],
+] as const;
+
+const chatPoints = [
+  ["37 modes. One cat.", "Rant Buddy takes your side, Health Guide stays careful, Hype Cat gasses you up. She switches on her own. You just talk."],
+  ["Your 2am overshare stays home.", "Chat runs on your PC by default. No account, no cloud chat log, no receipts."],
+  ["Soft when it hurts. Savage when it's funny.", "She roasts what they did, never who you are, and drops the jokes the second it gets real."],
+] as const;
+
+/** The Paper app's persona chat: a rendered demo on the left, the pitch on the right. */
+function ChatLab({ reducedMotion }: { reducedMotion: boolean }) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const visible = useVisibleMotion(videoRef);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    if (visible && !reducedMotion) void video.play().catch(() => {});
+    else video.pause();
+  }, [visible, reducedMotion]);
 
   return (
-    <>
-      <div className="appearance-stage">
-        <div className="studio-window">
-          <div className="studio-titlebar">
-            <span>APPEARANCE STUDIO / LIVE APP RENDERER</span>
-            <i />
-            <i />
-            <i />
-          </div>
-          <div className="studio-preview">
-            <span className="studio-halo" aria-hidden="true" />
-            <Image
-              key={asset}
-              className="studio-cat-media"
-              src={sitePath(asset)}
-              alt={`Animated ${bodyLabel} MewMuze pet with the ${patternLabel} coat pattern`}
-              width={128}
-              height={128}
-              unoptimized
-            />
-            <span className="studio-live-badge" aria-hidden="true">
-              <i />
-              LIVE EMOTION
-            </span>
-            <span className="preset-ticket">
-              <strong>FLOWER BAND</strong>
-              <small>
-                {bodyLabel} · {patternLabel} · animated
-              </small>
-            </span>
-          </div>
-          <p aria-live="polite">
-            Showing the authentic {bodyLabel} body with the {patternLabel} coat
-            pattern and a looping app-rendered emotion.
-          </p>
+    <section className="chat-lab section-pad" id="paper-preview" aria-labelledby="chat-lab-title">
+      <div className="section-shell chat-lab-shell">
+        {/* The glass pane is the bezel; the film sits on it as a sibling, so it is
+            never remounted when liquid-glass-react loads. */}
+        <div className="chat-lab-frame-wrap">
+          <GlassSurface variant="panel" className="chat-lab-frame" />
+          <video
+            ref={videoRef}
+            className="chat-lab-video"
+            src={sitePath("/videos/mewmuze-chat-demo.mp4")}
+            poster={sitePath("/videos/mewmuze-chat-demo-poster.webp")}
+            muted
+            playsInline
+            loop
+            preload="metadata"
+            aria-label="Demo: someone tells MewMuze they just had a breakup, MewMuze switches to Breakup Buddy and replies gently"
+          />
         </div>
-      </div>
-      <div className="appearance-copy">
-        <Eyebrow>APPEARANCE STUDIO</Eyebrow>
-        <h2>
-          Same personality.
-          <br />
-          <em>A pet that looks like yours.</em>
-        </h2>
-        <p>
-          Choose a body and coat pattern to see the real MewMuze renderer update
-          the animated pet immediately.
-        </p>
-        <div className="choice-block">
-          <span>Body</span>
-          <div>
-            {bodyOptions.map(([label, value]) => (
-              <button
-                key={value}
-                type="button"
-                className={body === value ? "is-active" : ""}
-                aria-pressed={body === value}
-                onClick={() => setBody(value)}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
-        </div>
-        <div className="choice-block">
-          <span>Pattern</span>
-          <div>
-            {patternOptions.map(([label, value]) => (
-              <button
-                key={value}
-                type="button"
-                className={pattern === value ? "is-active" : ""}
-                aria-pressed={pattern === value}
-                onClick={() => setPattern(value)}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
-        </div>
-        <div className="appearance-specs">
-          <span>
-            <small>Colors</small>
-            White base · green eyes · pink ears
-          </span>
-          <span>
-            <small>Motion</small>
-            Blink · curious look · happy response
-          </span>
-          <span>
-            <small>Accessory</small>
-            Flower Band
-          </span>
-        </div>
-      </div>
-    </>
-  );
-}
-
-function FaqSection() {
-  return (
-    <section className="faq section-pad" id="faq" aria-labelledby="faq-title" data-reveal>
-      <div className="section-shell faq-shell">
-        <div className="faq-heading">
-          <Eyebrow>QUESTIONS BEFORE THE PET MOVES IN</Eyebrow>
-          <h2 id="faq-title">
-            The useful answers.
+        <div className="chat-lab-copy">
+          <span className="liquid-kicker">INSIDE THE PAPER LAB · CHAT</span>
+          <h2 id="chat-lab-title">
+            Spill the tea.
             <br />
-            <em>No tiny fine-print maze.</em>
+            <em>She already switched modes.</em>
+          </h2>
+          <p className="chat-lab-lead">
+            Type &ldquo;I just had a breakup&rdquo; and she does not hit you with &ldquo;plenty of fish.&rdquo;
+            MewMuze reads the vibe, picks the persona that actually fits, and answers like the friend
+            who gets it. Main character support, zero cringe.
+          </p>
+          <ul className="chat-lab-personas" aria-label="Some of MewMuze's chat personas">
+            {chatPersonas.map(([emoji, name]) => (
+              <li key={name}>
+                <span aria-hidden="true">{emoji}</span> {name}
+              </li>
+            ))}
+            <li className="chat-lab-more">+ 29 more</li>
+          </ul>
+          <div className="chat-lab-points">
+            {chatPoints.map(([title, copy]) => (
+              <article key={title}>
+                <h3>{title}</h3>
+                <p>{copy}</p>
+              </article>
+            ))}
+          </div>
+          <p className="chat-lab-note">
+            Paper preview: chat, personas and voice are <strong>not included in the current Free or Pro downloads</strong>.
+            Illustrative conversation, not a live AI chat on this page.
+          </p>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/** The feelings the film leans on, in its own glow colours. */
+const emotionHighlights = [
+  ["Savage", "#ff2fb9"],
+  ["Angry", "#ff3d2e"],
+  ["Rage", "#ff3d2e"],
+  ["Sad", "#3b8dff"],
+  ["Crying", "#3b8dff"],
+  ["Adoring", "#ff6fcf"],
+  ["Sleepy", "#9d5cff"],
+] as const;
+
+const emotionSync = [
+  ["You type, she types.", "Start typing and a tiny keyboard comes out. Go too hard and she overheats with you."],
+  ["You vibe, she vibes.", "Music plays, headphones go on, head starts bopping. No request needed."],
+  ["You sing, she sings.", "The second an app is using your mic, she grabs hers. Takes a bow after."],
+] as const;
+
+
+/**
+ * The nav glass shows what is behind it: while it floats over a dark section
+ * (marked `data-nav-dark`) it switches to dark glass with light text
+ * (emotion-lab.css), so the links stay readable.
+ */
+function useDarkNavTone() {
+  useEffect(() => {
+    const root = document.documentElement;
+    let frame = 0;
+    const check = () => {
+      frame = 0;
+      const over = [...document.querySelectorAll<HTMLElement>("[data-nav-dark]")].some((section) => {
+        const rect = section.getBoundingClientRect();
+        return rect.top <= 44 && rect.bottom >= 44;
+      });
+      if (over) root.dataset.navTone = "dark";
+      else delete root.dataset.navTone;
+    };
+    const onScroll = () => {
+      if (!frame) frame = requestAnimationFrame(check);
+    };
+    check();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    return () => {
+      cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+      delete root.dataset.navTone;
+    };
+  }, []);
+}
+
+/** The Paper cat's emotion system: the copy on the left, every feeling on film to the right. */
+function EmotionLab({ reducedMotion }: { reducedMotion: boolean }) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const visible = useVisibleMotion(videoRef);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    if (visible && !reducedMotion) void video.play().catch(() => {});
+    else video.pause();
+  }, [visible, reducedMotion]);
+
+  return (
+    <section className="emotion-lab section-pad" id="feelings" data-nav-dark aria-labelledby="emotion-lab-title">
+      <div className="section-shell emotion-lab-shell">
+        <div className="emotion-lab-copy">
+          <span className="liquid-kicker">INSIDE THE PAPER LAB · FEELINGS</span>
+          <h2 id="emotion-lab-title">
+            She reads the room.
+            <br />
+            <em>Then she shows up for it.</em>
+          </h2>
+          <p className="emotion-lab-lead">
+            Sad? She goes soft and stays close instead of crying at you. Frustrated? She is annoyed
+            with you at the situation, never at you. Hyped? She is bouncing too. 29 feelings, one tiny
+            face, and she picks the one you actually need.
+          </p>
+          <ul className="emotion-lab-moods" aria-label="Some of MewMuze's 29 feelings">
+            {emotionHighlights.map(([name, color]) => (
+              <li key={name} style={{ "--mood": color } as CSSProperties}>
+                {name}
+              </li>
+            ))}
+            <li className="emotion-lab-more">+ 22 more</li>
+          </ul>
+          <div className="emotion-lab-sync">
+            {emotionSync.map(([title, copy]) => (
+              <article key={title}>
+                <h3>{title}</h3>
+                <p>{copy}</p>
+              </article>
+            ))}
+          </div>
+          <div className="emotion-lab-diary">
+            <div className="emotion-lab-diary-copy">
+              <h3>She keeps a diary. Of your story.</h3>
+              <p>
+                After a real conversation she writes it up as a short entry in your own voice, saved
+                as plain Markdown files on your PC. Forget Chat never touches it. Only you delete an entry.
+              </p>
+            </div>
+            <figure className="emotion-lab-entry" aria-label="Example diary entry">
+              <figcaption>diary/2026-09-14_23-41_x7k2.md</figcaption>
+              <strong># 14 September 2026</strong>
+              <small>11:41 PM</small>
+              <span>&ldquo;The night I finally said it&rdquo;</span>
+              <p>I told MewMuze about the breakup. She did not try to fix it, she just let me talk, and that helped more than advice would have.</p>
+            </figure>
+          </div>
+          <p className="emotion-lab-note">
+            Paper preview: the emotion engine and Diary are <strong>not included in the current Free or Pro downloads</strong>.
+            The Cyberpunk Cat costume comes with Pro. Film rendered by the Paper app&rsquo;s own sprite renderer.
+          </p>
+        </div>
+        <div className="emotion-lab-film">
+          <video
+            ref={videoRef}
+            className="emotion-lab-video"
+            src={sitePath("/videos/mewmuze-emotions.mp4")}
+            poster={sitePath("/videos/mewmuze-emotions-poster.webp")}
+            muted
+            playsInline
+            loop
+            preload="metadata"
+            aria-label="MewMuze in the Cyberpunk Cat costume and bandana cycling through all 29 feelings, including savage, angry, rage, sad and crying, then typing, dancing to music and singing into a mic"
+          />
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/** Pro Quick Tools, in plain words. Every row is something the shipped panel really does. */
+const quickToolCards = [
+  {
+    id: "pdf",
+    icon: "PDF",
+    title: "PDF Tools",
+    sub: "Images to PDF, export, merge, split",
+    rows: [
+      ["Pics → PDF", "Photos in, one clean PDF out. Assignment? Submitted."],
+      ["PDF → Pics", "Any page to PNG or JPG, up to 300 dpi. Crisp, not potato."],
+      ["Merge", "Five PDFs? Now it's one."],
+      ["Split", "Keep pages 1, 3 and 5-7. Or one file per page."],
+    ],
+  },
+  {
+    id: "sheets",
+    icon: "XLSX",
+    title: "Spreadsheet Tools",
+    sub: "CSV and XLSX, merge, split workbook",
+    rows: [
+      ["CSV ↔ XLSX", "CSV to Excel and back. Preview first, zero cursed columns."],
+      ["Merge sheets", "Many sheets, one file. Columns match up by name."],
+      ["Split workbook", "Twelve tabs? Twelve tidy files, Excel or CSV."],
+    ],
+  },
+] as const;
+
+/** Work Mode's PDF and spreadsheet tools: the jobs play as a film behind, the plain-words version sits in front. */
+function QuickToolsLab({ reducedMotion }: { reducedMotion: boolean }) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const visible = useVisibleMotion(videoRef);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    if (visible && !reducedMotion) void video.play().catch(() => {});
+    else video.pause();
+  }, [visible, reducedMotion]);
+
+  return (
+    <section className="tools-lab section-pad" id="quick-tools" aria-labelledby="tools-lab-title">
+      <video
+        ref={videoRef}
+        className="tools-lab-film"
+        src={sitePath("/videos/mewmuze-quick-tools.mp4")}
+        poster={sitePath("/videos/mewmuze-quick-tools-poster.webp")}
+        muted
+        playsInline
+        loop
+        preload="metadata"
+        aria-hidden="true"
+      />
+      <div className="tools-lab-overlay" aria-hidden="true" />
+      <div className="section-shell tools-lab-shell">
+        <header className="tools-lab-head">
+          <span className="liquid-kicker">WORK MODE · QUICK TOOLS · PRO</span>
+          <h2 id="tools-lab-title">
+            Stop feeding your files to sketchy sites.
+            <br />
+            <em className="tools-lab-sub">She does PDFs and spreadsheets. Offline.</em>
           </h2>
           <p>
-            Speed, privacy, devices, offline use and the classic “where did my licence
-            email go?” situation.
+            Fourteen fake download buttons and your file is gone who knows where? Nah. MewMuze does it
+            right on your PC. No upload, no account, no ads.
           </p>
-        </div>
-        <div className="faq-list">
-          {faqItems.map((item, index) => (
-            <details key={item.question} name="mewmuze-faq">
-              <summary>
-                <span>{String(index + 1).padStart(2, "0")}</span>
-                <strong>{item.question}</strong>
-                <i aria-hidden="true">+</i>
-              </summary>
-              <div className="faq-answer">
-                <p>{item.answer}</p>
-                {item.links?.length ? (
-                  <div className="faq-links">
-                    {item.links.map((link) => {
-                      const external = link.href.startsWith("http");
-                      return (
-                        <a
-                          key={link.href}
-                          href={external ? link.href : sitePath(link.href)}
-                          target={external ? "_blank" : undefined}
-                          rel={external ? "noreferrer" : undefined}
-                        >
-                          {link.label}{external ? " ↗" : " →"}
-                        </a>
-                      );
-                    })}
-                  </div>
-                ) : null}
+        </header>
+        <div className="tools-lab-cards">
+          {quickToolCards.map((card) => (
+            <article className={`tools-lab-card tools-lab-card-${card.id}`} key={card.id}>
+              <div className="tools-lab-card-head">
+                <span className="tools-lab-icon" aria-hidden="true">{card.icon}</span>
+                <div>
+                  <h3>{card.title}</h3>
+                  <small>{card.sub}</small>
+                </div>
               </div>
-            </details>
+              <dl>
+                {card.rows.map(([name, copy]) => (
+                  <div key={name}>
+                    <dt>{name}</dt>
+                    <dd>{copy}</dd>
+                  </div>
+                ))}
+              </dl>
+            </article>
           ))}
+        </div>
+        <ul className="tools-lab-stats" aria-label="What Quick Tools never needs">
+          <li><strong>0</strong> uploads</li>
+          <li><strong>0</strong> accounts</li>
+          <li><strong>0</strong> fake download buttons</li>
+        </ul>
+        <p className="tools-lab-note">Included with MewMuze Pro. Your files are processed on your own computer and never uploaded anywhere.</p>
+      </div>
+    </section>
+  );
+}
+
+/** A short word about the wardrobe; the costumes themselves live in the store. */
+function CostumeTeaser() {
+  return (
+    <section className="costume-lab section-pad" id="costumes" data-nav-dark aria-labelledby="costume-lab-title">
+      <div className="section-shell costume-lab-shell">
+        <header className="costume-lab-head">
+          <span className="liquid-kicker">BUILT-IN COSTUMES · INCLUDED WITH PRO</span>
+          <h2 id="costume-lab-title">
+            Three fits. <em>Same menace.</em>
+          </h2>
+          <p>
+            Corporate Cat, Cyberpunk Cat and Bat Cat ship with Pro. Every costume is drawn live on her
+            body, so it moves with each pose, paw and mood, and every one comes in colours you pick.
+          </p>
+          <a className="costume-lab-cta skeuo-button skeuo-button-primary" href={sitePath("/store/")}>
+            See the wardrobe <span aria-hidden="true">→</span>
+          </a>
+        </header>
+      </div>
+    </section>
+  );
+}
+
+const carePoints = [
+  ["A check-in in one tap", "Five moods, an optional note, nothing graded. A low day gets a paw heart, not a lecture."],
+  ["“I need a minute”", "Overwhelmed, angry, can’t focus, can’t sleep, lonely, or just need to breathe. Pick lonely and she simply sits with you."],
+  ["Breathe with her", "Relax (in for four, out for six) or Box breathing, 30 seconds to 5 minutes. She breathes along with you."],
+  ["A friendship that only grows", "Little wins, three small quests a day and reflections earn XP and keepsakes. Miss a day and nothing is lost. No streaks."],
+] as const;
+
+/** The Paper app's Care panel: a 2am check-in, a minute, a breath, on film beside the pitch. */
+function CareLab({ reducedMotion }: { reducedMotion: boolean }) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const visible = useVisibleMotion(videoRef);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    if (visible && !reducedMotion) void video.play().catch(() => {});
+    else video.pause();
+  }, [visible, reducedMotion]);
+
+  return (
+    <section className="care-lab section-pad" id="care" aria-labelledby="care-lab-title">
+      <div className="section-shell care-lab-shell">
+        <div className="care-lab-film">
+          <video
+            ref={videoRef}
+            src={sitePath("/videos/mewmuze-care.mp4")}
+            poster={sitePath("/videos/mewmuze-care-poster.webp")}
+            muted
+            playsInline
+            loop
+            preload="metadata"
+            aria-label="Demo: a late night check-in in MewMuze's Care panel. Low is picked and the cat answers with a paw heart, I feel lonely has her sit with you, then a one minute breathing session starts"
+          />
+        </div>
+        <div className="care-lab-copy">
+          <span className="liquid-kicker">INSIDE THE PAPER LAB · CARE</span>
+          <h2 id="care-lab-title">
+            Rough night?
+            <br />
+            <em>She stays up with you.</em>
+          </h2>
+          <p className="care-lab-lead">
+            Care is a quiet corner for checking in with yourself. Tell her how you are, take a tiny win, breathe for a
+            minute, or just say you need one. She answers the way a friend would, not the way an app would.
+          </p>
+          <ul className="care-lab-points">
+            {carePoints.map(([title, copy]) => (
+              <li key={title}>
+                <strong>{title}</strong>
+                <span>{copy}</span>
+              </li>
+            ))}
+          </ul>
+          <p className="care-lab-note">
+            Paper preview: Care is <strong>not included in the current Free or Pro downloads</strong>. It is not a
+            health product or a therapist: nothing in it scores, diagnoses or judges, and every number stays on your
+            computer. Film rebuilt from the app&rsquo;s own Care panel.
+          </p>
         </div>
       </div>
     </section>
   );
 }
 
-const dayMoments = [
-  {
-    time: "8:47",
-    title: "The first thing that looks back",
-    copy: "You open the laptop the way you always do, half awake, already behind. The screen fills with the same tabs and the same quiet. Then something small lifts its head near the corner and watches your cursor move. It is not doing anything useful. It is just glad you are here.",
-    tone: "mint",
-  },
-  {
-    time: "10:30",
-    title: "It sits down when you do",
-    copy: "You start the timer and brace for the long stretch. Your pet pads over, folds its paws, and settles beside it. No nudging, no badges, no advice. Just a small warm shape working alongside you, the way a real one would.",
-    tone: "blue",
-  },
-  {
-    time: "1:15",
-    title: "Someone noticed before you did",
-    copy: "Fifty two minutes and you have not moved. You did not count. It did. There is a stretch, a slow blink, and a patient stare you cannot argue with, so you finally stand up and roll your shoulders. Somebody was paying attention to you today.",
-    tone: "peach",
-  },
-  {
-    time: "3:00",
-    title: "The hour you were dreading",
-    copy: "Mail lands and it waves at you instead of buzzing. You drag the little body across the screen just to watch it stretch like warm dough, and it wobbles back into place looking mildly offended. You laugh out loud, alone, at your desk. The afternoon stops feeling flat.",
-    tone: "yellow",
-  },
-  {
-    time: "5:48",
-    title: "You close the laptop last",
-    copy: "The task finishes and it throws both paws in the air like it has been waiting all day for this. Then it yawns, turns twice, and curls up on the window edge to sleep. You linger a second before shutting the lid. Tomorrow it will be there before your coffee is.",
-    tone: "blue",
-  },
+const taskPoints = [
+  ["Subtasks, four levels deep", "Big task, small steps. Tick the steps and the parent ticks itself."],
+  ["A one-day timeline", "Every timed task on one strip, with a line for right now."],
+  ["Overdue gets called out", "Missed the 9:30? She noticed. Politely. In red."],
+] as const;
+
+/** The Paper app's Tasks panel: the list, then Insights, on film beside the pitch. */
+function TasksLab({ reducedMotion }: { reducedMotion: boolean }) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const visible = useVisibleMotion(videoRef);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    if (visible && !reducedMotion) void video.play().catch(() => {});
+    else video.pause();
+  }, [visible, reducedMotion]);
+
+  return (
+    <section className="tasks-lab section-pad" id="tasks" aria-labelledby="tasks-lab-title">
+      <div className="section-shell tasks-lab-shell">
+        <div className="tasks-lab-film">
+          <video
+            ref={videoRef}
+            src={sitePath("/videos/mewmuze-tasks.mp4")}
+            poster={sitePath("/videos/mewmuze-tasks-poster.webp")}
+            muted
+            playsInline
+            loop
+            preload="metadata"
+            aria-label="Demo: three tasks are typed into MewMuze's Tasks panel, two are ticked off, then Insights shows progress, time estimates, overdue tasks and a one-day timeline"
+          />
+        </div>
+        <div className="tasks-lab-copy">
+          <span className="liquid-kicker">INSIDE THE PAPER LAB · TASKS</span>
+          <h2 id="tasks-lab-title">
+            Make the list.
+            <br />
+            <em>She brings the receipts.</em>
+          </h2>
+          <p className="tasks-lab-lead">
+            Type a task, hit Enter, done. Nest subtasks, give things a time. Then tap Insights: what&rsquo;s done,
+            what&rsquo;s left, how long it really takes, and the stuff you&rsquo;re pretending isn&rsquo;t overdue.
+          </p>
+          <ul className="tasks-lab-points">
+            {taskPoints.map(([title, copy]) => (
+              <li key={title}>
+                <strong>{title}</strong>
+                <span>{copy}</span>
+              </li>
+            ))}
+          </ul>
+          <p className="tasks-lab-note">
+            Paper preview: Tasks is <strong>not included in the current Free or Pro downloads</strong>. Illustrative demo with made-up tasks.
+          </p>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+type RollTag = "free" | "pro" | "paper";
+const rollTags: Record<RollTag, string> = { free: "FREE + PRO", pro: "PRO", paper: "PAPER PREVIEW" };
+
+/** Everything else, one line each. Tags follow the edition table below. */
+const featureRoll: { name: string; line: string; tag: RollTag; color: string }[] = [
+  { name: "Time & Calc", line: "Tip splits, unit swaps, what time it is in Tokyo. No new tab, no Googling, no shame.", tag: "free", color: "#9dff4a" },
+  { name: "Focus Mode", line: "Start the timer and she stops chasing your cursor. Quiet cheering only. Lock in.", tag: "free", color: "#22e0ff" },
+  { name: "Pomodoro", line: "25 on, 5 off, repeat. Your attention span, but make it structured.", tag: "free", color: "#ff6fcf" },
+  { name: "Water & stretch", line: "Drink water. Unclench your jaw. Stand up. She is not asking.", tag: "free", color: "#ffd166" },
+  { name: "Reminders", line: "Write your own, get warned before it's due, snooze it like a pro. She remembers so you don't have to.", tag: "free", color: "#b18cff" },
+  { name: "Gmail pings", line: "New mail lands as a tiny card: who sent it and the subject. She never reads the email. Unlike your coworkers.", tag: "pro", color: "#9dff4a" },
+  { name: "Meeting warnings", line: "Calendar says 10 minutes? She taps the glass. Snooze for five, then no excuses.", tag: "pro", color: "#22e0ff" },
+  { name: "Clipboard helper", line: "Copy something and she offers to help with it. Only what you copied, nothing sneaky.", tag: "pro", color: "#ff6fcf" },
+  { name: "Voice to text", line: "Talk, she types. Push-to-talk dictation, transcribed right on your PC, raw and clean both kept.", tag: "paper", color: "#ffd166" },
+  { name: "Peek Mode", line: "Presenting? She ducks out of frame and comes back when the coast is clear.", tag: "free", color: "#b18cff" },
+  { name: "Music vibes", line: "Your playlist starts, she starts bopping. Knows it's playing, never snoops on the song.", tag: "free", color: "#9dff4a" },
+  { name: "Window physics", line: "Sits on your windows, clings to the edges, falls with full drama.", tag: "free", color: "#22e0ff" },
 ];
 
-const futureConcepts = ["Mecha Hero", "Shield Guardian", "Web Scout", "Moon Mage"];
+/** The last big section: every other feature, rolling up one line at a time. */
+function FeatureRoll() {
+  const sectionRef = useRef<HTMLElement>(null);
+  const visible = useVisibleMotion(sectionRef);
+  const items = (hidden: boolean) =>
+    featureRoll.map((f) => (
+      <li key={`${f.name}-${hidden}`} className="feature-roll-item" aria-hidden={hidden || undefined} style={{ "--c": f.color } as CSSProperties}>
+        <header>
+          <h3>{f.name}</h3>
+          <span className={`feature-roll-tag ${f.tag}`}>{rollTags[f.tag]}</span>
+        </header>
+        <p>{f.line}</p>
+      </li>
+    ));
+
+  return (
+    <section ref={sectionRef} className={`feature-roll section-pad${visible ? " is-playing" : ""}`} id="everything" data-nav-dark aria-labelledby="feature-roll-title">
+      <div className="section-shell feature-roll-shell">
+        <div className="feature-roll-head">
+          <span className="liquid-kicker">AND THE REST OF HER CV</span>
+          <h2 id="feature-roll-title">
+            She has range.
+            <br />
+            <em>Your excuses don&rsquo;t.</em>
+          </h2>
+          <p>All the small stuff that quietly saves your day, rolling past. Hover to make it stop.</p>
+          <ul className="feature-roll-legend" aria-label="Where each feature is available">
+            {(Object.keys(rollTags) as RollTag[]).map((tag) => (
+              <li key={tag} className={`feature-roll-tag ${tag}`}>{rollTags[tag]}</li>
+            ))}
+          </ul>
+        </div>
+        <div className="feature-roll-window">
+          <ul className="feature-roll-track">
+            {items(false)}
+            {items(true)}
+          </ul>
+        </div>
+      </div>
+    </section>
+  );
+}
 
 export default function Home() {
   const [reducedMotion, setReducedMotion] = useState(false);
-  const [finePointer, setFinePointer] = useState(true);
   // Starts true: the landing hero used to lock scrolling until a button was
   // pressed. Every lock/force-scroll/gate below only fires when this is
   // false, so starting unlocked removes the lock entirely without touching
   // the effect, the buttons, or the one-time "assemble" animation they used
   // to trigger - it now just plays once on mount instead.
   const [experienceUnlocked, setExperienceUnlocked] = useState(true);
-  const [heroEmotion, setHeroEmotion] = useState<HeroEmotion>("neutral");
   const [supportDeveloper, setSupportDeveloper] = useState(false);
   const supportSelected = supportDeveloper && commerce.supporterConfigured;
   // Dollars on the server, rupees after mount for Indian visitors. The server
   // snapshot is what makes one static file safe to serve worldwide.
   const rupees = useSyncExternalStore(noSubscribe, prefersRupees, serverPrefersRupees);
-  const basePriceLabel = priceLabelFor(rupees, false);
   const priceLabel = priceLabelFor(rupees, supportSelected);
   const heroRef = useRef<HTMLElement>(null);
   const heroActive = useVisibleMotion(heroRef, true);
-  const catMotionRef = useRef<HTMLSpanElement>(null);
-  const heroHeadRef = useRef<HTMLSpanElement>(null);
-  const leftPupilRef = useRef<HTMLSpanElement>(null);
-  const rightPupilRef = useRef<HTMLSpanElement>(null);
-  // Read inside the animation loop so a mood change retunes the motion without
-  // tearing down and restarting the frame loop.
+  const [heroTheme, setHeroTheme] = useState<HeroThemeId>("green");
+  const activeHeroTheme = heroThemes.find((theme) => theme.id === heroTheme) ?? heroThemes[0];
+  // The jacket colour themes the whole page, not just the hero (hero-neon.css :root palettes).
+  useEffect(() => {
+    document.documentElement.dataset.heroTheme = heroTheme;
+  }, [heroTheme]);
+  useDarkNavTone();
   useEffect(() => {
     const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const pointerQuery = window.matchMedia("(pointer: fine)");
     const syncPreferences = () => {
       setReducedMotion(motionQuery.matches);
-      setFinePointer(pointerQuery.matches);
     };
     syncPreferences();
     motionQuery.addEventListener("change", syncPreferences);
-    pointerQuery.addEventListener("change", syncPreferences);
     return () => {
       motionQuery.removeEventListener("change", syncPreferences);
-      pointerQuery.removeEventListener("change", syncPreferences);
     };
   }, []);
 
@@ -1446,36 +948,6 @@ export default function Home() {
     };
   }, [experienceUnlocked]);
 
-  useEffect(() => {
-    if (reducedMotion || !heroActive) {
-      const neutralTimer = window.setTimeout(() => setHeroEmotion("neutral"), 0);
-      return () => window.clearTimeout(neutralTimer);
-    }
-
-    const emotions: Exclude<HeroEmotion, "neutral">[] = [
-      "happy",
-      "cheerful",
-      "sad",
-    ];
-    let emotionIndex = 0;
-    let neutralTimer = 0;
-
-    const showNextEmotion = () => {
-      setHeroEmotion(emotions[emotionIndex]);
-      emotionIndex = (emotionIndex + 1) % emotions.length;
-      window.clearTimeout(neutralTimer);
-      neutralTimer = window.setTimeout(() => setHeroEmotion("neutral"), 2400);
-    };
-
-    const openingTimer = window.setTimeout(showNextEmotion, 2200);
-    const emotionTimer = window.setInterval(showNextEmotion, 5200);
-
-    return () => {
-      window.clearTimeout(openingTimer);
-      window.clearTimeout(neutralTimer);
-      window.clearInterval(emotionTimer);
-    };
-  }, [reducedMotion, heroActive]);
 
   useEffect(() => {
     const sections = Array.from(
@@ -1500,12 +972,7 @@ export default function Home() {
     return () => observer.disconnect();
   }, [reducedMotion]);
 
-  // The cursor tracking loop that moved the head and pupils has been removed.
-  // The pupils now sit centred, looking straight ahead, and the cat's life comes
-  // entirely from its own animations: the rotating emotions, the blink, the ear
-  // flicks and the idle breathe.
-
-  const unlockAndScroll = (targetId: "#story" | "#features" | "#pricing") => {
+  const unlockAndScroll = (targetId: "#paper-preview" | "#pricing") => {
     document.documentElement.classList.remove("mewmuze-scroll-locked");
     document.body.classList.remove("mewmuze-scroll-locked");
     setExperienceUnlocked(true);
@@ -1520,13 +987,6 @@ export default function Home() {
     }, 80);
   };
 
-  const showFreeInstallGuide = () => {
-    document.getElementById("free-install-guide")?.scrollIntoView({
-      behavior: reducedMotion ? "auto" : "smooth",
-      block: "start",
-    });
-  };
-
   return (
     <main
       id="top"
@@ -1536,156 +996,85 @@ export default function Home() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(appStructuredData) }}
       />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqStructuredData) }}
-      />
-      <WelcomeSplash />
+      <ScrollPet reducedMotion={reducedMotion} />
       <a
         className="skip-link"
-        href="#story"
+        href="#paper-preview"
         onClick={(event) => {
           if (!experienceUnlocked) {
             event.preventDefault();
-            unlockAndScroll("#story");
+            unlockAndScroll("#paper-preview");
           }
         }}
       >
-        Skip to the MewMuze story
+        Skip to the content
       </a>
 
       <header className="site-navigation">
-        <SiteNavigation />
+        <SiteNav />
       </header>
 
       <section
         ref={heroRef}
-        className={`hero ${!finePointer ? "touch-look" : ""}`}
+        id="companion"
+        className="hero cinematic-hero"
+        data-hero-theme={heroTheme}
         data-motion-paused={!heroActive || reducedMotion}
         aria-labelledby="hero-title"
       >
-        <div className="hero-edge" aria-hidden="true" />
-        <div className="hero-cat-peek">
-          <span
-            ref={catMotionRef}
-            className="hero-cat-motion"
-          >
-            <HeroCat
-              headUnitRef={heroHeadRef}
-              leftPupilRef={leftPupilRef}
-              rightPupilRef={rightPupilRef}
-              emotion={heroEmotion}
-              reducedMotion={reducedMotion || !heroActive}
-            />
-          </span>
-          <span className="cat-speech">Hi. I live here now.</span>
+        <div className="hero-environment" aria-hidden="true">
+          <span className="hero-light hero-light-a" />
+          <span className="hero-light hero-light-b" />
+          <span className="hero-light hero-light-c" />
+          <span className="hero-light hero-light-d" />
+          <span className="hero-pattern" />
+          <span className="hero-grain" />
         </div>
+        <div className="hero-secondary-actions">
+          <HeroSwatches value={heroTheme} onChange={setHeroTheme} />
+        </div>
+        <p className="privacy-note">
+          <span aria-hidden="true">●</span> Free to keep · Windows 10/11 · macOS coming soon · Local-first by design
+        </p>
+        <RealisticHeroVideo
+          reducedMotion={reducedMotion}
+          jacket={activeHeroTheme.jacket}
+          themeId={activeHeroTheme.id}
+        />
 
         <div className="hero-copy">
-          <Eyebrow>A PERSONAL DESKTOP PET FOR WINDOWS</Eyebrow>
-          <h1 id="hero-title">Your screen could use a little more life.</h1>
+          <Eyebrow>A PERSONAL DESKTOP PET FOR WINDOWS AND MACOS</Eyebrow>
+          <h1 id="hero-title">Your desktop, a little more alive.</h1>
           <p className="hero-support">
-            MewMuze lives quietly on your desktop, keeping you company, helping with the
-            little things, and making an ordinary workday feel a little less ordinary.
+            A little company. A little help. A lot of personality.
+            Meet the companion that makes your desktop feel like home.
           </p>
           <div className="hero-actions">
             <div className="hero-primary-actions">
-              <SkeuoButton
-                href={commerce.freeDownloadUrl}
-                onClick={showFreeInstallGuide}
-                variant="secondary"
-                className="hero-free-download"
-              >
-                Download Free <span aria-hidden="true">↓</span>
-              </SkeuoButton>
-              <SkeuoButton
-                onClick={() => unlockAndScroll("#pricing")}
-                className="hero-buy"
-              >
-                {`Get MewMuze Pro · ${priceLabel}`}
-              </SkeuoButton>
-              <SkeuoButton
-                onClick={() => unlockAndScroll("#story")}
-                variant="secondary"
-                className="hero-explore"
-              >
-                Explore Now <span aria-hidden="true">↓</span>
-              </SkeuoButton>
-            </div>
-            <div className="hero-secondary-actions">
-              <SkeuoButton onClick={() => unlockAndScroll("#features")} variant="quiet">
-                See every feature
-              </SkeuoButton>
+              <GlassSurface className="hero-glass-free"><DownloadButton className="hero-glass-link" href={commerce.freeDownloadUrl} edition="free">Download Free <span aria-hidden="true">↓</span></DownloadButton></GlassSurface>
+              <GlassSurface className="hero-glass-pro"><button className="hero-glass-link" type="button" onClick={() => unlockAndScroll("#pricing")}>{`Get MewMuze Pro · ${priceLabel}`}</button></GlassSurface>
+              <GlassSurface className="hero-glass-explore"><button className="hero-glass-link" type="button" onClick={() => unlockAndScroll("#paper-preview")}>Explore Now <span aria-hidden="true">↓</span></button></GlassSurface>
             </div>
           </div>
-          <p className="privacy-note">
-            <span aria-hidden="true">●</span> Cute companion. Real desktop utility.
-            Local-first by design.
-          </p>
         </div>
 
-        <div className="hero-status" aria-hidden="true">
-          <span>{heroEmotion === "neutral" ? "CURIOUS" : heroEmotion.toUpperCase()}</span>
-          <i />
-          <small>
-            {heroEmotion === "neutral" ? "cursor noticed" : "tiny mood moment"}
-          </small>
-        </div>
       </section>
 
-      <section className="monotony section-shell section-pad" id="story" data-reveal>
-        <div className="monotony-copy">
-          <Eyebrow>THE ORDINARY DESKTOP</Eyebrow>
-          <h2>
-            Nothing is wrong.
-            <br />
-            <em>That is somehow the problem.</em>
-          </h2>
-          <p>
-            You give the best hours of your day to a screen. The same three windows. The
-            same tabs. The same long silence between starting something and finally
-            finishing it. Nothing is going badly. It is just flat, and quiet in a way
-            nobody really admits to.
-          </p>
-          <p>
-            A companion will not fix your job or empty your inbox. What it changes is the
-            texture of the hours you spend on them, and that turns out to matter far more
-            than it sounds like it should.
-          </p>
-          <p className="story-turn">Then a small pair of green eyes looks up at you.</p>
-        </div>
-        <AppearanceShowcase reducedMotion={reducedMotion} />
-      </section>
-
-      <FeatureTheatre reducedMotion={reducedMotion} />
-
-      <section className="day-story section-pad" aria-labelledby="day-title" data-reveal>
-        <div className="section-shell">
-          <div className="section-heading">
-            <div>
-              <Eyebrow>A DAY WITH MEWMUZE</Eyebrow>
-              <h2 id="day-title">
-                Useful in the little gaps.
-                <br />
-                <em>Quiet in the important ones.</em>
-              </h2>
-            </div>
-            <p>A companion rhythm built around a real workday, not a dashboard demanding attention.</p>
-          </div>
-          <ol className="day-timeline">
-            {dayMoments.map((moment) => (
-              <li key={moment.time} className={`tone-${moment.tone}`}>
-                <time>{moment.time}</time>
-                <span className="timeline-pin" aria-hidden="true" />
-                <div>
-                  <h3>{moment.title}</h3>
-                  <p>{moment.copy}</p>
-                </div>
-              </li>
-            ))}
-          </ol>
-        </div>
-      </section>
+      {/* The page tells one day, in order: the hour nobody is around, she picks
+          up, she feels it back, she looks after you, she learns you, here is a whole day of that,
+          then the work she saves you, how she looks, and the receipts. The
+          catalogue sections stay where they were, at the end. */}
+      <ColdOpen />
+      <ChatLab reducedMotion={reducedMotion} />
+      <EmotionLab reducedMotion={reducedMotion} />
+      <CareLab reducedMotion={reducedMotion} />
+      <AdaptsLab />
+      <DayWithHer />
+      <QuickToolsLab reducedMotion={reducedMotion} />
+      <TasksLab reducedMotion={reducedMotion} />
+      <CostumeTeaser />
+      <Receipts />
+      <FeatureRoll />
 
       <section className="feature-directory section-shell section-pad" id="directory" data-reveal>
         <div className="section-heading">
@@ -1705,134 +1094,6 @@ export default function Home() {
         <FeatureDirectory />
       </section>
 
-      <section className="appearance section-pad" id="appearance" data-reveal>
-        <div className="section-shell appearance-shell">
-          <AppearanceStudio />
-        </div>
-      </section>
-
-      <section className="store-teaser section-shell section-pad" id="store" data-reveal>
-        <div className="store-teaser-card">
-          <div>
-            <Eyebrow>THE MEWMUZE WARDROBE</Eyebrow>
-            <h2>
-              The wardrobe is still
-              <br />
-              <em>being stitched.</em>
-            </h2>
-            <p>
-              Original costume concepts are taking shape, but nothing is for sale or
-              download yet.
-            </p>
-            <SkeuoButton href={sitePath("/store/")} variant="secondary">
-              Visit the Coming Soon store <span aria-hidden="true">→</span>
-            </SkeuoButton>
-          </div>
-          <div className="concept-stack" aria-label="Future original costume concepts">
-            {futureConcepts.map((concept, index) => (
-              <span key={concept} style={{ "--stack": index } as CSSProperties}>
-                <i aria-hidden="true" />
-                <strong>{concept}</strong>
-                <small>Concept in progress</small>
-              </span>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="privacy section-pad" id="privacy" data-reveal>
-        <div className="section-shell privacy-shell">
-          <div className="privacy-copy">
-            <Eyebrow>LOCAL-FIRST, CLEARLY EXPLAINED</Eyebrow>
-            <h2>
-              Company without
-              <br />
-              <em>the creepy part.</em>
-            </h2>
-            <p>
-              MewMuze&apos;s desktop behavior stays local. Network features are off until
-              you explicitly connect them.
-            </p>
-          </div>
-          <div className="privacy-grid">
-            {[
-              ["Local file work", "Quick Tools processes selected images and PDFs on your computer."],
-              ["Gmail envelope only", "Newest sender, subject, UID and unread count. Never the email body."],
-              ["Private calendar feed", "Upcoming timed events are fetched only after you add a private iCal address."],
-              ["No microphone audio", "MewMuze reads capture-active state, not a recording or transcription."],
-              ["No hidden screen reading", "Context uses broad app category and aggregate activity, not screen pixels."],
-              ["Your reminders", "Reminder text is written by you and stays part of the local companion experience."],
-            ].map(([title, copy]) => (
-              <article key={title}>
-                <span aria-hidden="true">✓</span>
-                <div>
-                  <h3>{title}</h3>
-                  <p>{copy}</p>
-                </div>
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <EditionsComparison proPrice={basePriceLabel} onFreeDownload={showFreeInstallGuide} />
-
-      <FreeInstallGuide />
-
-      <section className="account-section section-pad" id="account" data-reveal>
-        <div className="section-shell account-shell">
-          <div className="account-copy-block">
-            <Eyebrow>ONE SAFE PURCHASE FLOW</Eyebrow>
-            <h2>
-              Dodo handles the payment.
-              <br />
-              <em>MewMuze handles your pet.</em>
-            </h2>
-            <p>
-              Checkout stays on Dodo Payments, where local currencies, regional
-              payment methods, tax, receipts and refunds are handled securely. MewMuze
-              never receives or stores your card details.
-            </p>
-            <ul className="account-perks">
-              <li>
-                <strong>Pay in the currency Dodo offers you</strong>
-                <span>The hosted checkout localises the final amount and payment methods.</span>
-              </li>
-              <li>
-                <strong>Your licence arrives immediately</strong>
-                <span>It appears after payment and is also delivered to your checkout email.</span>
-              </li>
-              <li>
-                <strong>Activation stays private</strong>
-                <span>The app stores the key in your operating system credential vault.</span>
-              </li>
-            </ul>
-          </div>
-          <div className="account-panel purchase-flow-panel">
-            <span className="account-badge" aria-hidden="true">
-              <i />
-            </span>
-            <ol className="purchase-flow-steps">
-              <li>
-                <strong>1. Secure checkout</strong>
-                <span>Complete the one-time payment on Dodo Payments.</span>
-              </li>
-              <li>
-                <strong>2. Copy your licence</strong>
-                <span>The success page and email both contain the same key.</span>
-              </li>
-              <li>
-                <strong>3. Unlock MewMuze</strong>
-                <span>Paste it in MewMuze Settings. No permanent internet connection is needed.</span>
-              </li>
-            </ol>
-            <a className="skeuo-button skeuo-button-quiet" href={sitePath("/support/")}>
-              Purchase &amp; licence help
-            </a>
-          </div>
-        </div>
-      </section>
-
       <section className="pricing section-pad" id="pricing" aria-labelledby="pricing-title" data-reveal>
         <div className="section-shell pricing-shell">
           <div className="pricing-card">
@@ -1845,24 +1106,24 @@ export default function Home() {
                 unoptimized
               />
               <span>
-                <small>MEWMUZE PRO FOR WINDOWS</small>
+                <small>MEWMUZE PRO · WINDOWS, MACOS SOON</small>
                 <strong>MewMuze Pro</strong>
               </span>
             </div>
             <div className="pricing-price">
               <small>ONE-TIME PRICE</small>
               <strong id="pricing-title">{priceLabel}</strong>
-              <span>Pay once. No subscription, ever.</span>
+              <span>Roughly two burgers. Hers lasts longer.</span>
             </div>
             <ul>
-              <li>Personal Windows desktop pet</li>
-              <li>Expressive authentic animations</li>
-              <li>Focus and reminder tools</li>
-              <li>Local Quick Tools</li>
-              <li>Smart Clipboard Assistant</li>
-              <li>Appearance customization</li>
-              <li>Local-first privacy</li>
-              <li>All future updates and costumes included</li>
+              <li>A desktop pet who actually shows up</li>
+              <li>Animations drawn frame by frame, not looped</li>
+              <li>Focus timers she sits through with you</li>
+              <li>PDF and spreadsheet tools, offline</li>
+              <li>Clipboard assistant that remembers so you do not</li>
+              <li>Build her: body, coat, colours, costumes</li>
+              <li>Nothing leaves your machine. Nothing.</li>
+              <li>Every future update and costume, free</li>
             </ul>
             {commerce.supporterConfigured && (
               <label className="tip-toggle">
@@ -1873,10 +1134,10 @@ export default function Home() {
                 />
                 <span className="tip-box" aria-hidden="true" />
                 <span className="tip-copy">
-                  <strong>Add $1 to support the developer</strong>
+                  <strong>Throw in $1 for the developer</strong>
                   <small>
-                    One person builds MewMuze. This buys the coffee behind the next
-                    update.
+                    One person builds MewMuze. This is the coffee behind the next update.
+                    Entirely optional, zero guilt.
                   </small>
                 </span>
               </label>
@@ -1908,80 +1169,51 @@ export default function Home() {
           <div className="pricing-copy">
             <Eyebrow>ONE PET. ONE PRICE. ONCE.</Eyebrow>
             <h2>
-              Buy it once.
+              Cheaper than the app
               <br />
-              <em>Then never think about it again.</em>
+              <em>you forgot you subscribed to.</em>
             </h2>
             <p>
-              No monthly plan. No annual renewal. The checkout, receipt, tax and
-              licence delivery are handled by Dodo Payments. You pay a single time and
-              the pet is yours.
+              You have paid more than this for a lunch you cannot remember. This one
+              keeps showing up on your desktop, every day, for as long as you own the
+              computer. Pay once, then genuinely never think about it again.
             </p>
             <ul className="pricing-promises">
               <li>
-                <strong>One payment, kept forever</strong>
-                <span>There is no subscription to cancel, because there is no subscription.</span>
+                <strong>Nothing to cancel at 2am</strong>
+                <span>There is no subscription to forget about, because there is no subscription.</span>
               </li>
               <li>
-                <strong>Every future update, free</strong>
-                <span>New features, new animations and new costumes arrive at no extra cost.</span>
+                <strong>Updates are not a new tier</strong>
+                <span>New features, new animations and new costumes land for free. No Plus, no Max, no Ultra.</span>
               </li>
               <li>
                 <strong>The wardrobe keeps growing</strong>
-                <span>Costumes added after you buy are included, so you never buy your pet twice.</span>
+                <span>Costumes added after you buy are yours too. You never buy your pet twice.</span>
               </li>
             </ul>
-            <p className="pricing-footnote">Secure checkout and licence delivery are handled by Dodo Payments.</p>
+            <p className="pricing-footnote">
+              Secure checkout, tax and licence delivery are handled by Dodo Payments. Windows 10 and
+              11 today, macOS coming soon, and your licence covers both.
+            </p>
           </div>
         </div>
       </section>
 
-      <FaqSection />
-
-      <section className="final-cta section-shell section-pad" id="download" data-reveal>
-        <div className="cta-cat">
-          <CatFigure />
-          <span>ready when you are.</span>
-        </div>
-        <div>
-          <Eyebrow>WINDOWS 10 / 11 · 64-BIT</Eyebrow>
-          <h2>Your desktop is ready to feel a little less empty.</h2>
-          <p>
-            Bring home a tiny companion for focus, reminders, quiet reactions and the
-            ordinary minutes in between.
-          </p>
-          <div className="hero-actions">
-            <SkeuoButton
-              href={commerce.freeDownloadUrl}
-              onClick={showFreeInstallGuide}
-              variant="secondary"
-              className="final-free-download"
-            >
-              Download Free <span aria-hidden="true">↓</span>
-            </SkeuoButton>
-            <SkeuoButton href="#pricing">{`View MewMuze Pro · ${priceLabel}`}</SkeuoButton>
-            <SkeuoButton href="#directory" variant="quiet">
-              See every feature
-            </SkeuoButton>
-          </div>
-          <small>
-            One-time payment · no subscription · future updates and costumes included.
-          </small>
-        </div>
-      </section>
+      <ClosingBeat />
 
       <footer className="site-footer">
         <div className="section-shell">
           <a href="#top" aria-label="Back to the top">
             <SiteBrand />
           </a>
-          <p>Personal desktop pet for Windows. Local-first by design.</p>
+          <p>Personal desktop pet for Windows, with macOS coming soon. Local-first by design.</p>
           <nav aria-label="Footer navigation">
-            <a href="#features">Features</a>
-            <a href="#editions">Free vs Pro</a>
-            <a href="#appearance">Appearance</a>
-            <a href={sitePath("/store/")}>Store · Coming Soon</a>
-            <a href="#privacy">Privacy</a>
+            <a href="#directory">Features</a>
+            <a href="#costumes">Looks</a>
+            <a href="#pricing">Pricing</a>
+            <a href={sitePath("/store/")}>Store</a>
+            <a href={sitePath("/support/")}>Purchase help</a>
           </nav>
           <span>© 2026 MewMuze</span>
         </div>

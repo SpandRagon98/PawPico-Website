@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { PublicHeader } from "../../../components/PublicHeader";
+import { DownloadButton } from "../../../components/DownloadButton";
 import { sitePath } from "../../../lib/site-path";
 
 type PurchaseState = "pending" | "processing" | "fulfilled" | "revoked" | "error";
@@ -118,10 +119,17 @@ export default function CheckoutSuccess() {
                   Use the button below to download the official Windows installer. When the
                   download finishes, open <strong>MewMuze_0.1.9_Pro_x64-setup.exe</strong> to begin.
                 </p>
-                <a className="skeuo-button skeuo-button-primary" href={DOWNLOAD_URL}>
+                {/* Gated on an account, like every other download. The payment
+                    itself is already done and verified above: this only decides
+                    who the installer is handed to, and never touches checkout. */}
+                <DownloadButton
+                  className="skeuo-button skeuo-button-primary"
+                  href={DOWNLOAD_URL}
+                  edition="pro"
+                >
                   Download MewMuze Pro 0.1.9
-                </a>
-                <small>For Windows 10 and 11 · downloaded from the official MewMuze release</small>
+                </DownloadButton>
+                <small>For Windows 10 and 11 · macOS coming soon · downloaded from the official MewMuze release</small>
               </div>
             </article>
 

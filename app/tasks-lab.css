@@ -1,0 +1,98 @@
+/* Paper Tasks section: the rendered Tasks-to-Insights film on the left, the
+   pitch on the right, on the landing page's neon green ground. */
+
+.tasks-lab {
+  position: relative;
+  overflow: hidden;
+  border: 0 !important;
+  background:
+    radial-gradient(40% 40% at 0% 0%, color-mix(in srgb, var(--hero-acid) 40%, transparent), transparent 100%),
+    radial-gradient(36% 44% at 100% 20%, color-mix(in srgb, var(--hero-glow) 28%, transparent), transparent 100%),
+    radial-gradient(46% 50% at 30% 110%, color-mix(in srgb, var(--hero-neon) 30%, transparent), transparent 100%),
+    linear-gradient(180deg, var(--hero-base-1) 0%, color-mix(in oklab, var(--hero-soft) 45%, var(--hero-base-1)) 100%) !important;
+}
+.tasks-lab.section-pad { padding-block: clamp(64px, 7vw, 112px); }
+
+/* Above the page-level refraction layers (z 4), like the other sections. */
+.tasks-lab-shell {
+  position: relative;
+  z-index: 5;
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(0, .65fr);
+  gap: clamp(28px, 4vw, 64px);
+  align-items: center;
+}
+
+.tasks-lab-film {
+  position: relative;
+  aspect-ratio: 1440 / 1080;
+  overflow: hidden;
+  border-radius: 28px;
+  background: var(--hero-soft);
+  box-shadow: 0 34px 80px rgba(20, 50, 10, .16), 0 0 0 1px rgba(255, 255, 255, .9);
+}
+.tasks-lab-film video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.tasks-lab-copy > .liquid-kicker { color: var(--hero-accent); }
+.tasks-lab .tasks-lab-copy h2 {
+  margin: 14px 0 14px;
+  color: var(--hero-ink);
+  font-size: clamp(32px, 3.2vw, 52px);
+  line-height: 1.08;
+  letter-spacing: -.045em;
+}
+.tasks-lab .tasks-lab-copy h2 em { color: var(--hero-accent) !important; font-style: normal; }
+.tasks-lab-lead {
+  margin: 0 0 20px;
+  color: #3f4a3a;
+  font-size: clamp(14px, 1.05vw, 16px);
+  line-height: 1.65;
+}
+
+.tasks-lab-points {
+  display: grid;
+  gap: 10px;
+  margin: 0 0 16px;
+  padding: 0;
+  list-style: none;
+}
+.tasks-lab-points li {
+  padding: 12px 16px;
+  border: 1px solid rgba(255, 255, 255, .95);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, .72);
+  box-shadow: 0 10px 26px rgba(20, 50, 10, .07), inset 0 1px #fff;
+}
+.tasks-lab-points strong {
+  display: block;
+  margin-bottom: 2px;
+  color: var(--hero-ink);
+  font-size: 14px;
+  letter-spacing: -.02em;
+}
+.tasks-lab-points span {
+  color: #4a5545;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.tasks-lab-note {
+  margin: 0;
+  color: #5d6758;
+  font-size: 11.5px;
+  line-height: 1.55;
+}
+
+@media (max-width: 1100px) {
+  .tasks-lab-shell { grid-template-columns: 1fr; }
+  .tasks-lab-film { max-width: 760px; width: 100%; margin: 0 auto; }
+}
+/* Phones: crop the film's green margin so the panel reads bigger (the wide
+   Insights view is 1044 of the film's 1440px, so a square crop still holds it). */
+@media (max-width: 760px) {
+  .tasks-lab-film { aspect-ratio: 1 / 1; }
+}

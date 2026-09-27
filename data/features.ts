@@ -17,22 +17,20 @@ export type FeatureStory = {
   id: string;
   number: string;
   title: string;
-  shortTitle: string;
   group: FeatureGroup;
-  scene: string;
+  /** One line: what it is. Everything else is bullets. */
   story: string;
-  detail: string;
-  demoLabel: string;
   video: string;
   accent: "mint" | "pink" | "lavender" | "blue" | "peach" | "yellow";
-  facts: string[];
-  /** Plain-English payoff: what this actually changes for the person using it. */
-  helps: string;
+  /** What it actually does for you, in short pointers. */
+  helps: string[];
   notice?: FeatureNotice;
-  /** Shown only when a feature's Free/Pro availability is explicitly known. */
+  /** Shown only when a feature's edition is explicitly known. */
   availability?: {
-    free: boolean;
-    pro: boolean;
+    free?: boolean;
+    pro?: boolean;
+    /** In the Paper build only: not in the current Free or Pro downloads. */
+    paper?: boolean;
   };
 };
 
@@ -41,426 +39,455 @@ const stories: Omit<FeatureStory, "helps" | "notice">[] = [
     id: "cursor",
     number: "01",
     title: "Cursor companion",
-    shortTitle: "Cursor",
     group: "Lives on my desktop",
-    scene: "The pointer pauses. Two green eyes notice.",
-    story:
-      "MewMuze watches the cursor, follows with a restrained little head turn and sometimes decides it is worth chasing.",
-    detail:
-      "Cursor samples drive the moment and are discarded. Nothing becomes a cursor-history log.",
-    demoLabel: "watch → approach → chase → pounce",
+    story: "She clocks your cursor and sometimes decides it is prey.",
     video: "/videos/touch-and-mochi.mp4",
     accent: "mint",
-    facts: ["Glossy pupils lead the head", "Hover earns a look", "Playful profiles chase more often"],
   },
   {
     id: "petting",
     number: "02",
     title: "Petting",
-    shortTitle: "Petting",
     group: "Reacts to my day",
-    scene: "A gentle stroke becomes a tiny ritual.",
-    story:
-      "Move back and forth across MewMuze and your pet softens from a curious glance into closed eyes, purrs and a few shy hearts.",
-    detail:
-      "Plain hovering never counts as petting; the gesture needs deliberate, gentle movement.",
-    demoLabel: "look → soften → loaf → purr",
+    story: "Stroke her and she melts. Grab her too much and she gets attitude.",
     video: "/videos/gaze-and-purr.mp4",
     accent: "pink",
-    facts: ["Gesture-aware petting", "Purrs are optional", "Repeated grabbing can annoy"],
   },
   {
     id: "sleep",
     number: "03",
     title: "Doze and sleep",
-    shortTitle: "Doze",
     group: "Reacts to my day",
-    scene: "The cursor rests. MewMuze finally yawns.",
-    story:
-      "After the chosen period of real inactivity, MewMuze opens into a full yawn, curls down and sleeps until nearby movement wakes your pet.",
-    detail:
-      "A merely parked pointer does not wake your pet. Nearby movement does.",
-    demoLabel: "idle → yawn → curl → dream",
+    story: "You go quiet, she yawns, curls up and taps out.",
     video: "/videos/yawn-and-sleep.mp4",
     accent: "lavender",
-    facts: ["User-set inactivity timing", "Energy recovers at rest", "Nearby movement wakes gently"],
   },
   {
     id: "work",
     number: "04",
     title: "Work Mode",
-    shortTitle: "Work",
     group: "Helps me work",
-    scene: "The desk gets busy. Your pet gets a laptop.",
-    story:
-      "Work Mode parks MewMuze neatly beside a compact Quick Tools panel for local image and PDF conversion.",
-    detail:
-      "The panel tries the clearest side of your pet and stays inside the monitor work area.",
-    demoLabel: "park → lightning → local tools",
+    story: "A tiny PDF and image toolkit parks right next to her.",
     video: "/videos/work-mode.mp4",
     accent: "yellow",
-    facts: ["Images to PDF", "PDF to PNG or JPG", "Local processing"],
-    availability: { free: false, pro: true },
+    availability: { pro: true },
+  },
+  {
+    id: "spreadsheets",
+    number: "05",
+    title: "Spreadsheet Tools",
+    group: "Helps me work",
+    story: "CSV and Excel jobs that usually cost you a sketchy website.",
+    video: "/videos/mewmuze-quick-tools.mp4",
+    accent: "mint",
+    availability: { pro: true },
   },
   {
     id: "clipboard",
-    number: "05",
+    number: "06",
     title: "Clipboard Assistant",
-    shortTitle: "Clipboard",
     group: "Helps me work",
-    scene: "A copied snippet needs somewhere calmer to land.",
-    story:
-      "The clipboard assistant keeps the text you explicitly copy close at hand, with a small pet-sized surface instead of another sprawling utility window.",
-    detail:
-      "It responds to clipboard content you choose to copy; it does not read the screen behind it.",
-    demoLabel: "copy → notice → use",
+    story: "The thing you copied, still there two steps later.",
     video: "/videos/context-companion.mp4",
     accent: "blue",
-    facts: ["Explicit copied content", "No hidden screen reading", "Compact desktop placement"],
-    availability: { free: false, pro: true },
+    availability: { pro: true },
   },
   {
     id: "focus",
-    number: "06",
+    number: "07",
     title: "Focus Mode",
-    shortTitle: "Focus",
     group: "Keeps me on track",
-    scene: "One task. One timer. One very serious pet.",
-    story:
-      "Focus Mode settles MewMuze front-facing, suppresses chasing and quietly counts a steady work session upward.",
-    detail:
-      "Small nods and cheers punctuate longer sessions without turning the desktop into a game.",
-    demoLabel: "settle → focus → tiny cheer",
+    story: "She sits down and locks in with you. No chasing, no noise.",
     video: "/videos/focus-and-agent.mp4",
     accent: "mint",
-    facts: ["Count-up focus timer", "Chasing pauses", "Quiet encouragement"],
   },
   {
     id: "pomodoro",
-    number: "07",
+    number: "08",
     title: "Pomodoro",
-    shortTitle: "Pomodoro",
     group: "Keeps me on track",
-    scene: "A rhythm for work, rest and coming back.",
-    story:
-      "Choose focus, short break, long break and cycle lengths; MewMuze keeps the phase visible and celebrates completion.",
-    detail:
-      "Start, pause, resume, skip and reset remain under your control.",
-    demoLabel: "focus → break → return",
+    story: "25 on, 5 off, repeat. Your attention span, but structured.",
     video: "/videos/focus-tools.mp4",
     accent: "peach",
-    facts: ["Configurable phases", "Pause and resume", "Cycle completion"],
   },
   {
     id: "breaks",
-    number: "08",
+    number: "09",
     title: "Break and water reminders",
-    shortTitle: "Breaks",
     group: "Keeps me on track",
-    scene: "A small paw interrupts the fourth hour.",
-    story:
-      "Stretch and water nudges arrive as restrained notebook notices with matching pet reactions.",
-    detail:
-      "Work-rest checks count active use rather than simple wall-clock time.",
-    demoLabel: "active use → nudge → snooze",
+    story: "Drink water. Unclench your jaw. Stand up. She is not asking.",
     video: "/videos/smart-notifications.mp4",
     accent: "blue",
-    facts: ["Stretch intervals", "Water intervals", "Active-use awareness"],
   },
   {
     id: "reminders",
-    number: "09",
+    number: "10",
     title: "Custom reminders",
-    shortTitle: "Reminders",
     group: "Keeps me on track",
-    scene: "The thing you meant to remember appears beside your pet.",
-    story:
-      "Create one-off appointments or repeating personal nudges with your own message.",
-    detail:
-      "Warn and due states use distinct colors, and scheduled reminders support snooze or done.",
-    demoLabel: "write → warn → done",
+    story: "Your own nudges, in your own words, from a face you like.",
     video: "/videos/notices-motion.mp4",
     accent: "pink",
-    facts: ["User-written messages", "Warn and due states", "Snooze and mark done"],
+  },
+  {
+    id: "tasks",
+    number: "11",
+    title: "Tasks",
+    group: "Keeps me on track",
+    story: "A day list with subtasks, times and zero guilt trips.",
+    video: "/videos/mewmuze-tasks.mp4",
+    accent: "lavender",
+    availability: { paper: true },
   },
   {
     id: "gmail",
-    number: "10",
+    number: "12",
     title: "Gmail",
-    shortTitle: "Gmail",
     group: "Helps me work",
-    scene: "New mail, delivered by your pet.",
-    story:
-      "When you opt in, MewMuze checks Gmail once per minute and surfaces only the newest sender and subject.",
-    detail:
-      "The first successful check establishes a quiet baseline, so old messages never create a burst.",
-    demoLabel: "quiet poll → wave → envelope",
+    story: "New mail arrives as one tiny card. Sender and subject, that is it.",
     video: "/videos/gmail-connector.mp4",
     accent: "mint",
-    facts: ["IMAP over TLS", "Email body is never read", "Revocable app password"],
-    availability: { free: false, pro: true },
+    availability: { pro: true },
   },
   {
     id: "calendar",
-    number: "11",
+    number: "13",
     title: "Google Calendar",
-    shortTitle: "Calendar",
     group: "Helps me work",
-    scene: "The meeting is close. The ears go up.",
-    story:
-      "A private iCal feed becomes a gentle early warning and then a clearer starting-now notice.",
-    detail:
-      "The feed refreshes every five minutes and is parsed locally. Timed events drive alerts.",
-    demoLabel: "upcoming → warn → now",
+    story: "She taps the glass before the call, not four minutes after it.",
     video: "/videos/calendar-connector.mp4",
     accent: "yellow",
-    facts: ["Private iCal address", "0 to 120 minute warning", "Five-minute snooze"],
-    availability: { free: false, pro: true },
+    availability: { pro: true },
   },
   {
     id: "physics",
-    number: "12",
+    number: "14",
     title: "Desktop Physics",
-    shortTitle: "Physics",
     group: "Lives on my desktop",
-    scene: "Windows become ledges. The taskbar becomes a floor.",
-    story:
-      "MewMuze walks, hops, balances, hangs and rides moving windows using the actual desktop geometry.",
-    detail:
-      "Multi-monitor work areas, mixed display scaling and safe recovery keep exploration contained.",
-    demoLabel: "walk → jump → balance → land",
+    story: "Your real windows are the floor. She walks, hops and hangs off them.",
     video: "/videos/desktop-physics.mp4",
     accent: "lavender",
-    facts: ["Window-top ledges", "Side clinging", "Multi-monitor awareness"],
   },
   {
     id: "context",
-    number: "13",
+    number: "15",
     title: "Context aware",
-    shortTitle: "Context",
     group: "Reacts to my day",
-    scene: "Writing, coding and scrolling each get a different companion.",
-    story:
-      "Broad app category and activity select a fitting pose: notebook, tiny keyboard, reading strip or glasses.",
-    detail:
-      "MewMuze uses executable category and aggregate activity, never typed content or screen capture.",
-    demoLabel: "write → type → read → rest",
+    story: "Open an editor, glasses appear. Type hard, she starts steaming.",
     video: "/videos/context-companion.mp4",
     accent: "blue",
-    facts: ["No key identities", "No screen capture", "Priority-controlled reactions"],
   },
   {
     id: "music",
-    number: "14",
+    number: "16",
     title: "Music",
-    shortTitle: "Music",
     group: "Reacts to my day",
-    scene: "Playback starts. Headphones appear.",
-    story:
-      "Windows media playback state gives MewMuze a small headphone dance with a raised paw and music notes.",
-    detail:
-      "No title, artist, album artwork or other track metadata is read.",
-    demoLabel: "playback → headphones → bop",
+    story: "Your playlist starts, she starts bopping.",
     video: "/videos/music-and-singing.mp4",
     accent: "pink",
-    facts: ["Playback state only", "No track metadata", "Optional sound stays muted by default"],
   },
   {
     id: "microphone",
-    number: "15",
+    number: "17",
     title: "Microphone reaction",
-    shortTitle: "Microphone",
     group: "Reacts to my day",
-    scene: "A call begins. MewMuze finds a tiny microphone.",
-    story:
-      "When another application is actively using a microphone, MewMuze sings along and bows when capture ends.",
-    detail:
-      "Your pet detects capture-active state only. It never opens, records or transcribes the microphone stream.",
-    demoLabel: "capture on → sing → bow",
+    story: "Mic goes live, she sings along and bows when the call ends.",
     video: "/videos/music-and-singing.mp4",
     accent: "peach",
-    facts: ["Activity state only", "No recording", "No transcription"],
+  },
+  {
+    id: "feelings",
+    number: "18",
+    title: "Feelings engine",
+    group: "Reacts to my day",
+    story: "29 moods, and yes, the savage ones are in there.",
+    video: "/videos/mewmuze-emotions.mp4",
+    accent: "mint",
+    availability: { paper: true },
+  },
+  {
+    id: "chat",
+    number: "19",
+    title: "Local Chat",
+    group: "Reacts to my day",
+    story: "Talk to her. Pick the energy: comfort, rant, savage, calm.",
+    video: "/videos/mewmuze-chat-demo.mp4",
+    accent: "blue",
+    availability: { paper: true },
+  },
+  {
+    id: "diary",
+    number: "20",
+    title: "Diary",
+    group: "Reacts to my day",
+    story: "A private page for the day, kept on your machine.",
+    video: "/videos/mewmuze-chat-demo.mp4",
+    accent: "pink",
+    availability: { paper: true },
+  },
+  {
+    id: "adapts",
+    number: "21",
+    title: "Adapts to you",
+    group: "Reacts to my day",
+    story: "She learns your hours and how you talk. Slowly, and only on this PC.",
+    video: "/videos/rest-and-emotion.mp4",
+    accent: "lavender",
+    availability: { paper: true },
+  },
+  {
+    id: "voice",
+    number: "22",
+    title: "Voice to text",
+    group: "Helps me work",
+    story: "Hold the key, talk, she types it out.",
+    video: "/videos/music-and-singing.mp4",
+    accent: "peach",
+    availability: { paper: true },
   },
   {
     id: "appearance",
-    number: "16",
+    number: "23",
     title: "Appearance Studio",
-    shortTitle: "Appearance",
     group: "Looks like mine",
-    scene: "Same little soul. Your favorite coat.",
-    story:
-      "Five body plans, seven coat patterns, independent colors and three display sizes make the companion feel personal.",
-    detail:
-      "The current default accessory choice is intentionally simple: None or Flower Band.",
-    demoLabel: "body → pattern → color → flower",
+    story: "Build the cat. Body, coat, colours, size.",
     video: "/videos/customization-studio.mp4",
     accent: "pink",
-    facts: ["Five body plans", "Seven patterns", "None or Flower Band"],
+  },
+  {
+    id: "costumes",
+    number: "24",
+    title: "Built-in costumes",
+    group: "Looks like mine",
+    story: "Corporate Cat, Cyberpunk Cat, Bat Cat. Pick a fit, pick a colour.",
+    video: "/videos/costume-cyberpunk.mp4",
+    accent: "yellow",
+    availability: { pro: true },
   },
   {
     id: "personality",
-    number: "17",
+    number: "25",
     title: "Personality and rest",
-    shortTitle: "Personality",
     group: "Looks like mine",
-    scene: "Not a loop. A quiet little temperament.",
-    story:
-      "Energy, curiosity, recent interaction and weighted choices create slow blinks, grooming, play, sleepiness and the occasional sulk.",
-    detail:
-      "Calm, balanced and playful profiles change the rhythm without changing the pet you chose.",
-    demoLabel: "calm ↔ curious ↔ playful ↔ sleepy",
+    story: "Energy drains, moods stick, affection is remembered. Not a looping GIF.",
     video: "/videos/rest-and-emotion.mp4",
     accent: "lavender",
-    facts: ["Mood-driven choices", "Energy and recovery", "Calm activity profiles"],
   },
   {
     id: "peek",
-    number: "18",
+    number: "26",
     title: "Peek Mode",
-    shortTitle: "Peek",
     group: "Lives on my desktop",
-    scene: "Full screen? Just the ears, then.",
-    story:
-      "During presentations and full-screen work, MewMuze can retreat to a restrained corner peek instead of covering content.",
-    detail:
-      "Peek can be automatic or manual and remains secondary to focused desktop work.",
-    demoLabel: "notice full screen → retreat → peek",
+    story: "Sharing your screen? She ducks out of frame on her own.",
     video: "/videos/desktop-roaming.mp4",
     accent: "mint",
-    facts: ["Automatic or manual", "Presentation-friendly", "Returns when space is available"],
   },
   {
     id: "agent",
-    number: "19",
+    number: "27",
     title: "Local Agent Status",
-    shortTitle: "Agent",
     group: "Respects my privacy",
-    scene: "A local task changes state. Your pet understands the signal.",
-    story:
-      "Point MewMuze at one explicit local JSON status file and your pet can think, run, wait, celebrate or ask for attention.",
-    detail:
-      "The integration is off until you supply an absolute path; it never scans outside that exact file.",
-    demoLabel: "idle → thinking → running → success",
+    story: "Point her at one local status file and she reacts to your build.",
     video: "/videos/focus-and-agent.mp4",
     accent: "yellow",
-    facts: ["One explicit file", "No folder scanning", "Local status only"],
   },
   {
     id: "lightweight",
-    number: "20",
+    number: "28",
     title: "Lightweight Windows companion",
-    shortTitle: "Lightweight",
     group: "Respects my privacy",
-    scene: "Lively when you notice. Nearly still when you do not.",
-    story:
-      "A transparent Windows overlay adapts its frame rate and detail to interaction, rest, hidden and full-screen states.",
-    detail:
-      "Dynamic click-through keeps the desktop usable everywhere outside your pet, its menus and panels.",
-    demoLabel: "interact → settle → near-zero hidden",
+    story: "Lively when you look, near still when you do not.",
     video: "/mewmuze-idle-reel.mp4",
     accent: "blue",
-    facts: ["Adaptive rendering", "Dynamic click-through", "Windows 10 and 11"],
   },
   {
     id: "calculator",
-    number: "21",
+    number: "29",
     title: "Calculator",
-    shortTitle: "Calculator",
     group: "Helps me work",
-    scene: "A tiny calculation interrupts the actual work.",
-    story:
-      "MewMuze opens a compact calculator for the everyday arithmetic that would otherwise send you hunting for another tab.",
-    detail:
-      "The calculation resolves locally on your desktop, without an account, a cloud request or a permanent internet connection.",
-    demoLabel: "2450 + 785 → 3,235",
+    story: "Quick sums without opening a browser tab you will forget to close.",
     video: "/videos/work-mode.mp4",
     accent: "yellow",
-    facts: ["Everyday calculations", "Instant local results", "No browser detour"],
     availability: { free: true, pro: true },
   },
   {
     id: "unit-converter",
-    number: "22",
+    number: "30",
     title: "Unit Converter",
-    shortTitle: "Units",
     group: "Helps me work",
-    scene: "Two measurements need to mean the same thing.",
-    story:
-      "Choose the values and units you have, and MewMuze swaps them into the format you need in one small desktop panel.",
-    detail:
-      "Common unit conversions stay local and close to the task that prompted them, rather than opening another website.",
-    demoLabel: "5 km ↔ 3.11 mi",
+    story: "Km to miles, grams to cups, done in one little panel.",
     video: "/videos/work-mode.mp4",
     accent: "mint",
-    facts: ["Everyday unit conversion", "Two-card comparison", "Local processing"],
     availability: { free: true, pro: true },
   },
   {
     id: "time-converter",
-    number: "23",
+    number: "31",
     title: "Time Zone Converter",
-    shortTitle: "Time zones",
     group: "Helps me work",
-    scene: "The meeting time makes sense somewhere else.",
-    story:
-      "MewMuze places two locations side by side so you can translate a time zone without doing offset arithmetic in your head.",
-    detail:
-      "The converter handles the comparison locally and keeps both times visible long enough to plan the next call.",
-    demoLabel: "10:30 PM India → 1:00 PM New York",
+    story: "What time it is in Tokyo, without the mental maths.",
     video: "/videos/work-mode.mp4",
     accent: "blue",
-    facts: ["Side-by-side locations", "Fast time comparison", "No cloud processing"],
     availability: { free: true, pro: true },
   },
 ];
 
-const helps: Record<string, string> = {
-  cursor:
-    "The screen stops feeling like furniture. Something in there registers that you are present. You move the mouse, it looks up, and the room feels a little less empty than it did a second ago.",
-  petting:
-    "Thirty seconds of stroking a warm little animal is a genuinely better reset after a hard message than another lap around social media. It costs nothing and it is always within reach.",
-  sleep:
-    "Your pet winds down when you do, so your desktop stops shouting at the end of the day. Watching something curl up and go quiet is a surprisingly strong signal that you are allowed to stop too.",
-  work:
-    "You stop handing private documents to a free converter website. The two file jobs you actually do, images into a PDF and a PDF back into images, happen on your own machine in seconds.",
-  clipboard:
-    "The thing you copied is still there when you need it two steps later, so you stop re-finding the same link, code or address for the third time in ten minutes.",
-  focus:
-    "A focus timer you do not resent. Your pet sits down and works alongside you instead of a progress bar shaming you from a browser tab, which turns out to be a far better reason to keep going.",
-  pomodoro:
-    "Structure without rigidity. The cycle keeps its shape whether you are deep in it or stepping away, so a broken session never becomes a reason to abandon the whole afternoon.",
-  breaks:
-    "You actually stand up. A break you watch your pet take with you is much harder to dismiss than a notification you have already learned to click away without reading.",
-  reminders:
-    "The small things that fall through, the tablet, the callback, the water, arrive in your own words from something you like looking at, so they land instead of blending into the noise.",
-  gmail:
-    "You close the inbox tab that has been eating your afternoon. When something genuinely new lands, your pet waves and tells you who it is and what it is about. One line, no red badge, no falling back into the inbox.",
-  calendar:
-    "You stop joining calls four minutes late because a browser notification appeared behind a full-screen window. The warning comes from something always on top, with enough lead time to actually get ready.",
-  physics:
-    "This is the part that makes people call a colleague over. Your real windows are the world. Your pet walks your taskbar, hops between the apps you have open, and hangs off the edge of whatever you are typing in.",
-  context:
-    "Your pet reads the room without reading your screen. Open an editor and glasses appear; type hard for ten minutes and it starts steaming. You feel accompanied at work, from nothing more sensitive than an app name.",
-  music:
-    "Your music gets a tiny dancing audience. It costs you nothing, because MewMuze never learns the artist or the track, only that something is playing.",
-  microphone:
-    "Every call ends with a small bow. Your pet knows the mic went live and nothing else. No stream is opened, recorded or transcribed.",
-  appearance:
-    "The pet becomes yours rather than a stock mascot. People can honour a pet they have lost, match a familiar coat, or invent something that never existed, and it greets them in that form every single morning.",
-  personality:
-    "This is why it does not get old in week three. Energy drains and recovers, moods carry over, affection is remembered, so the pet you have in March behaves like one you have lived with rather than a looping GIF.",
-  peek:
-    "It never costs you a meeting. When you present or go full screen, your pet steps aside on its own, so you get a companion without a single embarrassing moment.",
-  agent:
-    "Stop babysitting a long build. Your pet works while the job runs and celebrates from across the screen when it lands, so you can go make tea and still know the moment it finishes.",
-  lightweight:
-    "It behaves itself. No taskbar clutter, clicks pass through to whatever is underneath, and it goes near idle when hidden, so company never costs you a battery or a frame rate.",
-  calculator:
-    "Tiny tools answer the questions that interrupt your day, so a quick sum stays quick and your actual work remains the thing in front of you.",
-  "unit-converter":
-    "The number becomes useful immediately. You can compare familiar units at a glance and move on without breaking concentration.",
-  "time-converter":
-    "Scheduling across cities stops being mental arithmetic. Both places stay visible, so the right time is obvious before the invitation goes out.",
+/** The payoff, in pointers. Short lines only: this is the part people skim. */
+const helps: Record<string, string[]> = {
+  cursor: [
+    "Move the mouse, she looks up",
+    "Hover near her and she comes over",
+    "Playful profiles chase more, calm ones stay put",
+  ],
+  petting: [
+    "Stroke back and forth for purrs and hearts",
+    "Hovering does not count, the gesture has to be real",
+    "Keep grabbing her and she gets annoyed",
+  ],
+  sleep: [
+    "Real inactivity, not just a timer",
+    "Full yawn, then a curl up",
+    "Movement nearby wakes her",
+  ],
+  work: [
+    "Images into one PDF, PDF back into images",
+    "Runs on your machine, no upload",
+    "Panel parks on her clearest side",
+  ],
+  spreadsheets: [
+    "CSV to Excel and back",
+    "Merge many sheets into one file",
+    "Split a workbook into tidy separate files",
+  ],
+  clipboard: [
+    "Keeps what you actually copied",
+    "Never reads the screen behind it",
+    "Pet sized, not another giant window",
+  ],
+  focus: [
+    "Count up timer, no shame bar",
+    "Chasing pauses while you work",
+    "Small cheers on the long runs",
+  ],
+  pomodoro: [
+    "Set focus, short break, long break",
+    "Pause, resume, skip, reset",
+    "One broken session does not kill the day",
+  ],
+  breaks: [
+    "Stretch and water nudges",
+    "Counts active use, not wall clock",
+    "Snooze it if you are mid thought",
+  ],
+  reminders: [
+    "One offs or repeats, your wording",
+    "Warns you before it is due",
+    "Snooze or mark it done",
+  ],
+  tasks: [
+    "Subtasks, times and a done count",
+    "See the day without opening an app",
+    "No streaks, no scores, no guilt",
+  ],
+  gmail: [
+    "Newest sender and subject only",
+    "She never opens the email body",
+    "App password you can revoke anytime",
+  ],
+  calendar: [
+    "Private iCal link, parsed on your PC",
+    "Warning up to 120 minutes ahead",
+    "Five minute snooze when you need it",
+  ],
+  physics: [
+    "Walks window tops and the taskbar",
+    "Clings to edges and falls with drama",
+    "Knows multiple monitors",
+  ],
+  context: [
+    "Reads the app category, never your screen",
+    "Different pose for writing, coding, reading",
+    "No typed text, ever",
+  ],
+  music: [
+    "Knows something is playing, nothing else",
+    "No title, artist or artwork",
+    "Headphones and a bop",
+  ],
+  microphone: [
+    "Knows the mic went live",
+    "Nothing is opened, recorded or transcribed",
+    "Bows when the call ends",
+  ],
+  feelings: [
+    "29 expressions across the whole range",
+    "Savage, angry and sad included",
+    "She types when you type and sings when you sing",
+  ],
+  chat: [
+    "Runs on your computer, not a server",
+    "Personas: comfort, rant, savage, calm and more",
+    "New chat or forget chat whenever you want",
+  ],
+  diary: [
+    "Write the day down beside her",
+    "Stays on your machine",
+    "Nothing is posted anywhere",
+  ],
+  adapts: [
+    "Learns the hours you are usually heads down",
+    "Picks up how long and how casual you write",
+    "Plain arithmetic on your PC, no model, no upload",
+  ],
+  voice: [
+    "Push to talk, she types it",
+    "Transcribed on your own machine",
+    "Raw and cleaned versions both kept",
+  ],
+  appearance: [
+    "Five body plans, seven coat patterns",
+    "Colours you pick, three display sizes",
+    "Match a real pet or invent one",
+  ],
+  costumes: [
+    "Three fits included with Pro",
+    "Six suit, five jacket or five accent colours",
+    "Drawn live on her body, so it moves with her",
+  ],
+  personality: [
+    "Energy drains and recovers",
+    "Moods carry over between sessions",
+    "March her behaves like a pet you have lived with",
+  ],
+  peek: [
+    "Spots full screen and presentations",
+    "Retreats to a corner peek",
+    "Comes back when there is room",
+  ],
+  agent: [
+    "One file path you type in yourself",
+    "Off until you set it",
+    "Thinks, runs, waits, celebrates",
+  ],
+  lightweight: [
+    "Frame rate drops when you are not looking",
+    "Clicks pass through to what is underneath",
+    "No taskbar clutter, Windows 10 and 11",
+  ],
+  calculator: [
+    "Everyday sums, instantly",
+    "Local, no account, works offline",
+    "Stays next to the work that prompted it",
+  ],
+  "unit-converter": [
+    "Two cards, side by side",
+    "Common everyday units",
+    "No website, no cookie banner",
+  ],
+  "time-converter": [
+    "Two cities on screen at once",
+    "No offset maths in your head",
+    "Sorted before you send the invite",
+  ],
 };
 
 const notices: Record<string, FeatureNotice> = {
@@ -508,7 +535,7 @@ const notices: Record<string, FeatureNotice> = {
 
 export const featureStories: FeatureStory[] = stories.map((story) => ({
   ...story,
-  helps: helps[story.id] ?? story.detail,
+  helps: helps[story.id] ?? [],
   notice: notices[story.id],
 }));
 

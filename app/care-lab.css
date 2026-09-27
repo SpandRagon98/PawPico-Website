@@ -1,0 +1,96 @@
+/* Paper Care section: the pitch on the left, the rendered Care film on the
+   right, on a light ground between the two dark emotion sections. Card and
+   type sizes match the Tasks section so the Paper previews read as a set. */
+
+.care-lab {
+  position: relative;
+  overflow: hidden;
+  border: 0 !important;
+  background:
+    radial-gradient(40% 44% at 100% 0%, color-mix(in srgb, var(--hero-acid) 40%, transparent), transparent 100%),
+    radial-gradient(36% 44% at 0% 30%, color-mix(in srgb, #ff9fc0 22%, transparent), transparent 100%),
+    radial-gradient(46% 50% at 70% 110%, color-mix(in srgb, var(--hero-neon) 28%, transparent), transparent 100%),
+    linear-gradient(180deg, var(--hero-base-1) 0%, color-mix(in oklab, var(--hero-soft) 45%, var(--hero-base-1)) 100%) !important;
+}
+.care-lab.section-pad { padding-block: clamp(64px, 7vw, 112px); }
+
+.care-lab-shell {
+  position: relative;
+  z-index: 5;
+  display: grid;
+  grid-template-columns: minmax(0, .65fr) minmax(0, 1.35fr);
+  gap: clamp(28px, 4vw, 64px);
+  align-items: center;
+}
+
+.care-lab-film {
+  order: 2;
+  position: relative;
+  aspect-ratio: 1440 / 1080;
+  overflow: hidden;
+  border-radius: 28px;
+  background: var(--hero-soft);
+  box-shadow: 0 34px 80px rgba(20, 50, 10, .16), 0 0 0 1px rgba(255, 255, 255, .9);
+}
+.care-lab-film video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.care-lab-copy > .liquid-kicker { color: var(--hero-accent); }
+.care-lab .care-lab-copy h2 {
+  margin: 14px 0 14px;
+  color: var(--hero-ink);
+  font-size: clamp(32px, 3.2vw, 52px);
+  line-height: 1.08;
+  letter-spacing: -.045em;
+}
+.care-lab .care-lab-copy h2 em { color: #c73866 !important; font-style: normal; }
+.care-lab-lead {
+  margin: 0 0 20px;
+  color: #3f4a3a;
+  font-size: clamp(14px, 1.05vw, 16px);
+  line-height: 1.65;
+}
+
+.care-lab-points {
+  display: grid;
+  gap: 10px;
+  margin: 0 0 16px;
+  padding: 0;
+  list-style: none;
+}
+.care-lab-points li {
+  padding: 12px 16px;
+  border: 1px solid rgba(255, 255, 255, .95);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, .72);
+  box-shadow: 0 10px 26px rgba(20, 50, 10, .07), inset 0 1px #fff;
+}
+.care-lab-points strong {
+  display: block;
+  margin-bottom: 2px;
+  color: var(--hero-ink);
+  font-size: 14px;
+  letter-spacing: -.02em;
+}
+.care-lab-points span {
+  color: #4a5545;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.care-lab-note {
+  margin: 0;
+  color: #5d6758;
+  font-size: 11.5px;
+  line-height: 1.55;
+}
+
+/* Stacked: film first, then the pitch. The film keeps its full width on
+   phones because the panel and the cat sit at opposite edges of it. */
+@media (max-width: 1100px) {
+  .care-lab-shell { grid-template-columns: 1fr; }
+  .care-lab-film { order: 0; max-width: 760px; width: 100%; margin: 0 auto; }
+}
