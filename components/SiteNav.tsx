@@ -82,7 +82,11 @@ function AccountControl() {
   }, [user]);
 
   return (
-    <GlassSurface className="nav-glass nav-glass-account" variant="navigation" fit>
+    <GlassSurface
+      className={`nav-glass nav-glass-account${user ? " nav-glass-avatar" : ""}`}
+      variant="navigation"
+      fit
+    >
       {user ? (
         <div className="nav-profile" ref={wrapRef}>
           <button

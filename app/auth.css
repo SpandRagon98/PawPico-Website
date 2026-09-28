@@ -298,7 +298,17 @@ html[data-nav-tone="dark"] .nav-account-button-live { color: var(--hero-neon, #7
 
 /* The signed in state: an initials avatar that opens a small profile card
    (name, email, log out), portalled to <body> since the glass pane around
-   it clips overflow. */
+   it clips overflow.
+   The pane's own `fit` sizing only sets its width to the content's; the
+   island row still forces every pane to a shared height (nav-dock-islands
+   .nav-glass), so a small avatar came out as a short pill, not a circle.
+   !important here beats that height and GlassSurface's own inline width,
+   so the pane is exactly as tall as it is wide. */
+.nav-glass-avatar {
+  width: 44px !important;
+  height: 44px !important;
+  flex: none;
+}
 .nav-profile {
   position: relative;
   display: inline-flex;
