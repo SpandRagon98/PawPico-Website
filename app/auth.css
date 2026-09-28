@@ -97,8 +97,10 @@
   box-shadow: inset 0 2px 0 #fff, 0 6px 16px rgba(20, 44, 26, .14);
 }
 .auth-badge img {
-  width: 100%;
-  height: 100%;
+  /* Short of 100%: object-fit: contain alone fills the square frame edge to
+     edge, so the round mask below cuts into the ears at the corners. */
+  width: 84%;
+  height: 84%;
   object-fit: contain;
   image-rendering: pixelated;
 }
@@ -294,15 +296,92 @@ html[data-nav-tone="dark"] .nav-account-button:hover {
 }
 html[data-nav-tone="dark"] .nav-account-button-live { color: var(--hero-neon, #74ff2a); }
 
-.nav-account-name {
-  max-width: 14ch;
+/* The signed in state: an initials avatar that opens a small profile card
+   (name, email, log out), portalled to <body> since the glass pane around
+   it clips overflow. */
+.nav-profile {
+  position: relative;
+  display: inline-flex;
+}
+.nav-profile-trigger {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+}
+.nav-profile-avatar {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--hero-accent, #2c7a00);
+  color: #f4fbef;
+  font: 800 12px/1 var(--mono, monospace);
+  letter-spacing: .02em;
+  transition: transform 160ms ease;
+}
+.nav-profile-trigger:hover .nav-profile-avatar { transform: scale(1.07); }
+html[data-nav-tone="dark"] .nav-profile-avatar { background: var(--hero-neon, #74ff2a); color: #0f1f0a; }
+
+.nav-profile-menu {
+  position: absolute;
+  z-index: 300;
+  width: 232px;
+  margin: 0;
+  padding: 14px 16px;
+  border: 1px solid rgba(255, 255, 255, .9);
+  border-radius: 20px;
+  background: #fff;
+  box-shadow: 0 24px 60px rgba(14, 32, 20, .24);
+  color: var(--hero-ink, #16321f);
+  text-align: left;
+  /* A dedicated keyframe, not auth-step: that one animates transform to
+     `none` at its end state, which would silently cancel the translateX
+     below (an animation's own transform wins over the static property). */
+  animation: nav-profile-in 200ms cubic-bezier(.22, .8, .28, 1) both;
+}
+@keyframes nav-profile-in {
+  from { opacity: 0; transform: translateX(-100%) translateY(8px); }
+  to { opacity: 1; transform: translateX(-100%); }
+}
+.nav-profile-name {
+  margin: 0 0 2px;
   overflow: hidden;
-  padding-left: 12px;
   font-weight: 700;
-  font-size: 11px;
+  font-size: 13px;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+.nav-profile-email {
+  margin: 0 0 12px;
+  overflow: hidden;
+  color: #6b7a70;
+  font-size: 11.5px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.nav-profile-logout {
+  display: flex;
+  width: 100%;
+  min-height: 32px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(22, 50, 31, .14);
+  border-radius: 999px;
+  background: transparent;
+  color: inherit;
+  font: 650 11px/1 var(--mono, monospace);
+  letter-spacing: .03em;
+  cursor: pointer;
+  transition: background 160ms ease, color 160ms ease;
+}
+.nav-profile-logout:hover { background: rgba(211, 47, 47, .08); color: #b3262f; }
 
 @media (max-width: 960px) {
   .nav-glass-account { display: none; }

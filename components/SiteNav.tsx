@@ -1,6 +1,8 @@
 "use client";
 
 import Image from "next/image";
+import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { GlassSurface } from "../app/GlassSurface";
 import { sitePath } from "../lib/site-path";
 import { useAuth } from "./AuthProvider";
@@ -15,8 +17,17 @@ import { useAuth } from "./AuthProvider";
 
 const FACE_LOGO_ASSET = "/cat/mewmuze-face-logo-hd.png";
 
+/** "Spandan Talukdar" -> "ST", "mewmuze" (no name) -> "M". */
+function initialsFor(user: { name: string; email: string }): string {
+  const words = user.name.trim().split(/\s+/).filter(Boolean);
+  if (words.length > 0) {
+    return words.slice(0, 2).map((word) => word[0]!.toUpperCase()).join("");
+  }
+  return (user.email[0] ?? "?").toUpperCase();
+}
+
 /**
- * Log in / Sign up, or who you are signed in as. Always present.
+ * Log in / Sign up, or an initials avatar that opens a small profile card.
  *
  * It is its own liquid-glass island, the same pane the links and the brand sit
  * in, so the three read as one bar rather than a bar with a plain button
@@ -25,18 +36,92 @@ const FACE_LOGO_ASSET = "/cat/mewmuze-face-logo-hd.png";
 function AccountControl() {
   const { state, requestSignIn, logOut } = useAuth();
   const user = state.status === "ready" ? state.account.user : null;
+  const [open, setOpen] = useState(false);
+  const [menuPos, setMenuPos] = useState<{ top: number; left: number } | null>(null);
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  const toggleMenu = () => {
+    if (open) {
+      setOpen(false);
+      return;
+    }
+    const rect = triggerRef.current?.getBoundingClientRect();
+    if (rect) {
+      // Document coordinates, so the card scrolls with the trigger instead
+      // of drifting: this island is not position: fixed like the links are.
+      setMenuPos({ top: rect.bottom + window.scrollY + 10, left: rect.right + window.scrollX });
+    }
+    setOpen(true);
+  };
+
+  useEffect(() => {
+    if (!open) return;
+    const onPointerDown = (event: PointerEvent) => {
+      const target = event.target as Node;
+      if (!wrapRef.current?.contains(target) && !menuRef.current?.contains(target)) setOpen(false);
+    };
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setOpen(false);
+    };
+    const onResize = () => setOpen(false);
+    document.addEventListener("pointerdown", onPointerDown);
+    document.addEventListener("keydown", onKeyDown);
+    window.addEventListener("resize", onResize);
+    return () => {
+      document.removeEventListener("pointerdown", onPointerDown);
+      document.removeEventListener("keydown", onKeyDown);
+      window.removeEventListener("resize", onResize);
+    };
+  }, [open]);
+
+  // Signing out closes the card instead of leaving it open on nothing.
+  useEffect(() => {
+    if (!user) setOpen(false);
+  }, [user]);
 
   return (
     <GlassSurface className="nav-glass nav-glass-account" variant="navigation" fit>
       {user ? (
-        <span className="nav-account">
-          <span className="nav-account-name" title={user.email}>
-            {user.name || user.email}
-          </span>
-          <button className="nav-account-button" type="button" onClick={() => void logOut()}>
-            Log out
+        <div className="nav-profile" ref={wrapRef}>
+          <button
+            ref={triggerRef}
+            className="nav-profile-trigger"
+            type="button"
+            onClick={toggleMenu}
+            aria-haspopup="true"
+            aria-expanded={open}
+            aria-label={`Account: ${user.name || user.email}`}
+          >
+            <span className="nav-profile-avatar" aria-hidden="true">
+              {initialsFor(user)}
+            </span>
           </button>
-        </span>
+          {open && menuPos &&
+            createPortal(
+              <div
+                ref={menuRef}
+                className="nav-profile-menu"
+                role="menu"
+                style={{ top: menuPos.top, left: menuPos.left }}
+              >
+                <p className="nav-profile-name">{user.name || "MewMuze account"}</p>
+                <p className="nav-profile-email">{user.email}</p>
+                <button
+                  className="nav-profile-logout"
+                  type="button"
+                  onClick={() => {
+                    setOpen(false);
+                    void logOut();
+                  }}
+                >
+                  Log out
+                </button>
+              </div>,
+              document.body,
+            )}
+        </div>
       ) : (
         <span className="nav-account">
           <button className="nav-account-button" type="button" onClick={() => requestSignIn()}>
