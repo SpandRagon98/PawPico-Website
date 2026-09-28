@@ -119,12 +119,13 @@ function auth_start_session(PDO $db, int $userId): void
 
     $db->prepare(
         'INSERT INTO user_sessions (user_id, token_hash, created_at, expires_at, last_seen_at, ip_hash, user_agent)
-         VALUES (:user_id, :token_hash, :now, :expires, :now, :ip, :agent)'
+         VALUES (:user_id, :token_hash, :created_at, :expires, :last_seen_at, :ip, :agent)'
     )->execute([
         ':user_id' => $userId,
         ':token_hash' => hash('sha256', $token),
-        ':now' => $now->format('Y-m-d H:i:s'),
+        ':created_at' => $now->format('Y-m-d H:i:s'),
         ':expires' => $expiresAt->format('Y-m-d H:i:s'),
+        ':last_seen_at' => $now->format('Y-m-d H:i:s'),
         ':ip' => auth_client_ip_hash(),
         ':agent' => substr((string)($_SERVER['HTTP_USER_AGENT'] ?? ''), 0, 255),
     ]);

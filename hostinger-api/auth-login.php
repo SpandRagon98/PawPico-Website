@@ -61,8 +61,12 @@ try {
             ->execute([':hash' => password_hash($password, PASSWORD_DEFAULT), ':id' => $user['id']]);
     }
 
-    $db->prepare('UPDATE users SET failed_attempts = 0, locked_until = NULL, last_login_at = :now, updated_at = :now WHERE id = :id')
-        ->execute([':now' => $now->format('Y-m-d H:i:s'), ':id' => $user['id']]);
+    $db->prepare('UPDATE users SET failed_attempts = 0, locked_until = NULL, last_login_at = :login_at, updated_at = :updated_at WHERE id = :id')
+        ->execute([
+            ':login_at' => $now->format('Y-m-d H:i:s'),
+            ':updated_at' => $now->format('Y-m-d H:i:s'),
+            ':id' => $user['id'],
+        ]);
 
     auth_start_session($db, (int)$user['id']);
 

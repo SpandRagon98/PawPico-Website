@@ -29,7 +29,7 @@ try {
     $now = (new DateTimeImmutable('now'))->format('Y-m-d H:i:s');
     $insert = $db->prepare(
         'INSERT INTO users (email, password_hash, full_name, created_at, updated_at)
-         VALUES (:email, :hash, :name, :now, :now)'
+         VALUES (:email, :hash, :name, :created_at, :updated_at)'
     );
 
     try {
@@ -37,7 +37,8 @@ try {
             ':email' => $email,
             ':hash' => password_hash($password, PASSWORD_DEFAULT),
             ':name' => $name !== '' ? $name : null,
-            ':now' => $now,
+            ':created_at' => $now,
+            ':updated_at' => $now,
         ]);
     } catch (PDOException $error) {
         // 23000 is the duplicate key on the unique email column.
